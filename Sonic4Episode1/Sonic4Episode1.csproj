@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--Project was exported from assembly: C:\Users\wamwo\Documents\GitHub\Sonic4Ep1-WP7-Decompilation\XAP\Sonic4 ep I.dll-->
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{99FAA8FF-D5E6-4245-8E9E-53F96B8E6C6D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Sonic4Episode1</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <ApplicationVersion>1.2.0.0</ApplicationVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MonoGame.Framework, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\MonoGame.Framework.WindowsDX.3.7.1.189\lib\net45\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework.Net, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.4.0.1\lib\net45\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct2D1, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.Direct2D1.4.0.1\lib\net45\SharpDX.Direct2D1.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.Direct3D11.4.0.1\lib\net45\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D9, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.Direct3D9.4.0.1\lib\net45\SharpDX.Direct3D9.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.DXGI.4.0.1\lib\net45\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Mathematics, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.Mathematics.4.0.1\lib\net45\SharpDX.Mathematics.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.MediaFoundation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.MediaFoundation.4.0.1\lib\net45\SharpDX.MediaFoundation.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XAudio2, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.XAudio2.4.0.1\lib\net45\SharpDX.XAudio2.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XInput, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>packages\SharpDX.XInput.4.0.1\lib\net45\SharpDX.XInput.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.InteropServices">
+      <HintPath>C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Runtime.InteropServices.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
+      <HintPath>C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.WindowsRuntime">
+      <HintPath>C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Runtime.InteropServices.WindowsRuntime.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.WindowsRuntime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Runtime.WindowsRuntime.dll</HintPath>
+    </Reference>
+    <Reference Include="Windows">
+      <HintPath>C:\Program Files (x86)\Windows Kits\8.1\References\CommonConfiguration\Neutral\Annotated\Windows.winmd</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppMain.cctor.cs" />
+    <Compile Include="UIntBuffer.cs" />
+    <Compile Include="XBOXLive.cs" />
+    <Compile Include="ByteBuffer.cs" />
+    <Compile Include="IntBuffer.cs" />
+    <Compile Include="UShortBuffer.cs" />
+    <Compile Include="AppMain.cs" />
+    <Compile Include="DoubleType`2.cs" />
+    <Compile Include="LiveFeature.cs" />
+    <Compile Include="Sonic4Ep1.cs" />
+    <Compile Include="SaveState.cs" />
+    <Compile Include="Upsell.cs" />
+    <Compile Include="ShortBuffer.cs" />
+    <Compile Include="GLIndexBuffer_ByteBuffer.cs" />
+    <Compile Include="StreamExtensions.cs" />
+    <Compile Include="GLVector3Data.cs" />
+    <Compile Include="FloatBuffer.cs" />
+    <Compile Include="TripleType`3.cs" />
+    <Compile Include="GLPositionData.cs" />
+    <Compile Include="GLTexCoordData.cs" />
+    <Compile Include="GLColorData.cs" />
+    <Compile Include="QuadType`4.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="GLNormalData.cs" />
+    <Compile Include="GLBlendIdxData.cs" />
+    <Compile Include="GLBlendWeightData.cs" />
+    <Compile Include="gs\backup\GSS_BACKUP.cs" />
+    <Compile Include="gs\backup\SBackup.cs" />
+    <Compile Include="gs\backup\SSystem.cs" />
+    <Compile Include="gs\backup\SStage.cs" />
+    <Compile Include="gs\backup\SSpecial.cs" />
+    <Compile Include="gs\backup\SOption.cs" />
+    <Compile Include="gs\backup\SSpecialSolo.cs" />
+    <Compile Include="gs\backup\SStageSolo.cs" />
+    <Compile Include="gs\backup\EEmeraldStage.cs" />
+    <Compile Include="gs\backup\ESpecialStage.cs" />
+    <Compile Include="setting\file.cs" />
+    <Compile Include="setting\main.cs" />
+    <Compile Include="Sonic4ep1\Strings.cs" />
+    <Compile Include="mpp\OpenGL.cs" />
+    <Compile Include="mpp\MppBitConverter.cs" />
+    <Compile Include="mpp\BlendStateExt.cs" />
+    <Compile Include="mpp\DepthStencilStateExt.cs" />
+    <Compile Include="mpp\SamplerStateExt.cs" />
+    <Compile Include="mpp\RasterizerStateEx.cs" />
+    <Compile Include="dbg\CPadEmu.cs" />
+    <Compile Include="accel\CArray2`1.cs" />
+    <Compile Include="accel\CArray3`1.cs" />
+    <Compile Include="accel\CArray4`1.cs" />
+    <Compile Include="accel\CCircularBuffer`1.cs" />
+    <Compile Include="ao\CProc`1.cs" />
+    <Compile Include="GameFramework\GameObjectBase.cs" />
+    <Compile Include="GameFramework\SpriteObject.cs" />
+    <Compile Include="GameFramework\TextObject.cs" />
+    <Compile Include="GameFramework\BenchmarkObject.cs" />
+    <Compile Include="er\CTrgAoAction.cs" />
+    <Compile Include="er\CTrgBase`1.cs" />
+    <Compile Include="er\CTrgState.cs" />
+    <Compile Include="er\CTrgRect.cs" />
+    <Compile Include="er\CTrgFlick.cs" />
+    <Compile Include="er\IntPair.cs" />
+    <Compile Include="er\CTrgStateEx.cs" />
+    <Compile Include="er\web\erWeb.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Microsoft\Xna\Framework.RuntimeProfile" />
+    <EmbeddedResource Include="Microsoft\Xna\Framework.XlastConfiguration" />
+    <EmbeddedResource Include="Sonic4ep1\Strings.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="packages\MonoGame.Framework.WindowsDX.3.7.1.189\build\MonoGame.Framework.WindowsDX.targets" Condition="Exists('packages\MonoGame.Framework.WindowsDX.3.7.1.189\build\MonoGame.Framework.WindowsDX.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\MonoGame.Framework.WindowsDX.3.7.1.189\build\MonoGame.Framework.WindowsDX.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\MonoGame.Framework.WindowsDX.3.7.1.189\build\MonoGame.Framework.WindowsDX.targets'))" />
+  </Target>
+</Project>

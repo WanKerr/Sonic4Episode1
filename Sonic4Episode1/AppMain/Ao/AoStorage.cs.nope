@@ -1,0 +1,367 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Xml.Serialization;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
+using mpp;
+
+public partial class AppMain
+{
+    private static void AoStorageInit()
+    {
+        AppMain.AOS_STORAGE global = AppMain.aoStorageGetGlobal();
+        if (global.initialized)
+            return;
+        global.initialized = false;
+        global.state = 0;
+        global.save_success = false;
+        global.save_buf = (byte[])null;
+        global.save_size = 0U;
+        global.load_success = false;
+        global.load_buf = (byte[])null;
+        global.load_size = 0U;
+        global.del_success = false;
+        global.tcb = (AppMain.AMS_TCB)null;
+        global.initialized = true;
+    }
+
+    private static void AoStorageExit()
+    {
+        AppMain.AOS_STORAGE global = AppMain.aoStorageGetGlobal();
+        if (!global.initialized)
+            return;
+        if (global.tcb != null)
+        {
+            AppMain.amTaskDelete(global.tcb);
+            global.tcb = (AppMain.AMS_TCB)null;
+        }
+        global.initialized = false;
+        global.state = 0;
+        global.save_success = false;
+        global.save_buf = (byte[])null;
+        global.save_size = 0U;
+        global.load_success = false;
+        global.load_buf = (byte[])null;
+        global.load_size = 0U;
+        global.del_success = false;
+        global.tcb = (AppMain.AMS_TCB)null;
+        global.initialized = false;
+    }
+
+    private static void AoStorageSetSaveMsgFile(string file)
+    {
+    }
+
+    private static byte[] AoStorageGetSaveMsgFile()
+    {
+        return (byte[])null;
+    }
+
+    private static bool AoStorageIsError()
+    {
+        return AppMain.aoStorageGetGlobal().error != 0;
+    }
+
+    private static int AoStorageGetError()
+    {
+        return AppMain.aoStorageGetGlobal().error;
+    }
+
+    private static void AoStorageClearError()
+    {
+        AppMain.aoStorageGetGlobal().error = 0;
+    }
+
+    private static void AoStorageSaveStart(gs.Sonic4Save save, bool is_first, bool is_new)
+    {
+        AppMain.AOS_STORAGE global = AppMain.aoStorageGetGlobal();
+        if (global.state != 0)
+        {
+            AppMain.aoStorageSetError(5);
+        }
+        else
+        {
+            global.state = 1;
+            global.save_success = false;
+            global.save = save;
+            AppMain.aoStorageSaveThread();
+            global.tcb = AppMain.amTaskMake(new AppMain.TaskProc(AppMain.aoStorageSaveTaskProcedure), (AppMain.TaskProc)null, 0U, 0U, 0U, "aoStorage::Save");
+            AppMain.amTaskStart(global.tcb);
+        }
+    }
+
+    private static bool AoStorageSaveFreeSpaceIsEnough()
+    {
+        return true;
+    }
+
+    private static bool AoStorageSaveIsFinished()
+    {
+        return AppMain.aoStorageGetGlobal().state != 1;
+    }
+
+    private static bool AoStorageSaveIsSuccessed()
+    {
+        return AppMain.aoStorageGetGlobal().save_success;
+    }
+
+    private static gs.Sonic4Save AoStorageLoadStart()
+    {
+        AppMain.AOS_STORAGE global = AppMain.aoStorageGetGlobal();
+        if (global.state != 0)
+        {
+            AppMain.aoStorageSetError(5);
+            return null;
+        }
+        else
+        {
+            global.state = 2;
+            global.load_success = false;
+            AppMain.aoStorageLoadThread();
+            var save = global.save;
+
+            global.tcb = AppMain.amTaskMake(new AppMain.TaskProc(AppMain.aoStorageLoadTaskProcedure), (AppMain.TaskProc)null, 0U, 0U, 0U, "aoStorage::Load");
+            AppMain.amTaskStart(global.tcb);
+
+            return save;
+        }
+    }
+
+    private static bool AoStorageLoadIsFinished()
+    {
+        return AppMain.aoStorageGetGlobal().state != 2;
+    }
+
+    private static bool AoStorageLoadIsSuccessed()
+    {
+        return AppMain.aoStorageGetGlobal().load_success;
+    }
+
+    private static bool AoStorageLoadIsCreaterOwn()
+    {
+        return true;
+    }
+
+    private static void AoStorageDeleteStart()
+    {
+        AppMain.AOS_STORAGE global = AppMain.aoStorageGetGlobal();
+        if (global.state != 0)
+        {
+            AppMain.aoStorageSetError(5);
+        }
+        else
+        {
+            AppMain.AoStorageClearError();
+            string str = AppMain.aoStorageAllocSaveFilePath();
+            str = Path.Combine(AppMain.storePath, str);
+            try
+            {
+                if (!File.Exists(str))
+                {
+                    global.del_success = false;
+                }
+                else
+                {
+                    File.Delete(str);
+                    global.del_success = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                global.del_success = false;
+            }
+            AppMain.aoStorageFreeSaveFilePath(str);
+            global.state = 0;
+        }
+    }
+
+    private static bool AoStorageDeleteIsFinished()
+    {
+        return AppMain.aoStorageGetGlobal().state != 3;
+    }
+
+    private static bool AoStorageDeleteIsSuccessed()
+    {
+        return AppMain.aoStorageGetGlobal().del_success;
+    }
+
+    private static bool AoStorageIsExecuteReal()
+    {
+        return true;
+    }
+
+    private static string aoStorageAllocSaveFilePath()
+    {
+        return AppMain.g_ao_storage_filename;
+    }
+
+    private static void aoStorageFreeSaveFilePath(string path)
+    {
+    }
+
+    private static uint AoStorageSaveObj(string path, gs.Sonic4Save save)
+    {
+        try
+        {
+            var str = Path.Combine(AppMain.storePath, path);
+            var writer = new XmlSerializer(typeof(gs.Sonic4Save));
+            using (var storageFileStream = File.Open(str, FileMode.OpenOrCreate))
+            {
+                storageFileStream.SetLength(0);
+                writer.Serialize(storageFileStream, save);
+            }
+            return 0;
+        }
+        catch (Exception ex)
+        {
+        }
+        return 1;
+    }
+
+
+    private static uint AoStorageSaveMm(string path, byte[] data, int size)
+    {
+        try
+        {
+            var str = Path.Combine(AppMain.storePath, path);
+            using (var storageFileStream = File.Open(str, FileMode.OpenOrCreate))
+                storageFileStream.Write(data, 0, size);
+            return 0;
+        }
+        catch (Exception ex)
+        {
+        }
+        return 1;
+    }
+
+    private static void aoStorageSaveThread()
+    {
+        AppMain.AOS_STORAGE global = AppMain.aoStorageGetGlobal();
+        string path = AppMain.aoStorageAllocSaveFilePath();
+        uint num = 0;
+        if (global.save != null)
+        {
+            num = AoStorageSaveObj(path, global.save);
+        }
+        else
+        {
+            num = AppMain.AoStorageSaveMm(path, global.save_buf, (int)global.save_size);
+        }
+
+        AppMain.aoStorageFreeSaveFilePath(path);
+        if (num == 0U)
+            global.save_success = true;
+        else
+            AppMain.aoStorageSetError(2);
+    }
+
+    private static void aoStorageSaveTaskProcedure(AppMain.AMS_TCB tcb)
+    {
+        AppMain.AOS_STORAGE global = AppMain.aoStorageGetGlobal();
+        AppMain.amTaskDelete(tcb);
+        global.save_buf = (byte[])null;
+        global.save_size = 0U;
+        global.save = null;
+        global.state = 0;
+        global.tcb = (AppMain.AMS_TCB)null;
+    }
+
+    private static uint AoStorageLoadMm(string path, byte[] data, uint size)
+    {
+        try
+        {
+            var str = Path.Combine(AppMain.storePath, path);
+            if (!File.Exists(str))
+                return 1;
+            using (var storageFileStream = File.Open(str, FileMode.Open))
+            {
+                byte[] buffer = new byte[32768];
+                int length = 0;
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    while (true)
+                    {
+                        int count = storageFileStream.Read(buffer, 0, buffer.Length);
+                        if (count > 0)
+                        {
+                            length = count;
+                            memoryStream.Write(buffer, 0, count);
+                        }
+                        else
+                            break;
+                    }
+                    Array.Copy((Array)memoryStream.ToArray(), (Array)data, length);
+                }
+            }
+            return 0;
+        }
+        catch (Exception ex)
+        {
+        }
+        return 1;
+    }
+
+    private static uint AoStorageLoadObj(string path)
+    {
+        try
+        {
+            var str = Path.Combine(AppMain.storePath, path);
+            if (!File.Exists(str))
+                return 1;
+
+            var global = aoStorageGetGlobal();
+            var serializer = new XmlSerializer(typeof(gs.Sonic4Save));
+
+            using (var storageFileStream = File.Open(str, FileMode.Open))
+            {
+                global.save = (gs.Sonic4Save)serializer.Deserialize(storageFileStream);
+            }
+            return 0;
+        }
+        catch (Exception ex)
+        {
+        }
+        return 1;
+    }
+
+    private static void aoStorageLoadThread()
+    {
+        AppMain.AOS_STORAGE global = AppMain.aoStorageGetGlobal();
+        string path = AppMain.aoStorageAllocSaveFilePath();
+        uint num = AppMain.AoStorageLoadObj(path);
+        AppMain.aoStorageFreeSaveFilePath(path);
+        if (num == 0U)
+            global.load_success = true;
+        else
+            AppMain.aoStorageSetError(1);
+    }
+
+    private static void aoStorageLoadTaskProcedure(AppMain.AMS_TCB tcb)
+    {
+        AppMain.AOS_STORAGE global = AppMain.aoStorageGetGlobal();
+        AppMain.amTaskDelete(tcb);
+        global.load_buf = (byte[])null;
+        global.load_size = 0U;
+        global.state = 0;
+        global.tcb = (AppMain.AMS_TCB)null;
+    }
+
+    private static AppMain.AOS_STORAGE aoStorageGetGlobal()
+    {
+        return AppMain.g_ao_storage;
+    }
+
+    private static void aoStorageSetError(int error)
+    {
+        if (AppMain.g_ao_storage.error != 0 && AppMain.g_ao_storage.error != 5)
+            return;
+        AppMain.g_ao_storage.error = error;
+    }
+
+
+}

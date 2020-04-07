@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sonic4Episode1", "Sonic4Episode1.csproj", "{99FAA8FF-D5E6-4245-8E9E-53F96B8E6C6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sonic4Episode1.Win32", "..\Sonic4Episode1.Win32\Sonic4Episode1.Win32.csproj", "{A62267CF-9F86-45EE-9DAE-41555B2CB9A7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{99FAA8FF-D5E6-4245-8E9E-53F96B8E6C6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99FAA8FF-D5E6-4245-8E9E-53F96B8E6C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99FAA8FF-D5E6-4245-8E9E-53F96B8E6C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99FAA8FF-D5E6-4245-8E9E-53F96B8E6C6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A62267CF-9F86-45EE-9DAE-41555B2CB9A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A62267CF-9F86-45EE-9DAE-41555B2CB9A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A62267CF-9F86-45EE-9DAE-41555B2CB9A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A62267CF-9F86-45EE-9DAE-41555B2CB9A7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54427269-D7E5-4634-B9DC-FD798DC18031}
+	EndGlobalSection
+EndGlobal
