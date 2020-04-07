@@ -68,7 +68,7 @@ public partial class AppMain
     private static void gsInitProcLoadLoadingFile(AppMain.GSS_INIT_WORK work)
     {
         if (work.fs == null)
-            work.fs = AppMain.amFsReadBackground("DEMO/LOADING/D_LOADING.AMB");
+            work.fs = AppMain.amFsReadBackground(AppMain.g_gs_init_loading_file_path);
         if (!AppMain.amFsIsComplete(work.fs))
             return;
         AppMain.DmLoadingBuild(work.fs);

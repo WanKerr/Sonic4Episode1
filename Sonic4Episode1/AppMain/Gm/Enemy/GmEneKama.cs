@@ -417,7 +417,7 @@ public partial class AppMain
             AppMain.GmComEfctSetDispOffsetF(efct_work, 0.0f, -20f, 0.0f);
         gmsEneKamaWork.ene_3d_work.ene_com.enemy_flag |= 65536U;
         gmsEneKamaWork.timer = 180;
-        AppMain.GmSoundPlaySE("Boss2_03");
+        AppMain.GmSoundPlaySE(AppMain.GMD_ENE_KAMA_SE_BOMB);
         obj_work.disp_flag |= 32U;
         obj_work.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmEneKamaFlashEnd);
         AppMain.OBS_RECT_WORK pRec = gmsEneKamaWork.ene_3d_work.ene_com.rect_work[1];
@@ -531,7 +531,7 @@ public partial class AppMain
         pRec.flag |= 4U;
         obj_work.flag |= 512U;
         obj_work.pos.z = 655360;
-        AppMain.GmSoundPlaySE("Kama");
+        AppMain.GmSoundPlaySE(AppMain.GMD_ENE_KAMA_SE_KAMA);
     }
 
     private static void gmEneKamaHandAttackMain(AppMain.OBS_OBJECT_WORK obj_work)

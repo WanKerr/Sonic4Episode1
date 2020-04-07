@@ -241,7 +241,7 @@ public partial class AppMain
                 AppMain.amMotionSetup(out motion, ambChunk);
                 amb.buf[index] = (object)motion;
             }
-            else if (extension.Equals(".AMB", StringComparison.OrdinalIgnoreCase))
+            else if (extension.Equals(AppMain.g_dm_buy_screen_amb_ext, StringComparison.OrdinalIgnoreCase))
             {
                 amb.buf[index] = (object)AppMain.readAMBFile(ambChunk);
                 AppMain.amPreLoadAmbItems((AppMain.AMS_AMB_HEADER)amb.buf[index]);

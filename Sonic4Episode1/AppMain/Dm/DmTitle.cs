@@ -1170,7 +1170,7 @@ public partial class AppMain
         CTrgAoAction trgGame = main_work.trg_game;
         if (!trgGame.GetState(0U)[10] || !trgGame.GetState(0U)[1])
             return;
-        string url = AppMain.GsEnvGetLanguage() != 0 ? "http://sega.com/apps" : "http://sega.jp/kt/microsoft/smart/";
+        string url = AppMain.GsEnvGetLanguage() != 0 ? AppMain.c_url : "http://sega.jp/kt/microsoft/smart/";
         AppMain.DmSoundPlaySE("Ok");
         erWeb.StartWeb(url);
     }

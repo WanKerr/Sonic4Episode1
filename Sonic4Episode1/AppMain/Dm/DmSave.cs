@@ -176,7 +176,7 @@ public partial class AppMain
 
     private static void dmSaveLoadRequest(AppMain.DMS_SAVE_MAIN_WORK main_work)
     {
-        main_work.arc_cmn_amb_fs[0] = AppMain.amFsReadBackground("DEMO/CMN/D_CMN_WIN.AMB");
+        main_work.arc_cmn_amb_fs[0] = AppMain.amFsReadBackground(AppMain.DMD_MANUAL_CMN_DATA_FILENAME);
         main_work.arc_cmn_amb_fs[1] = AppMain.amFsReadBackground(AppMain.dm_save_menu_cmn_lng_amb_name_tbl[AppMain.GsEnvGetLanguage()]);
         main_work.proc_menu_update = new AppMain._saveproc_input_update(AppMain.dmSaveProcLoadWait);
     }

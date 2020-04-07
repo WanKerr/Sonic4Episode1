@@ -1974,7 +1974,7 @@ public partial class AppMain
         AppMain.gmBoss2EffBallBombPartInit(obj_work.pos, parentObj, -4096);
         ((AppMain.OBS_OBJECT_WORK)AppMain.GmEfctCmnEsCreate((AppMain.OBS_OBJECT_WORK)null, 10)).pos.Assign(obj_work.pos);
         obj_work.flag |= 4U;
-        AppMain.GmSoundPlaySE("Boss2_03");
+        AppMain.GmSoundPlaySE(AppMain.GMD_ENE_KAMA_SE_BOMB);
     }
 
     

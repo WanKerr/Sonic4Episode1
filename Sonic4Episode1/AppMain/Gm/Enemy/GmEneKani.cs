@@ -145,7 +145,7 @@ public partial class AppMain
         obj_work.disp_flag &= 4294967291U;
         obj_work.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmEneKaniAttackMain);
         obj_work.spd.x = 0;
-        AppMain.GmSoundPlaySE("Kani");
+        AppMain.GmSoundPlaySE(AppMain.GMD_ENE_KANI_SE_PUNCH);
     }
 
     public static void gmEneKaniAttackMain(AppMain.OBS_OBJECT_WORK obj_work)

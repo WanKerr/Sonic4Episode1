@@ -338,7 +338,7 @@ public class LiveFeature : XBOXLive
             spriteBatch.Draw(LiveFeature.titleImg, new Rectangle(15, 22, 128, 16), Color.White);
             if (AppMain.dm_xbox_show_progress == 100)
             {
-                string text = LiveFeature.achievements_current.ToString() + "/" + (object)LiveFeature.achievements_total + " G";
+                string text = LiveFeature.achievements_current.ToString() + AppMain.AMD_FS_PATH_CHAR + (object)LiveFeature.achievements_total + " G";
                 Vector2 vector2 = fonts[1].MeasureString(text);
                 spriteBatch.DrawString(fonts[0], text, new Vector2((float)(240 - ((int)vector2.X >> 1)), 60f), Color.White);
             }

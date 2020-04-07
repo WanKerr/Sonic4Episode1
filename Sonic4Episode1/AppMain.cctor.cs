@@ -17565,7 +17565,7 @@ public partial class AppMain
         new AppMain.GMS_GAMEDAT_LOAD_DATA("G_SS/GMK/GMK_SS_ARROW_TEX.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 985),
         new AppMain.GMS_GAMEDAT_LOAD_DATA("G_SS/GMK/GMK_SS_ARROW_MAT.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 986),
         new AppMain.GMS_GAMEDAT_LOAD_DATA("G_ZONE2/MSG/G_MSG_Z2.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 991),
-        new AppMain.GMS_GAMEDAT_LOAD_DATA("DEMO/CMN/D_CMN_WIN.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 992)
+        new AppMain.GMS_GAMEDAT_LOAD_DATA(AppMain.DMD_MANUAL_CMN_DATA_FILENAME, new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 992)
         };
         AppMain.gm_gamedat_tbl_gimmick02_03 = new AppMain.GMS_GAMEDAT_LOAD_DATA[]
         {
@@ -17661,7 +17661,7 @@ public partial class AppMain
         new AppMain.GMS_GAMEDAT_LOAD_DATA("G_ZONE3/GMK/GMK_SW_WALL3_MAT.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 936),
         new AppMain.GMS_GAMEDAT_LOAD_DATA("G_ZONE3/GMK/GMK_SW_WALL3_TVX.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 937),
         new AppMain.GMS_GAMEDAT_LOAD_DATA("G_ZONE3/MSG/G_MSG_Z3.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 991),
-        new AppMain.GMS_GAMEDAT_LOAD_DATA("DEMO/CMN/D_CMN_WIN.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 992)
+        new AppMain.GMS_GAMEDAT_LOAD_DATA(AppMain.DMD_MANUAL_CMN_DATA_FILENAME, new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 992)
         };
         AppMain.gm_gamedat_tbl_gimmick03_03 = new AppMain.GMS_GAMEDAT_LOAD_DATA[]
         {
@@ -17952,7 +17952,7 @@ public partial class AppMain
         new AppMain.GMS_GAMEDAT_LOAD_DATA("G_ZONE2/GMK/GMK_BOBBIN_MTN.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 865),
         new AppMain.GMS_GAMEDAT_LOAD_DATA("G_ZONE2/GMK/GMK_BOBBIN_MAT.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 866),
         new AppMain.GMS_GAMEDAT_LOAD_DATA("G_SS/MSG/G_MSG_SS.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 991),
-        new AppMain.GMS_GAMEDAT_LOAD_DATA("DEMO/CMN/D_CMN_WIN.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 992)
+        new AppMain.GMS_GAMEDAT_LOAD_DATA(AppMain.DMD_MANUAL_CMN_DATA_FILENAME, new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 992)
         };
         AppMain.gm_gamedat_tbl_gimmick_ending = new AppMain.GMS_GAMEDAT_LOAD_DATA[]
         {
@@ -17963,7 +17963,7 @@ public partial class AppMain
         new AppMain.GMS_GAMEDAT_LOAD_DATA("G_COM/RING/RING_MDL.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 956),
         new AppMain.GMS_GAMEDAT_LOAD_DATA("G_COM/RING/RING_TEX.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 957),
         new AppMain.GMS_GAMEDAT_LOAD_DATA("DEMO/STFRL/D_STFRL_FONT.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 958),
-        new AppMain.GMS_GAMEDAT_LOAD_DATA("DEMO/CMN/D_CMN_WIN.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 959),
+        new AppMain.GMS_GAMEDAT_LOAD_DATA(AppMain.DMD_MANUAL_CMN_DATA_FILENAME, new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 959),
         new AppMain.GMS_GAMEDAT_LOAD_DATA("DEMO/STFRL/D_STFRL_IMG000.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 960),
         new AppMain.GMS_GAMEDAT_LOAD_DATA("DEMO/CMN/D_CMN_MSG_JP.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 961),
         new AppMain.GMS_GAMEDAT_LOAD_DATA("DEMO/CMN/D_CMN_MSG_US.AMB", new AppMain.GMS_GAMEDAT_LOAD_DATA._alloc_(AppMain.gmGameDatLoadAllocHead), null, new AppMain.GMS_GAMEDAT_LOAD_DATA._proc_post_(AppMain.gmGameDatLoadProcPostGimmick), 962),
@@ -19206,11 +19206,11 @@ public partial class AppMain
         "snd_sng_z4a2",
         "snd_sng_z4a3",
         "snd_sng_boss1",
-        "snd_sng_boss2",
-        "snd_sng_boss2",
-        "snd_sng_boss2",
-        "snd_sng_boss2",
-        "snd_sng_boss2",
+        AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME,
+        AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME,
+        AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME,
+        AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME,
+        AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME,
         "snd_sng_special",
         "snd_sng_special",
         "snd_sng_special",
@@ -19238,11 +19238,11 @@ public partial class AppMain
         "snd_sng_z4a2_speedup",
         "snd_sng_z4a3_speedup",
         "snd_sng_boss1",
-        "snd_sng_boss2",
-        "snd_sng_boss2",
-        "snd_sng_boss2",
-        "snd_sng_boss2",
-        "snd_sng_boss2",
+        AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME,
+        AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME,
+        AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME,
+        AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME,
+        AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME,
         "snd_sng_special",
         "snd_sng_special",
         "snd_sng_special",
@@ -19269,7 +19269,7 @@ public partial class AppMain
         "snd_sng_z2a1",
         "snd_sng_z3a3",
         "snd_sng_z4a2",
-        "snd_sng_boss2",
+        AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME,
         "snd_sng_special"
         };
         AppMain.gm_sound_bgm_win_boss_wait_frame_list = new int[]
@@ -24039,9 +24039,9 @@ public partial class AppMain
         };
         AppMain.dm_title_menu_cmn_amb_name_tbl = new string[]
         {
-        "DEMO/CMN/D_CMN_BTN.AMB",
+        AppMain.g_dm_buy_screen_btn_amb_path,
         "DEMO/CMN/D_CMN_OBI.AMB",
-        "DEMO/CMN/D_CMN_WIN.AMB"
+        AppMain.DMD_MANUAL_CMN_DATA_FILENAME
         };
         AppMain.dm_title_menu_cmn_lng_amb_name_tbl = new string[]
         {
@@ -24146,14 +24146,14 @@ public partial class AppMain
         AppMain.dm_title_is_title_start = false;
         AppMain.dm_snd_bgm_player_tcb = null;
         AppMain.dm_snd_bgm_player_flag = 0U;
-        AppMain.DMD_OPT_CMN_DATA_FILENAME = "DEMO/CMN/D_CMN_WIN.AMB";
+        AppMain.DMD_OPT_CMN_DATA_FILENAME = AppMain.DMD_MANUAL_CMN_DATA_FILENAME;
         AppMain.DMD_OPT_DATA_FILENAME = "DEMO/OPT/D_OPTION.AMB";
         AppMain.dm_opt_menu_cmn_amb_name_tbl = new string[]
         {
         "DEMO/CMN/D_CMN_BG.AMB",
-        "DEMO/CMN/D_CMN_BTN.AMB",
+        AppMain.g_dm_buy_screen_btn_amb_path,
         "DEMO/CMN/D_CMN_OBI.AMB",
-        "DEMO/CMN/D_CMN_WIN.AMB"
+        AppMain.DMD_MANUAL_CMN_DATA_FILENAME
         };
         AppMain.dm_opt_menu_cmn_lng_amb_name_tbl = new string[]
         {
@@ -28098,9 +28098,9 @@ public partial class AppMain
         AppMain.dm_stgslct_menu_cmn_amb_name_tbl = new string[]
         {
         "DEMO/CMN/D_CMN_BG.AMB",
-        "DEMO/CMN/D_CMN_BTN.AMB",
+        AppMain.g_dm_buy_screen_btn_amb_path,
         "DEMO/CMN/D_CMN_OBI.AMB",
-        "DEMO/CMN/D_CMN_WIN.AMB"
+        AppMain.DMD_MANUAL_CMN_DATA_FILENAME
         };
         AppMain.dm_stgslct_menu_cmn_lng_amb_name_tbl = new string[]
         {
