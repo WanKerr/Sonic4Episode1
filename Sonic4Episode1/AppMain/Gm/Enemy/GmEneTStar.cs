@@ -274,7 +274,7 @@ public partial class AppMain
         gmsEnemy3DWork.ene_com.rect_work[1].flag &= 4294967291U;
         gmsEnemy3DWork.ene_com.rect_work[0].flag &= 4294967291U;
         gmsEnemy3DWork.ene_com.rect_work[2].flag &= 4294967291U;
-        AppMain.GmSoundPlaySE("Boss2_03");
+        AppMain.GmSoundPlaySE(AppMain.GMD_ENE_KAMA_SE_BOMB);
         gmsEnemy3DWork.ene_com.enemy_flag |= 65536U;
         AppMain.GlobalPool<AppMain.NNS_MATRIX>.Release(nnsMatrix1);
         AppMain.GlobalPool<AppMain.NNS_MATRIX>.Release(nnsMatrix2);

@@ -356,7 +356,7 @@ public partial class AppMain
 
     private void dmStgSlctLoadRequest(AppMain.DMS_STGSLCT_MAIN_WORK main_work)
     {
-        main_work.arc_amb_fs[0] = AppMain.amFsReadBackground("DEMO/STGSLCT/D_STGSLCT.AMB");
+        main_work.arc_amb_fs[0] = AppMain.amFsReadBackground(AppMain.DMD_STGSLCT_DATA_FILENAME);
         main_work.arc_amb_fs[1] = AppMain.amFsReadBackground(AppMain.dm_stgslct_main_lng_amb_name_tbl[AppMain.GsEnvGetLanguage()]);
         for (int index = 0; index < 4; ++index)
             main_work.arc_cmn_amb_fs[index] = AppMain.amFsReadBackground(AppMain.dm_stgslct_menu_cmn_amb_name_tbl[index]);

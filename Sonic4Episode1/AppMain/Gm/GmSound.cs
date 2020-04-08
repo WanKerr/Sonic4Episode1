@@ -175,7 +175,7 @@ public partial class AppMain
         AppMain.gm_sound_bgm_sub_scb = gmSoundBgmScb;
         AppMain.GsSoundScbSetVolume(AppMain.gm_sound_bgm_scb, 1f);
         AppMain.GsSoundScbSetSeqMute(AppMain.gm_sound_bgm_scb, false);
-        AppMain.GsSoundPlayBgm(AppMain.gm_sound_bgm_scb, "snd_sng_boss2", 15);
+        AppMain.GsSoundPlayBgm(AppMain.gm_sound_bgm_scb, AppMain.GMD_SOUND_ANGRY_BOSS_BGM_NAME, 15);
         AppMain.gm_sound_bgm_scb.flag |= 2147483648U;
         if (flag1)
             AppMain.GmSoundPauseStageBGM(0);
@@ -214,7 +214,7 @@ public partial class AppMain
         AppMain.gm_sound_bgm_sub_scb = gmSoundBgmScb;
         AppMain.GsSoundScbSetVolume(AppMain.gm_sound_bgm_scb, 1f);
         AppMain.GsSoundScbSetSeqMute(AppMain.gm_sound_bgm_scb, false);
-        AppMain.GsSoundPlayBgm(AppMain.gm_sound_bgm_scb, "snd_sng_final", 15);
+        AppMain.GsSoundPlayBgm(AppMain.gm_sound_bgm_scb, AppMain.GMD_SOUND_FINAL_BOSS_BGM_NAME, 15);
         AppMain.gm_sound_bgm_scb.flag |= 2147483648U;
         if (flag1)
             AppMain.GmSoundPauseStageBGM(0);
