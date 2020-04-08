@@ -1,0 +1,94 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.IO.IsolatedStorage;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
+using accel;
+using dbg;
+using er;
+using er.web;
+using gs;
+using gs.backup;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+using mpp;
+using setting;
+
+public partial class AppMain
+{
+    private class GMS_CLRDM_MAIN_WORK
+    {
+        public readonly AppMain.AMS_FS[] ama_fs = new AppMain.AMS_FS[2];
+        public readonly AppMain.AMS_FS[] amb_fs = new AppMain.AMS_FS[2];
+        public readonly AppMain.A2S_AMA_HEADER[] ama = new AppMain.A2S_AMA_HEADER[2];
+        public readonly AppMain.AMS_AMB_HEADER[] amb = new AppMain.AMS_AMB_HEADER[2];
+        public readonly AppMain.AOS_TEXTURE[] tex = AppMain.New<AppMain.AOS_TEXTURE>(2);
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] tex_up_act = new AppMain.GMS_COCKPIT_2D_WORK[5];
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] time_num_act = new AppMain.GMS_COCKPIT_2D_WORK[5];
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] ring_num_act = new AppMain.GMS_COCKPIT_2D_WORK[5];
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] total_num_act = new AppMain.GMS_COCKPIT_2D_WORK[9];
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] line_act = new AppMain.GMS_COCKPIT_2D_WORK[3];
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] record_time_num_act = new AppMain.GMS_COCKPIT_2D_WORK[7];
+        public readonly CTrgAoAction trg_retry = new CTrgAoAction();
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] btn_retry = new AppMain.GMS_COCKPIT_2D_WORK[3];
+        public readonly CTrgAoAction trg_back = new CTrgAoAction();
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] btn_back = new AppMain.GMS_COCKPIT_2D_WORK[3];
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] tex_spst_up_act = new AppMain.GMS_COCKPIT_2D_WORK[3];
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] spst_num_act = new AppMain.GMS_COCKPIT_2D_WORK[7];
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] icon_emer_up_act = new AppMain.GMS_COCKPIT_2D_WORK[7];
+        public readonly AppMain.GMS_COCKPIT_2D_WORK[] icon_emer_down_act = new AppMain.GMS_COCKPIT_2D_WORK[7];
+        public readonly uint[] time_score = new uint[2];
+        public readonly uint[] ring_score = new uint[2];
+        public readonly uint[] total_score = new uint[2];
+        public AppMain.GMS_COCKPIT_2D_WORK tex_time_act;
+        public AppMain.GMS_COCKPIT_2D_WORK tex_ring_act;
+        public AppMain.GMS_COCKPIT_2D_WORK tex_total_act;
+        public AppMain.GMS_COCKPIT_2D_WORK sonic_icon_act;
+        public AppMain.GMS_COCKPIT_2D_WORK sonic_icon_act2;
+        public AppMain.GMS_COCKPIT_2D_WORK tex_big_time_act;
+        public AppMain.GMS_COCKPIT_2D_WORK time_sonic_icon_act;
+        public AppMain.GMS_COCKPIT_2D_WORK tex_new_record_act;
+        public AppMain.GMS_COCKPIT_2D_WORK tex_retry_act;
+        public AppMain.GMS_COCKPIT_2D_WORK tex_back_slct_act;
+        public AppMain.GMS_COCKPIT_2D_WORK bg_retry;
+        public AppMain.GMS_COCKPIT_2D_WORK icon_emer_light_act;
+        public AppMain.GMS_COCKPIT_2D_WORK tex_extend_act;
+        public AppMain.GMS_CLRDM_MAIN_WORK._WorkDelegate proc_input;
+        public AppMain.GMS_CLRDM_MAIN_WORK._WorkDelegate proc_update;
+        public AppMain.GMS_CLRDM_MAIN_WORK._WorkDelegate proc_calc_score;
+        public uint clear_time;
+        public ushort time_min;
+        public ushort time_sec;
+        public ushort time_msec;
+        public float timer;
+        public float flash_timer;
+        public uint flag;
+        public int idle_time;
+        public int count;
+        public int game_mode;
+        public bool is_clear_spe_stg;
+        public bool is_full_eme;
+        public bool is_get_eme;
+        public int has_eme_num;
+        public int get_eme_no;
+        public bool is_first_spe_clear;
+        public int next_evt;
+        public uint cur_retry_slct;
+        public ushort stage_id;
+        public ushort prev_spe_stage_id;
+        public bool nodisp_check;
+
+        public delegate void _WorkDelegate(AppMain.GMS_CLRDM_MAIN_WORK pArg);
+    }
+}
