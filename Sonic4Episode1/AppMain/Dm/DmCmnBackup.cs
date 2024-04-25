@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
+﻿using gs.backup;
 
 public partial class AppMain
 {
@@ -19,7 +9,7 @@ public partial class AppMain
         if (save != null)
         {
             instance.SetSave(save);
-         }
+        }
     }
 
     private static bool DmCmnBackupIsLoadFinished()
@@ -33,7 +23,7 @@ public partial class AppMain
 
     private static bool DmCmnBackupIsLoadSuccessed()
     {
-        AppMain.GSS_MAIN_SYS_INFO mainSysInfo = AppMain.GsGetMainSysInfo();
+        GSS_MAIN_SYS_INFO mainSysInfo = GsGetMainSysInfo();
         bool flag;
         if (XmlStorage.SaveSuccess())
         {
@@ -47,7 +37,7 @@ public partial class AppMain
 
     private static void DmCmnBackupSave(bool is_first, bool is_new, bool is_del)
     {
-        AppMain.GSS_MAIN_SYS_INFO mainSysInfo = AppMain.GsGetMainSysInfo();
+        GSS_MAIN_SYS_INFO mainSysInfo = GsGetMainSysInfo();
         var save = SSave.CreateInstance().GetSave();
         if (save == null)
         {
@@ -66,7 +56,7 @@ public partial class AppMain
         }
         else
         {
-            if (mainSysInfo.is_save_run == 0U || !AppMain.dmCmnBackupIsCmpSaveData())
+            if (mainSysInfo.is_save_run == 0U || !dmCmnBackupIsCmpSaveData())
                 return;
             XmlStorage.Save(save, false, false);
             // mainSysInfo.cmp_backup.setData(mainSysInfo.backup.getData());
@@ -80,7 +70,7 @@ public partial class AppMain
 
     private static bool DmCmnBackupIsSaveSuccessed()
     {
-        AppMain.GSS_MAIN_SYS_INFO mainSysInfo = AppMain.GsGetMainSysInfo();
+        GSS_MAIN_SYS_INFO mainSysInfo = GsGetMainSysInfo();
         bool flag;
         if (XmlStorage.SaveSuccess())
         {
@@ -99,7 +89,7 @@ public partial class AppMain
 
     private static bool dmCmnBackupIsCmpSaveData()
     {
-        return !AppMain.dmCmnBackupMathCompare();
+        return !dmCmnBackupMathCompare();
     }
 
     private static bool dmCmnBackupMathCompare()

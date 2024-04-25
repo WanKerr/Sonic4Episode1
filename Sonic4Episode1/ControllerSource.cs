@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 class MonoGameController : Controller
@@ -29,12 +27,12 @@ class MonoGameController : Controller
     public override void SetVibration(ushort left, ushort right)
     {
         if (this.doVibrate)
-            GamePad.SetVibration(index, (float)left / ushort.MaxValue, (float)right / ushort.MaxValue);
+            GamePad.SetVibration((PlayerIndex)index, (float)left / ushort.MaxValue, (float)right / ushort.MaxValue);
     }
 
     public override void UpdateControllerReading(ref ControllerReading reading)
     {
-        var state = GamePad.GetState(index, GamePadDeadZone.Circular);
+        var state = GamePad.GetState((PlayerIndex)index, GamePadDeadZone.Circular);
 
         if (this.keyboardController != null)
         {
@@ -48,14 +46,14 @@ class MonoGameController : Controller
         reading.ary = (short)(state.ThumbSticks.Right.Y * short.MaxValue);
 
         if (state.Buttons.A == ButtonState.Pressed)
-            reading.direction |= (ControllerConsts.JUMP_BUTTON | ControllerConsts.CONFIRM | ControllerConsts.A);
+            reading.direction |= (ControllerConsts.A);
         if (state.Buttons.B == ButtonState.Pressed)
-            reading.direction |= (ControllerConsts.JUMP_BUTTON | ControllerConsts.CANCEL | ControllerConsts.B);
+            reading.direction |= (ControllerConsts.B);
 
         if (state.Buttons.Y == ButtonState.Pressed)
-            reading.direction |= (ControllerConsts.SUPER_SONIC | ControllerConsts.Y);
+            reading.direction |= (ControllerConsts.Y);
         if (state.Buttons.X == ButtonState.Pressed)
-            reading.direction |= (ControllerConsts.SUPER_SONIC | ControllerConsts.X);
+            reading.direction |= (ControllerConsts.X);
 
         if (state.Buttons.LeftShoulder == ButtonState.Pressed)
             reading.direction |= ControllerConsts.L;

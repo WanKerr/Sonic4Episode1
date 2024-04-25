@@ -5,7 +5,6 @@
 // Assembly location: C:\Users\wamwo\Documents\GitHub\Sonic4Ep1-WP7-Decompilation\XAP\Sonic4 ep I.dll
 
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
 
 namespace gs.backup
@@ -59,14 +58,14 @@ namespace gs.backup
 
         }
 
-        private StageRecord getRecord(SStageSolo.ERecordKind.Type record_kind)
+        private StageRecord getRecord(ERecordKind.Type record_kind)
         {
             return stage.StageRecords[(int)record_kind];
         }
 
         private StageRecord getRecord(bool is_supersonic)
         {
-            return this.getRecord(is_supersonic ? SStageSolo.ERecordKind.Type.SuperSonic : SStageSolo.ERecordKind.Type.Sonic);
+            return this.getRecord(is_supersonic ? ERecordKind.Type.SuperSonic : ERecordKind.Type.Sonic);
         }
 
         public bool IsHighScoreEnable(bool is_supersonic)

@@ -5,7 +5,6 @@
 // Assembly location: C:\Users\wamwo\Documents\GitHub\Sonic4Ep1-WP7-Decompilation\XAP\Sonic4 ep I.dll
 
 using System;
-using System.IO;
 
 namespace gs.backup
 {

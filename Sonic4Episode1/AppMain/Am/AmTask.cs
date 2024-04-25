@@ -1,42 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-
-public partial class AppMain
+﻿public partial class AppMain
 {
-    public static AppMain.AMS_TCB amTaskMake(
-      AppMain.TaskProc proc,
-      AppMain.TaskProc dest,
+    public static AMS_TCB amTaskMake(
+      TaskProc proc,
+      TaskProc dest,
       uint prio,
       uint user,
       uint attr,
       string name)
     {
-        return AppMain.amTaskMake(AppMain._am_default_taskp, proc, dest, prio, user, attr, name, 1U, 0, uint.MaxValue);
+        return amTaskMake(_am_default_taskp, proc, dest, prio, user, attr, name, 1U, 0, uint.MaxValue);
     }
 
-    public static AppMain.AMS_TCB amTaskMake(
-      AppMain.AMS_TASK taskp,
-      AppMain.TaskProc proc,
-      AppMain.TaskProc dest,
+    public static AMS_TCB amTaskMake(
+      AMS_TASK taskp,
+      TaskProc proc,
+      TaskProc dest,
       uint prio,
       uint user,
       uint attr,
       string name)
     {
-        return AppMain.amTaskMake(taskp, proc, dest, prio, user, attr, name, 1U, 0, uint.MaxValue);
+        return amTaskMake(taskp, proc, dest, prio, user, attr, name, 1U, 0, uint.MaxValue);
     }
 
-    public static AppMain.AMS_TCB amTaskMake(
-      AppMain.TaskProc proc,
-      AppMain.TaskProc dest,
+    public static AMS_TCB amTaskMake(
+      TaskProc proc,
+      TaskProc dest,
       uint prio,
       uint user,
       uint attr,
@@ -45,117 +34,117 @@ public partial class AppMain
       int group,
       uint run)
     {
-        return AppMain.amTaskMake(AppMain._am_default_taskp, proc, dest, prio, user, attr, name, stall, group, run);
+        return amTaskMake(_am_default_taskp, proc, dest, prio, user, attr, name, stall, group, run);
     }
 
-    private static void amTaskSetProcedure(AppMain.AMS_TCB tcb, AppMain.TaskProc proc)
+    private static void amTaskSetProcedure(AMS_TCB tcb, TaskProc proc)
     {
         tcb.procedure = proc;
         tcb.proc_addr = int.MaxValue;
     }
 
-    private static void amTaskSetDestructor(AppMain.AMS_TCB tcb, AppMain.TaskProc dest)
+    private static void amTaskSetDestructor(AMS_TCB tcb, TaskProc dest)
     {
         tcb.destructor = dest;
     }
 
     public static void amTaskDeleteGroup(uint user, uint attr, uint flag)
     {
-        AppMain.amTaskDeleteGroup(AppMain._am_default_taskp, user, attr, flag);
+        amTaskDeleteGroup(_am_default_taskp, user, attr, flag);
     }
 
     public static void amTaskDeletePriority(uint prio_begin, uint prio_end, uint user)
     {
-        AppMain.amTaskDeletePriority(AppMain._am_default_taskp, prio_begin, prio_end, user);
+        amTaskDeletePriority(_am_default_taskp, prio_begin, prio_end, user);
     }
 
     public static void amTaskSleepGroup(uint user, uint attr, uint flag)
     {
-        AppMain.amTaskSleepGroup(AppMain._am_default_taskp, user, attr, flag);
+        amTaskSleepGroup(_am_default_taskp, user, attr, flag);
     }
 
     public static void amTaskSleepPriority(uint prio_begin, uint prio_end, uint user)
     {
-        AppMain.amTaskSleepPriority(AppMain._am_default_taskp, prio_begin, prio_end, user);
+        amTaskSleepPriority(_am_default_taskp, prio_begin, prio_end, user);
     }
 
     public static void amTaskWakeupGroup(uint user, uint attr, uint flag)
     {
-        AppMain.amTaskWakeupGroup(AppMain._am_default_taskp, user, attr, flag);
+        amTaskWakeupGroup(_am_default_taskp, user, attr, flag);
     }
 
     public static void amTaskWakeupPriority(uint prio_begin, uint prio_end, uint user)
     {
-        AppMain.amTaskWakeupPriority(AppMain._am_default_taskp, prio_begin, prio_end, user);
+        amTaskWakeupPriority(_am_default_taskp, prio_begin, prio_end, user);
     }
 
-    public static object amTaskGetWork(AppMain.AMS_TCB tcb)
+    public static object amTaskGetWork(AMS_TCB tcb)
     {
         return tcb.work;
     }
 
-    private static AppMain.AMS_TCB amTaskNextTcb(AppMain.AMS_TCB tcbp)
+    private static AMS_TCB amTaskNextTcb(AMS_TCB tcbp)
     {
-        return tcbp.next = AppMain.GlobalPool<AppMain.AMS_TCB>.Alloc();
+        return tcbp.next = GlobalPool<AMS_TCB>.Alloc();
     }
 
-    private static AppMain.AMS_TCB amPrevNextTcb(AppMain.AMS_TCB tcbp)
+    private static AMS_TCB amPrevNextTcb(AMS_TCB tcbp)
     {
-        return tcbp.prev = AppMain.GlobalPool<AppMain.AMS_TCB>.Alloc();
+        return tcbp.prev = GlobalPool<AMS_TCB>.Alloc();
     }
 
-    private static AppMain.AMS_TCB_FOOTER amTaskGetTcbFooter(AppMain.AMS_TCB tcbp)
+    private static AMS_TCB_FOOTER amTaskGetTcbFooter(AMS_TCB tcbp)
     {
         return tcbp.footer;
     }
 
-    private static AppMain.AMS_TASK amTaskInitSystem()
+    private static AMS_TASK amTaskInitSystem()
     {
-        return AppMain.amTaskInitSystem(256, 64, 1);
+        return amTaskInitSystem(256, 64, 1);
     }
 
-    private static AppMain.AMS_TASK amTaskInitSystem(
+    private static AMS_TASK amTaskInitSystem(
       int max_tcb,
       int work_size,
       int thread_num)
     {
-        AppMain.AMS_TASK amsTask = new AppMain.AMS_TASK();
-        if (AppMain._am_default_taskp == null)
-            AppMain._am_default_taskp = amsTask;
+        AMS_TASK amsTask = new AMS_TASK();
+        if (_am_default_taskp == null)
+            _am_default_taskp = amsTask;
         amsTask.tcb_max = max_tcb;
         amsTask.tcb_work_size = work_size + 63 & -64;
         amsTask.tcb_head.name = "TCB Head";
         amsTask.tcb_head.priority = 0U;
-        amsTask.tcb_head.prev = (AppMain.AMS_TCB)null;
+        amsTask.tcb_head.prev = null;
         amsTask.tcb_head.next = amsTask.tcb_tail;
         amsTask.tcb_head.user_id = 0U;
         amsTask.tcb_head.attribute = 1U;
         amsTask.tcb_head.wkbegin = 218237452;
-        AppMain.amTaskSetProcedure(amsTask.tcb_head, (AppMain.TaskProc)null);
-        AppMain.amTaskSetDestructor(amsTask.tcb_head, (AppMain.TaskProc)null);
+        amTaskSetProcedure(amsTask.tcb_head, null);
+        amTaskSetDestructor(amsTask.tcb_head, null);
         amsTask.tcb_tail.name = "TCB Tail";
         amsTask.tcb_tail.priority = uint.MaxValue;
         amsTask.tcb_tail.prev = amsTask.tcb_head;
-        amsTask.tcb_tail.next = (AppMain.AMS_TCB)null;
+        amsTask.tcb_tail.next = null;
         amsTask.tcb_tail.user_id = 0U;
         amsTask.tcb_tail.attribute = 1U;
         amsTask.tcb_tail.wkbegin = 218237452;
-        AppMain.amTaskSetProcedure(amsTask.tcb_tail, (AppMain.TaskProc)null);
-        AppMain.amTaskSetDestructor(amsTask.tcb_tail, (AppMain.TaskProc)null);
+        amTaskSetProcedure(amsTask.tcb_tail, null);
+        amTaskSetDestructor(amsTask.tcb_tail, null);
         return amsTask;
     }
 
     private static void amTaskExitSystem()
     {
-        AppMain.amTaskExitSystem(AppMain._am_default_taskp);
+        amTaskExitSystem(_am_default_taskp);
     }
 
-    private static void amTaskExitSystem(AppMain.AMS_TASK taskp)
+    private static void amTaskExitSystem(AMS_TASK taskp)
     {
-        AppMain.amMemFreeSystem((object)taskp);
+        amMemFreeSystem(taskp);
     }
 
-    private static void amTaskReset(AppMain.AMS_TASK taskp)
+    private static void amTaskReset(AMS_TASK taskp)
     {
         taskp.tcb_head.next = taskp.tcb_tail;
         taskp.tcb_tail.prev = taskp.tcb_head;
@@ -163,18 +152,18 @@ public partial class AppMain
 
     private static void amTaskExecute()
     {
-        AppMain.amTaskExecute(AppMain._am_default_taskp);
+        amTaskExecute(_am_default_taskp);
     }
 
-    private static void amTaskExecute(AppMain.AMS_TASK taskp)
+    private static void amTaskExecute(AMS_TASK taskp)
     {
-        AppMain._amTaskExecuteInOrder(taskp);
+        _amTaskExecuteInOrder(taskp);
     }
 
-    private static AppMain.AMS_TCB amTaskMake(
-      AppMain.AMS_TASK taskp,
-      AppMain.TaskProc proc,
-      AppMain.TaskProc dest,
+    private static AMS_TCB amTaskMake(
+      AMS_TASK taskp,
+      TaskProc proc,
+      TaskProc dest,
       uint prio,
       uint user,
       uint attr,
@@ -183,38 +172,41 @@ public partial class AppMain
       int group,
       uint run)
     {
-        AppMain.AMS_TCB amsTcb = AppMain.GlobalPool<AppMain.AMS_TCB>.Alloc();
+        AMS_TCB amsTcb = GlobalPool<AMS_TCB>.Alloc();
         amsTcb.name = name;
-        AppMain.AMS_TCB_FOOTER tcbFooter = AppMain.amTaskGetTcbFooter(amsTcb);
+        AMS_TCB_FOOTER tcbFooter = amTaskGetTcbFooter(amsTcb);
         tcbFooter.cpu_cnt = 0U;
         tcbFooter.cpu_cnt_max = 0U;
         amsTcb.priority = prio;
         amsTcb.priority = prio;
         amsTcb.user_id = user;
         amsTcb.attribute = attr;
-        AppMain.amTaskSetProcedure(amsTcb, proc);
-        AppMain.amTaskSetDestructor(amsTcb, dest);
-        AppMain.AMS_TCB next = taskp.tcb_head.next;
+        amTaskSetProcedure(amsTcb, proc);
+        amTaskSetDestructor(amsTcb, dest);
+        AMS_TCB next = taskp.tcb_head.next;
         while (next != taskp.tcb_tail && next.priority <= prio)
             next = next.next;
         next.prev.next = amsTcb;
         amsTcb.prev = next.prev;
         next.prev = amsTcb;
         amsTcb.next = next;
+
+        //System.Diagnostics.Debug.WriteLine($"Task {name}, prio {prio}, next {next.name}, prev {amsTcb.prev.name}");
+
         return amsTcb;
     }
 
-    private int amTaskPending(AppMain.AMS_TCB tcbp)
+    private int amTaskPending(AMS_TCB tcbp)
     {
         return 0;
     }
 
-    public static int amTaskStart(AppMain.AMS_TCB tcbp)
+    public static int amTaskStart(AMS_TCB tcbp)
     {
         return 0;
     }
 
-    public static void amTaskDelete(AppMain.AMS_TCB tcb)
+    public static void amTaskDelete(AMS_TCB tcb)
     {
         if (tcb.proc_addr == -1)
             return;
@@ -223,225 +215,225 @@ public partial class AppMain
         tcb.proc_addr = -1;
     }
 
-    public static void amTaskDeleteGroup(AppMain.AMS_TASK taskp, uint user, uint attr, uint flag)
+    public static void amTaskDeleteGroup(AMS_TASK taskp, uint user, uint attr, uint flag)
     {
         if (user == 0U)
             user = uint.MaxValue;
-        AppMain.AMS_TCB next = taskp.tcb_head.next;
+        AMS_TCB next = taskp.tcb_head.next;
         switch (flag)
         {
             case 0:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) != 0)
-                        AppMain.amTaskDelete(next);
+                        amTaskDelete(next);
                 }
                 break;
             case 1:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) == (int)attr)
-                        AppMain.amTaskDelete(next);
+                        amTaskDelete(next);
                 }
                 break;
             case 2:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) == 0)
-                        AppMain.amTaskDelete(next);
+                        amTaskDelete(next);
                 }
                 break;
             case 3:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) != (int)attr)
-                        AppMain.amTaskDelete(next);
+                        amTaskDelete(next);
                 }
                 break;
         }
     }
 
     public static void amTaskDeletePriority(
-      AppMain.AMS_TASK taskp,
+      AMS_TASK taskp,
       uint prio_begin,
       uint prio_end,
       uint user)
     {
-        AppMain.AMS_TCB next = taskp.tcb_head.next;
+        AMS_TCB next = taskp.tcb_head.next;
         while (next != taskp.tcb_tail && next.priority < prio_begin)
             next = next.next;
         for (; next != taskp.tcb_tail && next.priority <= prio_end; next = next.next)
         {
             if (user == 0U || ((int)next.user_id & (int)user) != 0)
-                AppMain.amTaskDelete(next);
+                amTaskDelete(next);
         }
     }
 
-    public static void amTaskSleep(AppMain.AMS_TCB tcb)
+    public static void amTaskSleep(AMS_TCB tcb)
     {
         tcb.proc_addr |= 1;
     }
 
-    public static void amTaskSleepGroup(AppMain.AMS_TASK taskp, uint user, uint attr, uint flag)
+    public static void amTaskSleepGroup(AMS_TASK taskp, uint user, uint attr, uint flag)
     {
-        AppMain.mppAssertNotImpl();
+        mppAssertNotImpl();
         if (user == 0U)
             user = uint.MaxValue;
-        AppMain.AMS_TCB next = taskp.tcb_head.next;
+        AMS_TCB next = taskp.tcb_head.next;
         switch (flag)
         {
             case 0:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) != 0)
-                        AppMain.amTaskSleep(next);
+                        amTaskSleep(next);
                 }
                 break;
             case 1:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) == (int)attr)
-                        AppMain.amTaskSleep(next);
+                        amTaskSleep(next);
                 }
                 break;
             case 2:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) == 0)
-                        AppMain.amTaskSleep(next);
+                        amTaskSleep(next);
                 }
                 break;
             case 3:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) != (int)attr)
-                        AppMain.amTaskSleep(next);
+                        amTaskSleep(next);
                 }
                 break;
         }
     }
 
     public static void amTaskSleepPriority(
-      AppMain.AMS_TASK taskp,
+      AMS_TASK taskp,
       uint prio_begin,
       uint prio_end,
       uint user)
     {
-        AppMain.mppAssertNotImpl();
-        AppMain.AMS_TCB next = taskp.tcb_head.next;
+        mppAssertNotImpl();
+        AMS_TCB next = taskp.tcb_head.next;
         while (next != taskp.tcb_tail && next.priority < prio_begin)
             next = next.next;
         for (; next != taskp.tcb_tail && next.priority <= prio_end; next = next.next)
         {
             if (user == 0U || ((int)next.user_id & (int)user) != 0)
-                AppMain.amTaskSleep(next);
+                amTaskSleep(next);
         }
     }
 
-    public static void amTaskWakeup(AppMain.AMS_TCB tcb)
+    public static void amTaskWakeup(AMS_TCB tcb)
     {
-        AppMain.mppAssertNotImpl();
+        mppAssertNotImpl();
         tcb.proc_addr &= -2;
     }
 
-    public static void amTaskWakeupGroup(AppMain.AMS_TASK taskp, uint user, uint attr, uint flag)
+    public static void amTaskWakeupGroup(AMS_TASK taskp, uint user, uint attr, uint flag)
     {
-        AppMain.mppAssertNotImpl();
+        mppAssertNotImpl();
         if (user == 0U)
             user = uint.MaxValue;
-        AppMain.AMS_TCB next = taskp.tcb_head.next;
+        AMS_TCB next = taskp.tcb_head.next;
         switch (flag)
         {
             case 0:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) != 0)
-                        AppMain.amTaskWakeup(next);
+                        amTaskWakeup(next);
                 }
                 break;
             case 1:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) == (int)attr)
-                        AppMain.amTaskWakeup(next);
+                        amTaskWakeup(next);
                 }
                 break;
             case 2:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) == 0)
-                        AppMain.amTaskWakeup(next);
+                        amTaskWakeup(next);
                 }
                 break;
             case 3:
                 for (; next != taskp.tcb_tail; next = next.next)
                 {
                     if (((int)next.user_id & (int)user) != 0 && ((int)next.attribute & (int)attr) != (int)attr)
-                        AppMain.amTaskWakeup(next);
+                        amTaskWakeup(next);
                 }
                 break;
         }
     }
 
     public static void amTaskWakeupPriority(
-      AppMain.AMS_TASK taskp,
+      AMS_TASK taskp,
       uint prio_begin,
       uint prio_end,
       uint user)
     {
-        AppMain.mppAssertNotImpl();
-        AppMain.AMS_TCB next = taskp.tcb_head.next;
+        mppAssertNotImpl();
+        AMS_TCB next = taskp.tcb_head.next;
         while (next != taskp.tcb_tail && next.priority < prio_begin)
             next = next.next;
         for (; next != taskp.tcb_tail && next.priority <= prio_end; next = next.next)
         {
             if (user == 0U || ((int)next.user_id & (int)user) != 0)
-                AppMain.amTaskWakeup(next);
+                amTaskWakeup(next);
         }
     }
 
-    private static void amTaskSetOwnerName(AppMain.AMS_TASKLIST_OWNER[] pList, uint listSize)
+    private static void amTaskSetOwnerName(AMS_TASKLIST_OWNER[] pList, uint listSize)
     {
-        AppMain.mppAssertNotImpl();
-        AppMain._am_owner_list = pList;
-        AppMain._am_szOwnerList = AppMain._am_owner_list != null ? (int)listSize : 0;
+        mppAssertNotImpl();
+        _am_owner_list = pList;
+        _am_szOwnerList = _am_owner_list != null ? (int)listSize : 0;
     }
 
-    private static void amTaskDisplayList(AppMain.AMS_TASK taskp, int locx, int locy)
+    private static void amTaskDisplayList(AMS_TASK taskp, int locx, int locy)
     {
-        AppMain.mppAssertNotImpl();
+        mppAssertNotImpl();
     }
 
-    private static void amTaskDisplayThread(AppMain.AMS_TASK taskp)
+    private static void amTaskDisplayThread(AMS_TASK taskp)
     {
-        AppMain.mppAssertNotImpl();
+        mppAssertNotImpl();
     }
 
-    private static void _amTaskExecuteInOrder(AppMain.AMS_TASK taskp)
+    private static void _amTaskExecuteInOrder(AMS_TASK taskp)
     {
-        for (AppMain.AMS_TCB next = taskp.tcb_head.next; next != taskp.tcb_tail; next = next.next)
+        for (AMS_TCB next = taskp.tcb_head.next; next != taskp.tcb_tail; next = next.next)
         {
             if (next.procedure != null && next.proc_addr > 0)
                 next.procedure(next);
         }
-        for (AppMain.AMS_TCB next = taskp.tcb_head.next; next != taskp.tcb_tail; next = next.next)
+        for (AMS_TCB next = taskp.tcb_head.next; next != taskp.tcb_tail; next = next.next)
         {
             if (next.proc_addr == -1)
-                AppMain._amTaskDeleteReal(next);
+                _amTaskDeleteReal(next);
         }
     }
 
-    private static void _amTaskDeleteReal(AppMain.AMS_TCB tcb)
+    private static void _amTaskDeleteReal(AMS_TCB tcb)
     {
-        AppMain.AMS_TASK taskp = tcb.taskp;
+        AMS_TASK taskp = tcb.taskp;
         tcb.prev.next = tcb.next;
         tcb.next.prev = tcb.prev;
-        AppMain.GlobalPool<AppMain.AMS_TCB>.Release(tcb);
+        GlobalPool<AMS_TCB>.Release(tcb);
     }
 
-    private static void _amTaskCheckWork(AppMain.AMS_TASK taskp)
+    private static void _amTaskCheckWork(AMS_TASK taskp)
     {
-        AppMain.mppAssertNotImpl();
+        mppAssertNotImpl();
     }
 
 }

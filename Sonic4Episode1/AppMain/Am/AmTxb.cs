@@ -1,73 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
+﻿using System.IO;
 
 public partial class AppMain
 {
-    public static AppMain.TXB_HEADER readTXBfile(object data)
+    public static TXB_HEADER readTXBfile(object data)
     {
-        AppMain.AmbChunk ambChunk = (AppMain.AmbChunk)data;
-        return AppMain.readTXBfile(ambChunk.array, ambChunk.offset);
+        AmbChunk ambChunk = (AmbChunk)data;
+        return readTXBfile(ambChunk.array, ambChunk.offset);
     }
 
-    public static AppMain.TXB_HEADER readTXBfile(byte[] data, int offset)
+    public static TXB_HEADER readTXBfile(byte[] data, int offset)
     {
-        return AppMain.readTXBfile(data, offset, (string)null);
+        return readTXBfile(data, offset, null);
     }
 
-    public static AppMain.TXB_HEADER readTXBfile(byte[] data, int offset, string sPath)
+    public static TXB_HEADER readTXBfile(byte[] data, int offset, string sPath)
     {
-        AppMain.TXB_HEADER txbHeader = (AppMain.TXB_HEADER)null;
+        TXB_HEADER txbHeader = null;
         if (data != null)
         {
             using (MemoryStream memoryStream = new MemoryStream(data, offset, data.Length - offset))
             {
-                using (BinaryReader br = new BinaryReader((Stream)memoryStream))
-                    txbHeader = AppMain.readTXBfile(br, sPath);
+                using (BinaryReader br = new BinaryReader(memoryStream))
+                    txbHeader = readTXBfile(br, sPath);
             }
         }
         return txbHeader;
     }
 
-    public static AppMain.TXB_HEADER readTXBfile(BinaryReader br)
+    public static TXB_HEADER readTXBfile(BinaryReader br)
     {
-        return AppMain.readTXBfile(br, (string)null);
+        return readTXBfile(br, null);
     }
 
-    public static AppMain.TXB_HEADER readTXBfile(BinaryReader br, string sPath)
+    public static TXB_HEADER readTXBfile(BinaryReader br, string sPath)
     {
-        AppMain.TXB_HEADER txbHeader = new AppMain.TXB_HEADER();
+        TXB_HEADER txbHeader = new TXB_HEADER();
         txbHeader.file_id = br.ReadBytes(4);
-        txbHeader.texfilelist_offset = AppMain._amConvertEndian(br.ReadInt32());
+        txbHeader.texfilelist_offset = _amConvertEndian(br.ReadInt32());
         txbHeader.pad = br.ReadBytes(8);
-        br.BaseStream.Position = (long)txbHeader.texfilelist_offset;
-        txbHeader.texfilelist.nTex = AppMain._amConvertEndian(br.ReadInt32());
-        txbHeader.texfilelist.tex_list_offset = AppMain._amConvertEndian(br.ReadInt32());
+        br.BaseStream.Position = txbHeader.texfilelist_offset;
+        txbHeader.texfilelist.nTex = _amConvertEndian(br.ReadInt32());
+        txbHeader.texfilelist.tex_list_offset = _amConvertEndian(br.ReadInt32());
         if (txbHeader.texfilelist.tex_list_offset != 0)
         {
-            br.BaseStream.Position = (long)txbHeader.texfilelist.tex_list_offset;
-            txbHeader.texfilelist.pTexFileList = (AppMain.NNS_TEXFILE[])new AppMain.TXB_TEXFILE[txbHeader.texfilelist.nTex];
+            br.BaseStream.Position = txbHeader.texfilelist.tex_list_offset;
+            txbHeader.texfilelist.pTexFileList = (new TXB_TEXFILE[txbHeader.texfilelist.nTex]);
             for (int index = 0; index < txbHeader.texfilelist.nTex; ++index)
             {
-                txbHeader.texfilelist.pTexFileList[index] = (AppMain.NNS_TEXFILE)new AppMain.TXB_TEXFILE();
-                txbHeader.texfilelist.pTexFileList[index].fType = AppMain._amConvertEndian(br.ReadUInt32());
-                ((AppMain.TXB_TEXFILE)txbHeader.texfilelist.pTexFileList[index]).name_offset = AppMain._amConvertEndian(br.ReadInt32());
-                txbHeader.texfilelist.pTexFileList[index].MinFilter = AppMain._amConvertEndian(br.ReadUInt16());
-                txbHeader.texfilelist.pTexFileList[index].MagFilter = AppMain._amConvertEndian(br.ReadUInt16());
-                txbHeader.texfilelist.pTexFileList[index].GlobalIndex = AppMain._amConvertEndian(br.ReadUInt32());
-                txbHeader.texfilelist.pTexFileList[index].Bank = AppMain._amConvertEndian(br.ReadUInt32());
+                txbHeader.texfilelist.pTexFileList[index] = new TXB_TEXFILE();
+                txbHeader.texfilelist.pTexFileList[index].fType = _amConvertEndian(br.ReadUInt32());
+                ((TXB_TEXFILE)txbHeader.texfilelist.pTexFileList[index]).name_offset = _amConvertEndian(br.ReadInt32());
+                txbHeader.texfilelist.pTexFileList[index].MinFilter = _amConvertEndian(br.ReadUInt16());
+                txbHeader.texfilelist.pTexFileList[index].MagFilter = _amConvertEndian(br.ReadUInt16());
+                txbHeader.texfilelist.pTexFileList[index].GlobalIndex = _amConvertEndian(br.ReadUInt32());
+                txbHeader.texfilelist.pTexFileList[index].Bank = _amConvertEndian(br.ReadUInt32());
             }
             for (int index = 0; index < txbHeader.texfilelist.nTex; ++index)
             {
-                br.BaseStream.Position = (long)((AppMain.TXB_TEXFILE)txbHeader.texfilelist.pTexFileList[index]).name_offset;
-                txbHeader.texfilelist.pTexFileList[index].Filename = AppMain.readChars(br);
+                br.BaseStream.Position = ((TXB_TEXFILE)txbHeader.texfilelist.pTexFileList[index]).name_offset;
+                txbHeader.texfilelist.pTexFileList[index].Filename = readChars(br);
                 string str = txbHeader.texfilelist.pTexFileList[index].Filename.Replace(".PVR", ".PNG");
                 txbHeader.texfilelist.pTexFileList[index].Filename = str;
             }
@@ -75,44 +66,44 @@ public partial class AppMain
         return txbHeader;
     }
 
-    private static AppMain.NNS_TEXFILELIST amTxbGetTexFileList(AppMain.TXB_HEADER txb)
+    private static NNS_TEXFILELIST amTxbGetTexFileList(TXB_HEADER txb)
     {
-        return (AppMain.NNS_TEXFILELIST)txb.texfilelist;
+        return txb.texfilelist;
     }
 
-    private static uint amTxbGetCount(AppMain.TXB_HEADER txb)
+    private static uint amTxbGetCount(TXB_HEADER txb)
     {
         return txb == null ? 0U : (uint)txb.texfilelist.nTex;
     }
 
-    private ushort amTxbGetMagFilter(AppMain.TXB_HEADER txb, uint tex_no)
+    private ushort amTxbGetMagFilter(TXB_HEADER txb, uint tex_no)
     {
-        AppMain.mppAssertNotImpl();
-        return tex_no >= AppMain.amTxbGetCount(txb) ? AppMain.g_txb_mag_filter[0] : txb.texfilelist.pTexFileList[(int)tex_no].MagFilter;
+        mppAssertNotImpl();
+        return tex_no >= amTxbGetCount(txb) ? g_txb_mag_filter[0] : txb.texfilelist.pTexFileList[(int)tex_no].MagFilter;
     }
 
-    private ushort amTxbGetMinFilter(AppMain.TXB_HEADER txb, uint tex_no)
+    private ushort amTxbGetMinFilter(TXB_HEADER txb, uint tex_no)
     {
-        AppMain.mppAssertNotImpl();
-        return tex_no >= AppMain.amTxbGetCount(txb) ? AppMain.g_txb_min_filter[0] : txb.texfilelist.pTexFileList[(int)tex_no].MinFilter;
+        mppAssertNotImpl();
+        return tex_no >= amTxbGetCount(txb) ? g_txb_min_filter[0] : txb.texfilelist.pTexFileList[(int)tex_no].MinFilter;
     }
 
-    private string amTxbGetName(AppMain.TXB_HEADER txb, uint tex_no)
+    private string amTxbGetName(TXB_HEADER txb, uint tex_no)
     {
-        AppMain.mppAssertNotImpl();
-        if (tex_no >= AppMain.amTxbGetCount(txb))
+        mppAssertNotImpl();
+        if (tex_no >= amTxbGetCount(txb))
             tex_no = 0U;
         return txb.texfilelist.pTexFileList[(int)tex_no].Filename;
     }
 
-    private static int amTxbConv(AppMain.TXB_HEADER header)
+    private static int amTxbConv(TXB_HEADER header)
     {
         return 0;
     }
 
     private static int amTxbConv(byte[] stream)
     {
-        AppMain.mppAssertNotImpl();
+        mppAssertNotImpl();
         return 1;
     }
 }

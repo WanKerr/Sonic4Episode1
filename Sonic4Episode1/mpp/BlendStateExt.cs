@@ -8,25 +8,25 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace mpp
 {
-  internal static class BlendStateExt
-  {
-    public static BlendState clone(this BlendState original)
+    internal static class BlendStateExt
     {
-      return new BlendState()
-      {
-        AlphaBlendFunction = original.AlphaBlendFunction,
-        AlphaDestinationBlend = original.AlphaDestinationBlend,
-        AlphaSourceBlend = original.AlphaSourceBlend,
-        BlendFactor = original.BlendFactor,
-        ColorBlendFunction = original.ColorBlendFunction,
-        ColorDestinationBlend = original.ColorDestinationBlend,
-        ColorSourceBlend = original.ColorSourceBlend,
-        ColorWriteChannels = original.ColorWriteChannels,
-        ColorWriteChannels1 = original.ColorWriteChannels1,
-        ColorWriteChannels2 = original.ColorWriteChannels2,
-        ColorWriteChannels3 = original.ColorWriteChannels3,
-        MultiSampleMask = original.MultiSampleMask
-      };
+        public static BlendState clone(this BlendState original)
+        {
+            return new BlendState()
+            {
+                AlphaBlendFunction = original.AlphaBlendFunction,
+                AlphaDestinationBlend = original.AlphaDestinationBlend,
+                AlphaSourceBlend = original.AlphaSourceBlend,
+                BlendFactor = original.BlendFactor,
+                ColorBlendFunction = original.ColorBlendFunction,
+                ColorDestinationBlend = original.ColorDestinationBlend,
+                ColorSourceBlend = original.ColorSourceBlend,
+                ColorWriteChannels = original.ColorWriteChannels,
+                ColorWriteChannels1 = original.ColorWriteChannels1,
+                ColorWriteChannels2 = original.ColorWriteChannels2,
+                ColorWriteChannels3 = original.ColorWriteChannels3,
+                MultiSampleMask = original.MultiSampleMask
+            };
+        }
     }
-  }
 }

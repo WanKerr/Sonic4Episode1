@@ -11,9 +11,9 @@
 
         public void Init()
         {
-            
+
         }
-        
+
         public bool GodMode
         {
             get => save.Debug.GodMode;

@@ -1,43 +1,16 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
-
 public partial class AppMain
 {
-    public class AMS_PARAM_DRAW_PRIMITIVE : AppMain.IClearable
+    public class AMS_PARAM_DRAW_PRIMITIVE : IClearable
     {
-        public AppMain.NNS_MATRIX mtx;
+        public NNS_MATRIX mtx;
         public int type;
-        public AppMain.NNS_PRIM3D_PCT_ARRAY vtxPCT3D;
-        public AppMain.NNS_PRIM3D_PC[] vtxPC3D;
-        public AppMain.NNS_PRIM2D_PCT[] vtxPCT2D;
-        public AppMain.NNS_PRIM2D_PC[] vtxPC2D;
+        public NNS_PRIM3D_PCT_ARRAY vtxPCT3D;
+        public NNS_PRIM3D_PC[] vtxPC3D;
+        public NNS_PRIM2D_PCT[] vtxPCT2D;
+        public NNS_PRIM2D_PC[] vtxPC2D;
         private int formatXD;
         public int count;
-        public AppMain.NNS_TEXLIST texlist;
+        public NNS_TEXLIST texlist;
         public int texId;
         public int ablend;
         public float sortZ;
@@ -53,41 +26,23 @@ public partial class AppMain
 
         public int format3D
         {
-            get
-            {
-                return this.formatXD;
-            }
-            set
-            {
-                this.formatXD = value;
-            }
+            get => this.formatXD;
+            set => this.formatXD = value;
         }
 
         public int format2D
         {
-            get
-            {
-                return this.formatXD;
-            }
-            set
-            {
-                this.formatXD = value;
-            }
+            get => this.formatXD;
+            set => this.formatXD = value;
         }
 
         public float zOffset
         {
-            get
-            {
-                return this.sortZ;
-            }
-            set
-            {
-                this.sortZ = value;
-            }
+            get => this.sortZ;
+            set => this.sortZ = value;
         }
 
-        public void Assign(AppMain.AMS_PARAM_DRAW_PRIMITIVE other)
+        public void Assign(AMS_PARAM_DRAW_PRIMITIVE other)
         {
             this.mtx = other.mtx;
             this.type = other.type;
@@ -114,25 +69,25 @@ public partial class AppMain
 
         public void Clear()
         {
-            this.mtx = (AppMain.NNS_MATRIX)null;
+            this.mtx = null;
             this.type = 0;
-            this.vtxPCT3D = (AppMain.NNS_PRIM3D_PCT_ARRAY)null;
-            this.vtxPC3D = (AppMain.NNS_PRIM3D_PC[])null;
-            this.vtxPCT2D = (AppMain.NNS_PRIM2D_PCT[])null;
-            this.vtxPC2D = (AppMain.NNS_PRIM2D_PC[])null;
+            this.vtxPCT3D = null;
+            this.vtxPC3D = null;
+            this.vtxPCT2D = null;
+            this.vtxPC2D = null;
             this.formatXD = 0;
             this.count = 0;
-            this.texlist = (AppMain.NNS_TEXLIST)null;
+            this.texlist = null;
             this.texId = 0;
             this.ablend = 0;
             this.sortZ = 0.0f;
             this.bldSrc = 0;
             this.bldDst = 0;
             this.bldMode = 0;
-            this.aTest = (short)0;
-            this.zMask = (short)0;
-            this.zTest = (short)0;
-            this.noSort = (short)0;
+            this.aTest = 0;
+            this.zMask = 0;
+            this.zTest = 0;
+            this.noSort = 0;
             this.uwrap = 0;
             this.vwrap = 0;
         }

@@ -1,37 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
-
 public partial class AppMain
 {
-    public class GMS_FADE_OBJ_WORK : AppMain.IOBS_OBJECT_WORK
+    public class GMS_FADE_OBJ_WORK : IOBS_OBJECT_WORK
     {
-        public readonly AppMain.IZS_FADE_WORK fade_work = new AppMain.IZS_FADE_WORK();
+        public readonly IZS_FADE_WORK fade_work = new IZS_FADE_WORK();
         public object m_pHolder;
-        public readonly AppMain.OBS_OBJECT_WORK obj_work;
+        public readonly OBS_OBJECT_WORK obj_work;
 
         public GMS_FADE_OBJ_WORK(object _obj)
           : this()
@@ -41,23 +14,23 @@ public partial class AppMain
 
         public GMS_FADE_OBJ_WORK()
         {
-            this.obj_work = AppMain.OBS_OBJECT_WORK.Create((object)this);
+            this.obj_work = OBS_OBJECT_WORK.Create(this);
         }
 
-        public AppMain.OBS_OBJECT_WORK Cast()
+        public OBS_OBJECT_WORK Cast()
         {
             return this.obj_work;
         }
 
-        public static explicit operator AppMain.OBS_OBJECT_WORK(AppMain.GMS_FADE_OBJ_WORK work)
+        public static explicit operator OBS_OBJECT_WORK(GMS_FADE_OBJ_WORK work)
         {
             return work.obj_work;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_ALARM_FADE_WORK(
-          AppMain.GMS_FADE_OBJ_WORK p)
+        public static explicit operator GMS_BOSS5_ALARM_FADE_WORK(
+          GMS_FADE_OBJ_WORK p)
         {
-            return (AppMain.GMS_BOSS5_ALARM_FADE_WORK)p.m_pHolder;
+            return (GMS_BOSS5_ALARM_FADE_WORK)p.m_pHolder;
         }
     }
 }

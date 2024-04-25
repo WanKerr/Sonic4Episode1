@@ -5,11 +5,10 @@
 // Assembly location: C:\Users\wamwo\Documents\GitHub\Sonic4Ep1-WP7-Decompilation\XAP\Sonic4 ep I.dll
 
 using System;
-using System.IO;
 
 namespace gs.backup
 {
-    public class SSystem: SBase
+    public class SSystem : SBase
     {
         private Sonic4Save save;
 
@@ -17,20 +16,22 @@ namespace gs.backup
         {
             this.save = save;
         }
-
-        public uint GetPlayerStock()
+        public uint PlayerStock
         {
-            return save.System.Lives;
+            get => save.System.Lives;
+            set => save.System.Lives = Math.Min(value, 1000U);
         }
 
-        public uint GetKilled()
+        public uint Killed
         {
-            return save.System.Killed;
+            get => save.System.Killed;
+            set => save.System.Killed = Math.Min(value, 1000U);
         }
 
-        public uint GetClearCount()
+        public uint ClearCount
         {
-            return save.System.ClearCount;
+            get => save.System.ClearCount;
+            set => save.System.ClearCount = Math.Min(value, 2U);
         }
 
         public static SSystem CreateInstance(uint save_index)
@@ -48,7 +49,7 @@ namespace gs.backup
 
         }
 
-        public bool IsAnnounce(SSystem.EAnnounce index)
+        public bool IsAnnounce(EAnnounce index)
         {
             switch (index)
             {
@@ -81,25 +82,7 @@ namespace gs.backup
             }
         }
 
-        public void SetPlayerStock(uint player_stock)
-        {
-            player_stock = Math.Min(player_stock, 1000U);
-            save.System.Lives = player_stock;
-        }
-
-        public void SetKilled(uint killed)
-        {
-            killed = Math.Min(killed, 1000U);
-            save.System.Killed = killed;
-        }
-
-        public void SetClearCount(uint count)
-        {
-            count = Math.Min(count, 2U);
-            save.System.ClearCount = count;
-        }
-
-        public void SetAnnounce(SSystem.EAnnounce index, bool is_announce)
+        public void SetAnnounce(EAnnounce index, bool is_announce)
         {
             switch (index)
             {

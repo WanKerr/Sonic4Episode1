@@ -6,5 +6,5 @@
 
 internal class Constants
 {
-  public const bool TRIAL_MODE = false;
+    public const bool TRIAL_MODE = false;
 }

@@ -1,0 +1,66 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFrameworks>net8.0</TargetFrameworks>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<DefineConstants>TRACE;FNA;ASYNC_IO;AOT;HAS_DISCORD</DefineConstants>
+	</PropertyGroup>
+
+	<Import Project="..\Sonic4Episode1\Sonic4Episode1.projitems" Label="Shared" />
+
+	<ItemGroup>
+		<Folder Include="Properties" />
+		<RdXmlFile Include="rd.xml" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<PublishAot>true</PublishAot>
+		<PublishTrimmed>true</PublishTrimmed>
+
+		<OptimizationPreference>Size</OptimizationPreference>
+		<TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
+
+		<DebuggerSupport>true</DebuggerSupport>
+		<EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+		<EventSourceSupport>false</EventSourceSupport>
+		<HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+		<MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+		<EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+		<InvariantGlobalization>false</InvariantGlobalization>
+		<UseSystemResourceKeys>true</UseSystemResourceKeys>
+		<StackTraceSupport>false</StackTraceSupport>
+		
+		<IlcGenerateMstatFile>true</IlcGenerateMstatFile>
+		<IlcGenerateDgmlFile>true</IlcGenerateDgmlFile>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+		<!--<LinkerArg Include="/LTCG" />-->
+		<!--<NativeLibrary Include="..\Dependencies\FNA\lib\SDL2.lib" />
+		<NativeLibrary Include="..\Dependencies\FNA\lib\FNA3D.lib" />
+		<NativeLibrary Include="..\Dependencies\FNA\lib\FAudio.lib" />
+		<NativeLibrary Include="..\Dependencies\FNA\lib\libtheorafile.lib" />-->
+		<!-- <NativeLibrary Include="..\Dependencies\FNA\lib\discord_game_sdk.dll.lib" /> -->
+		<NativeLibrary Include="Shell32.lib" />
+		<NativeLibrary Include="Winmm.lib" />
+		<NativeLibrary Include="Setupapi.lib" />
+		<NativeLibrary Include="Gdi32.lib" />
+		<NativeLibrary Include="Imm32.lib" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!--<DirectPInvoke Include="FNA3D" />
+		<DirectPInvoke Include="FAudio" />
+		<DirectPInvoke Include="libtheorafile" />-->
+		<!-- <DirectPInvoke Include="discord_game_sdk" /> -->
+		<!--<DirectPInvokeList Include="SDLApis.txt" />-->
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Submodules\FNA\FNA.Core.csproj" />
+	</ItemGroup>
+	
+</Project>

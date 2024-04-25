@@ -1,0 +1,444 @@
+﻿
+body {
+    font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+.uno-loader {
+    /* Main container of the loader */
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--bg-color, white);
+}
+
+    .uno-loader .logo {
+        width: auto;
+        height: auto;
+        /* Protect the width and height of the logo to fit the screen */
+        max-width: 70vw;
+        max-height: 70vh;
+        /* Center the logo */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .uno-loader progress {
+        /* Reset the default appearance */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        /* Get rid of default border in Firefox. */
+        border: none;
+        /* Dimensions */
+        width: 100%;
+        height: 6px;
+        position: absolute;
+        /* Position */
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+
+    .uno-loader img[src=''] {
+        visibility: collapse;
+    }
+
+    .uno-loader progress::-moz-progress-bar {
+        /* Firefox */
+        background-color: var(--accent-color, #f85977);
+    }
+
+    .uno-loader progress::-webkit-progress-value {
+        /* Chrome & Safari */
+        background-color: var(--accent-color, #f85977);
+    }
+
+    .uno-loader[loading-position='top'] progress {
+        bottom: auto;
+        top: 0;
+        color: var(--accent-color, #f85977);
+    }
+
+    .uno-loader[loading-position='top'] .alert {
+        bottom: auto;
+        top: 10px;
+    }
+
+    .uno-loader[loading-alert] .alert {
+        /* Position */
+        display: block;
+        position: absolute;
+        bottom: 10px;
+        padding: 8px 16px;
+        font-weight: normal;
+        font-size: 14px;
+        color: var(--accent-color, #f85977);
+        background: whitesmoke;
+        transition: all 400ms ease;
+        transform-origin: 50% 50%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+        .uno-loader[loading-alert] .alert:after {
+            text-align: center;
+            display: block;
+            width: 100%;
+            position: absolute;
+            top: 0;
+        }
+
+   /* .uno-loader[loading-alert='none'] .alert {
+        display: none;
+    }*/
+
+    .uno-loader[loading-alert='error'] .alert:after {
+        animation-name: pulse;
+        animation-duration: 2500ms;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+    }
+
+    .uno-loader[loading-alert='warning'] .alert:after,
+    .uno-loader[loading-alert='error'] .alert:after {
+        top: 2px;
+        font-size: 26px;
+        content: '\26A0';
+    }
+
+    .uno-loader[loading-alert='warning'] .alert:after {
+        color: DarkGoldenRod;
+    }
+
+    .uno-loader[loading-alert='error'] .alert:after {
+        color: DarkRed;
+    }
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.85);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(0.85);
+    }
+}
+
+
+.message-dialog {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    overflow: hidden;
+    user-select: none;
+    max-width: 100vw;
+}
+
+    .message-dialog::backdrop {
+        animation: show_backdrop 0.1s linear forwards;
+    }
+
+    .message-dialog[open] .message-dialog-content-root {
+        animation: show_desktop 0.1s linear forwards;
+    }
+
+    .message-dialog[open].closing .message-dialog-content-root {
+        animation: hide_desktop 0.1s linear forwards;
+    }
+
+    .message-dialog[open].closing::backdrop {
+        animation: hide_backdrop 0.1s linear forwards;
+    }
+
+    .message-dialog .message-dialog-content-root {
+        color: black;
+        background-color: white;
+        padding: 24px;
+        display: flex;
+        justify-content: center;
+        transform-origin: center;
+    }
+
+    .message-dialog .message-dialog-content-container {
+        max-width: 800px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .message-dialog .message-dialog-content {
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        overflow-x: hidden;
+        overflow-y: visible;
+        line-height: 1.5em;
+    }
+
+    .message-dialog .message-dialog-button-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 20px;
+    }
+
+    .message-dialog .message-dialog-title {
+        font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+        font-size: 20pt;
+        font-weight: 300;
+        line-height: 1.2;
+        margin: 0;
+    }
+
+    .message-dialog .message-dialog-button {
+        appearance: none;
+        font-size: 11pt;
+        font-weight: 500;
+        line-height: 1.3636;
+        font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+        background-color: #cccccc;
+        border: 2px solid #cccccc;
+        color: #1f1f1f;
+        min-height: 32px;
+        min-width: 90px;
+        padding: 4px 8px;
+    }
+
+        .message-dialog .message-dialog-button:hover {
+            background-color: #dddddd;
+            border-color: #dddddd;
+        }
+
+            .message-dialog .message-dialog-button:hover:active {
+                background-color: #1f1f1f;
+                border-color: #1f1f1f;
+                color: white;
+            }
+
+        .message-dialog .message-dialog-button.primary {
+            background-color: #4617b4;
+            border-color: #4617b4;
+            color: white;
+        }
+
+            .message-dialog .message-dialog-button.primary:hover {
+                background-color: #602fce;
+                border-color: #4617b4;
+                color: white;
+            }
+
+                .message-dialog .message-dialog-button.primary:hover:active {
+                    background-color: #1f1f1f;
+                    border-color: #1f1f1f;
+                    color: white;
+                }
+
+    .message-dialog a,
+    .message-dialog a:visited {
+        text-decoration: none;
+        color: #602fce;
+    }
+
+@media screen and (max-width: 600px) {
+    .message-dialog {
+        margin: 0;
+    }
+
+        .message-dialog a,
+        .message-dialog a:visited {
+            color: #9676e0;
+        }
+
+        .message-dialog[open] .message-dialog-content-root {
+            animation: show_mobile 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+
+        .message-dialog[open].closing .message-dialog-content-root {
+            animation: hide_mobile 0.1s ease-in forwards;
+        }
+
+        .message-dialog .message-dialog-content-root {
+            background: #1f1f1f;
+            color: white;
+            transform: rotate3d(1, 0, 0, 0deg);
+            padding: 20px;
+        }
+
+        .message-dialog .message-dialog-title {
+            font-size: 15pt;
+            font-weight: 500;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .message-dialog .message-dialog-button-container {
+            justify-content: stretch;
+        }
+
+        .message-dialog .message-dialog-button {
+            flex: 1;
+            max-width: 50%;
+        }
+
+        .message-dialog .message-dialog-content {
+            margin: 20px 0 24px 0;
+            font-size: 11pt;
+        }
+
+        .message-dialog .message-dialog-button {
+            background-color: #1f1f1f;
+            border: 2px solid white;
+            color: white;
+            text-transform: lowercase;
+        }
+
+            .message-dialog .message-dialog-button:hover {
+                background-color: rgba(255, 255, 255, 0.33);
+                border-color: white;
+            }
+
+                .message-dialog .message-dialog-button:hover:active {
+                    background-color: white;
+                    border-color: white;
+                    color: #1f1f1f;
+                }
+
+            .message-dialog .message-dialog-button.primary {
+                background-color: transparent;
+                border: 2px solid white;
+                color: white;
+            }
+
+                .message-dialog .message-dialog-button.primary:hover {
+                    background-color: rgba(255, 255, 255, 0.33);
+                    border-color: white;
+                }
+
+                    .message-dialog .message-dialog-button.primary:hover:active {
+                        background-color: white;
+                        border-color: white;
+                        color: #1f1f1f;
+                    }
+}
+
+@keyframes show_desktop {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes hide_desktop {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes show_mobile {
+    from {
+        transform: rotate3d(1, 0, 0, 120deg);
+    }
+
+    to {
+        transform: rotate3d(1, 0, 0, 0deg);
+    }
+}
+
+@keyframes hide_mobile {
+    from {
+        transform: rotate3d(1, 0, 0, 0deg);
+    }
+
+    to {
+        transform: rotate3d(1, 0, 0, -90deg);
+    }
+}
+
+@keyframes show_backdrop {
+    from {
+        background: rgba(0, 0, 0, 0);
+    }
+
+    to {
+        background: rgba(0, 0, 0, 0.6);
+    }
+}
+
+@keyframes hide_backdrop {
+    from {
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    to {
+        background: rgba(0, 0, 0, 0);
+    }
+}
+
+#tap-to-play {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.33);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer !important;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+
+    display: none;
+}
+
+    #tap-to-play button {
+        appearance: none;
+        font-size: 12pt;
+        font-weight: 500;
+        line-height: 1.3636;
+        font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+        background-color: #cccccc;
+        border: 2px solid #cccccc;
+        color: #1f1f1f;
+        min-height: 32px;
+        min-width: 90px;
+        padding: 4px 8px;
+        background-color: #1f1f1f;
+        border: 2px solid white;
+        color: white;
+        text-transform: lowercase;
+    }
+
+    #tap-to-play button:hover {
+        background-color: rgba(255, 255, 255, 0.33);
+        border-color: white;
+    }
+
+        #tap-to-play button:hover:active {
+            background-color: white;
+            border-color: white;
+            color: #1f1f1f;
+        }
+
+
+#tap-to-play.visible {
+    display: block;
+}

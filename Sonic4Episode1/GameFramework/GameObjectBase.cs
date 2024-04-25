@@ -8,20 +8,29 @@ using Microsoft.Xna.Framework;
 
 namespace GameFramework
 {
-  public abstract class GameObjectBase
-  {
-    public GameObjectBase(Game game)
+    public abstract class GameObjectBase
     {
-      this.Game = game;
+        public GameObjectBase(Game game)
+        {
+            this.Game = game;
+            this.IsEnabled = true;
+        }
+
+        public bool IsEnabled { get; set; }
+
+        protected Game Game { get; set; }
+
+        public int UpdateCount { get; set; }
+
+        public void Update(GameTime time)
+        {
+            if (IsEnabled)
+                this.UpdateCore(time);
+        }
+
+        protected virtual void UpdateCore(GameTime gameTime)
+        {
+            ++this.UpdateCount;
+        }
     }
-
-    protected Game Game { get; set; }
-
-    public int UpdateCount { get; set; }
-
-    public virtual void Update(GameTime gameTime)
-    {
-      ++this.UpdateCount;
-    }
-  }
 }

@@ -1,30 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
-
 public partial class AppMain
 {
     public class AMS_TCB_REPORT
@@ -32,7 +5,7 @@ public partial class AppMain
         public string name;
         public float frame_start;
         public float frame_end;
-        public AppMain.AMS_TCB_REPORT next;
+        public AMS_TCB_REPORT next;
         public int reserved;
     }
 }

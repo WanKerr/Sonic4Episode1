@@ -8,30 +8,24 @@ using mpp;
 
 public struct GLIndexBuffer_ByteBuffer : OpenGL.GLIndexBuffer
 {
-  private ByteBuffer data_;
-  private int dataSize_;
+    private ByteBuffer data_;
+    private int dataSize_;
 
-  public GLIndexBuffer_ByteBuffer(ByteBuffer data, int dataSize)
-  {
-    this.data_ = data;
-    this.dataSize_ = dataSize;
-  }
-
-  public int Size
-  {
-    get
+    public GLIndexBuffer_ByteBuffer(ByteBuffer data, int dataSize)
     {
-      return this.dataSize_ / 2;
+        this.data_ = data;
+        this.dataSize_ = dataSize;
     }
-  }
 
-  public void ExtractTo(ushort[] dst)
-  {
-    int index = 0;
-    for (int getOffset = 0; getOffset < this.dataSize_; getOffset += 2)
+    public int Size => this.dataSize_ / 2;
+
+    public void ExtractTo(ushort[] dst)
     {
-      dst[index] = this.data_.GetUShort(getOffset);
-      ++index;
+        int index = 0;
+        for (int getOffset = 0; getOffset < this.dataSize_; getOffset += 2)
+        {
+            dst[index] = this.data_.GetUShort(getOffset);
+            ++index;
+        }
     }
-  }
 }

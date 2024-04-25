@@ -1,119 +1,173 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
 
 public partial class AppMain
 {
-    private static AppMain.OBS_OBJECT_WORK GmGmkGoalPanelInit(
-         AppMain.GMS_EVE_RECORD_EVENT eve_rec,
+    private static int __initial_y;
+    private static int __initial_spd_m;
+
+    private static OBS_OBJECT_WORK GmGmkGoalPanelInit(
+         GMS_EVE_RECORD_EVENT eve_rec,
          int pos_x,
          int pos_y,
          byte type)
     {
-        AppMain.OBS_OBJECT_WORK work = AppMain.GMM_ENEMY_CREATE_WORK(eve_rec, pos_x, pos_y, (AppMain.TaskWorkFactoryDelegate)(() => (object)new AppMain.GMS_ENEMY_3D_WORK()), "GMK_GOAL_PANEL");
-        AppMain.GMS_ENEMY_3D_WORK gmsEnemy3DWork = (AppMain.GMS_ENEMY_3D_WORK)work;
+        OBS_OBJECT_WORK work = GMM_ENEMY_CREATE_WORK(eve_rec, pos_x, pos_y, () => new GMS_ENEMY_3D_WORK(), "GMK_GOAL_PANEL");
+        GMS_ENEMY_3D_WORK gmsEnemy3DWork = (GMS_ENEMY_3D_WORK)work;
         gmsEnemy3DWork.ene_com.enemy_flag |= 65536U;
-        AppMain.ObjObjectCopyAction3dNNModel(work, AppMain.gm_gmk_goal_panel_obj_3d_list[0], gmsEnemy3DWork.obj_3d);
+        ObjObjectCopyAction3dNNModel(work, gm_gmk_goal_panel_obj_3d_list[0], gmsEnemy3DWork.obj_3d);
         work.pos.z = -131072;
         work.move_flag |= 8448U;
         work.disp_flag |= 4194304U;
         work.flag |= 16U;
-        work.dir.y = (ushort)32768;
+        work.dir.y = 32768;
         gmsEnemy3DWork.ene_com.col_work.obj_col.flag |= 134217728U;
-        work.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmGmkGoalPanelMain);
-        AppMain.GmGmkSplRingMake(pos_x + 393216, pos_y - 393216);
+        work.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmGmkGoalPanelMain);
+        GmGmkSplRingMake(pos_x + 393216, pos_y - 393216);
+        __initial_y = pos_y;
+
         return work;
     }
 
     public static void GmGmkGoalPanelBuild()
     {
-        AppMain.gm_gmk_goal_panel_obj_3d_list = AppMain.GmGameDBuildRegBuildModel(AppMain.GmGameDatGetGimmickData(836), AppMain.GmGameDatGetGimmickData(837), 0U);
+        gm_gmk_goal_panel_obj_3d_list = GmGameDBuildRegBuildModel(GmGameDatGetGimmickData(836), GmGameDatGetGimmickData(837), 0U);
     }
 
     public static void GmGmkGoalPanelFlush()
     {
-        AppMain.AMS_AMB_HEADER amsAmbHeader = AppMain.readAMBFile((object)AppMain.GmGameDatGetGimmickData(836));
-        AppMain.GmGameDBuildRegFlushModel(AppMain.gm_gmk_goal_panel_obj_3d_list, amsAmbHeader.file_num);
+        AMS_AMB_HEADER amsAmbHeader = readAMBFile(GmGameDatGetGimmickData(836));
+        GmGameDBuildRegFlushModel(gm_gmk_goal_panel_obj_3d_list, amsAmbHeader.file_num);
     }
 
-    private static void gmGmkGoalPanelMain(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmGmkGoalPanelMain(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_PLAYER_WORK ply_work = AppMain.g_gm_main_system.ply_work[0];
+        GMS_PLAYER_WORK ply_work = g_gm_main_system.ply_work[0];
         if (obj_work.pos.x >= ply_work.obj_work.pos.x)
             return;
         SaveState.deleteSave();
-        if (((int)ply_work.player_flag & 16384) != 0)
-            AppMain.g_gm_main_system.game_flag |= 33554432U;
+        if ((ply_work.player_flag & 16384) != 0)
+            g_gm_main_system.game_flag |= 33554432U;
         else
-            AppMain.g_gm_main_system.game_flag &= 4261412863U;
-        AppMain.HgTrophyTryAcquisition(1);
-        AppMain.GmPlayerSetGoalState(ply_work);
-        AppMain.g_gm_main_system.game_flag &= 4294966271U;
-        AppMain.g_gm_main_system.game_flag |= 1048576U;
+            g_gm_main_system.game_flag &= 4261412863U;
+        HgTrophyTryAcquisition(1);
+        GmPlayerSetGoalState(ply_work);
+        g_gm_main_system.game_flag &= 4294966271U;
+        g_gm_main_system.game_flag |= 1048576U;
         obj_work.user_work = 4096U;
         obj_work.user_timer = 120;
-        obj_work.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmGmkGoalPanelPass);
-        AppMain.GmGmkCamScrLimitSet(new AppMain.GMS_EVE_RECORD_EVENT()
+        obj_work.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmGmkGoalPanelPass);
+
+        __initial_spd_m = ply_work.obj_work.spd_m;
+        var options = gs.backup.SSave.CreateInstance().GetRemaster();
+
+        GmGmkCamScrLimitSet(new GMS_EVE_RECORD_EVENT()
         {
-            flag = (ushort)5,
-            left = (sbyte)-96,
-            top = (sbyte)-104,
-            width = (byte)192,
-            height = (byte)112
+            flag = 5,
+            left = options.BugFixes ? (sbyte)-104 : (sbyte)-112,
+            top = options.BugFixes ? (sbyte)-104 : (sbyte)-96, // actually center stuff
+            width = 192,
+            height = 112
         }, obj_work.pos.x, obj_work.pos.y);
-        AppMain.gm_gmk_goal_panel_effct = AppMain.GmEfctCmnEsCreate(obj_work, 32);
-        AppMain.GmEffect3DESSetDispOffset(AppMain.gm_gmk_goal_panel_effct, 0.0f, 30f, 15f);
-        AppMain.GmEffect3DESSetDispRotation(AppMain.gm_gmk_goal_panel_effct, (short)0, (short)0, (short)0);
-        AppMain.GMM_PAD_VIB_SMALL();
-        AppMain.GmSoundPlaySE("GoalPanel");
+        gm_gmk_goal_panel_effct = GmEfctCmnEsCreate(obj_work, 32);
+        GmEffect3DESSetDispOffset(gm_gmk_goal_panel_effct, 0.0f, 30f, 15f);
+        GmEffect3DESSetDispRotation(gm_gmk_goal_panel_effct, 0, 0, 0);
+        GMM_PAD_VIB_SMALL();
+        GmSoundPlaySE("GoalPanel");
     }
 
-    private static AppMain.OBS_OBJECT_WORK GmGmkCamScrLimitSet(
-      AppMain.GMS_EVE_RECORD_EVENT eve_rec,
+    private static OBS_OBJECT_WORK GmGmkCamScrLimitSet(
+      GMS_EVE_RECORD_EVENT eve_rec,
       int pos_x,
       int pos_y)
     {
-        return AppMain.GmEventMgrLocalEventBirth((ushort)302, pos_x, pos_y, eve_rec.flag, eve_rec.left, eve_rec.top, eve_rec.width, eve_rec.height, (byte)0);
+        return GmEventMgrLocalEventBirth(302, pos_x, pos_y, eve_rec.flag, eve_rec.left, eve_rec.top, eve_rec.width, eve_rec.height, 0);
     }
 
-    private static void gmGmkGoalPanelPass(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmGmkGoalPanelPass(OBS_OBJECT_WORK obj_work)
     {
         --obj_work.user_timer;
         if (obj_work.user_timer <= 0)
         {
             obj_work.user_timer = 0;
             obj_work.user_work = 0U;
-            obj_work.dir.y = (ushort)0;
+            obj_work.dir.y = 0;
             obj_work.user_timer = 120;
-            obj_work.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmGmkGoalPanelWait);
-            AppMain.gmGmkGoalPanelEfctKill();
-            AppMain.GmPlySeqChangeActGoal(AppMain.g_gm_main_system.ply_work[0]);
+            obj_work.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmGmkGoalPanelWait);
+            gmGmkGoalPanelEfctKill();
+            GmPlySeqChangeActGoal(g_gm_main_system.ply_work[0]);
         }
         obj_work.dir.y += (ushort)obj_work.user_work;
+
+        var options = gs.backup.SSave.CreateInstance().GetRemaster();
+        if (options.Misc && gm_gmk_goal_panel_effct != null)
+        {
+            GMS_PLAYER_WORK ply_work = g_gm_main_system.ply_work[0];
+            float multiplier = (__initial_spd_m / (float)ply_work.spd_max);
+            float panelMax = (330_000 * multiplier);
+            float effectMax = (60 * multiplier); // best guess i've ever made
+
+            if (obj_work.user_timer > 100)
+            {
+                var progress = easeOutCirc((120 - obj_work.user_timer) / 20f);
+
+                obj_work.pos.y = __initial_y - (int)(panelMax * progress);
+                GmEffect3DESSetDispOffset(gm_gmk_goal_panel_effct, 0.0f, 30f + (effectMax * progress), 15f);
+            }
+            else
+            {
+                var progress = easeOutBounce(((120 - obj_work.user_timer) - 20) / 100f);
+
+                obj_work.pos.y = __initial_y - (int)panelMax - (int)(-panelMax * progress);
+                GmEffect3DESSetDispOffset(gm_gmk_goal_panel_effct, 0.0f, 30f + effectMax - (effectMax * progress), 15f);
+            }
+        }
     }
 
-    private static void gmGmkGoalPanelWait(AppMain.OBS_OBJECT_WORK obj_work)
+    static float easeOutCirc(float x)
+    {
+        return (float)Math.Sqrt(1f - Math.Pow(x - 1f, 2));
+    }
+
+    static float easeOutBounce(float x)
+    {
+        const float n1 = 7.5625f;
+        const float d1 = 2.75f;
+
+        if (x < 1 / d1)
+        {
+            return n1 * x * x;
+        }
+        else if (x < 2 / d1)
+        {
+            return n1 * (x -= 1.5f / d1) * x + 0.75f;
+        }
+        else if (x < 2.5 / d1)
+        {
+            return n1 * (x -= 2.25f / d1) * x + 0.9375f;
+        }
+        else
+        {
+            return n1 * (x -= 2.625f / d1) * x + 0.984375f;
+        }
+    }
+
+    private static void gmGmkGoalPanelWait(OBS_OBJECT_WORK obj_work)
     {
         if (--obj_work.user_timer > 0)
+        {
             return;
-        AppMain.g_gm_main_system.game_flag |= 4U;
-        obj_work.ppFunc = (AppMain.MPP_VOID_OBS_OBJECT_WORK)null;
-        AppMain.gmGmkGoalPanelEfctKill();
+        }
+        g_gm_main_system.game_flag |= 4U;
+        obj_work.ppFunc = null;
+        gmGmkGoalPanelEfctKill();
     }
 
     private static void gmGmkGoalPanelEfctKill()
     {
-        if (AppMain.gm_gmk_goal_panel_effct == null)
+        if (gm_gmk_goal_panel_effct == null)
             return;
-        AppMain.ObjDrawKillAction3DES((AppMain.OBS_OBJECT_WORK)AppMain.gm_gmk_goal_panel_effct);
-        AppMain.gm_gmk_goal_panel_effct = (AppMain.GMS_EFFECT_3DES_WORK)null;
+        ObjDrawKillAction3DES((OBS_OBJECT_WORK)gm_gmk_goal_panel_effct);
+        gm_gmk_goal_panel_effct = null;
     }
 
 

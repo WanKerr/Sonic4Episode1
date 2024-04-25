@@ -1,59 +1,34 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
 
 public partial class AppMain
 {
-    public class ITaskLink : AppMain.ITask
+    public class ITaskLink : ITask
     {
-        private AppMain.AMS_TCB m_task_tcb;
+        private AMS_TCB m_task_tcb;
 
         public void AttachTask(string name)
         {
-            this.AttachTask(name, AppMain.ITask.c_priority_default, AppMain.ITask.c_user_default, AppMain.ITask.c_attribute_default, AppMain.ITask.c_group_default, AppMain.ITask.c_stall_mask_default, AppMain.ITask.c_run_mask_default);
+            this.AttachTask(name, c_priority_default, c_user_default, c_attribute_default, c_group_default, c_stall_mask_default, c_run_mask_default);
         }
 
         public void AttachTask(string name, uint priority)
         {
-            this.AttachTask(name, priority, AppMain.ITask.c_user_default, AppMain.ITask.c_attribute_default, AppMain.ITask.c_group_default, AppMain.ITask.c_stall_mask_default, AppMain.ITask.c_run_mask_default);
+            this.AttachTask(name, priority, c_user_default, c_attribute_default, c_group_default, c_stall_mask_default, c_run_mask_default);
         }
 
         public void AttachTask(string name, uint priority, uint user)
         {
-            this.AttachTask(name, priority, user, AppMain.ITask.c_attribute_default, AppMain.ITask.c_group_default, AppMain.ITask.c_stall_mask_default, AppMain.ITask.c_run_mask_default);
+            this.AttachTask(name, priority, user, c_attribute_default, c_group_default, c_stall_mask_default, c_run_mask_default);
         }
 
         public void AttachTask(string name, uint priority, uint user, uint attribute)
         {
-            this.AttachTask(name, priority, user, attribute, AppMain.ITask.c_group_default, AppMain.ITask.c_stall_mask_default, AppMain.ITask.c_run_mask_default);
+            this.AttachTask(name, priority, user, attribute, c_group_default, c_stall_mask_default, c_run_mask_default);
         }
 
         public void AttachTask(string name, uint priority, uint user, uint attribute, int group)
         {
-            this.AttachTask(name, priority, user, attribute, group, AppMain.ITask.c_stall_mask_default, AppMain.ITask.c_run_mask_default);
+            this.AttachTask(name, priority, user, attribute, group, c_stall_mask_default, c_run_mask_default);
         }
 
         public void AttachTask(
@@ -64,7 +39,7 @@ public partial class AppMain
           int group,
           uint stall_mask)
         {
-            this.AttachTask(name, priority, user, attribute, group, stall_mask, AppMain.ITask.c_run_mask_default);
+            this.AttachTask(name, priority, user, attribute, group, stall_mask, c_run_mask_default);
         }
 
         public void AttachTask(
@@ -77,28 +52,28 @@ public partial class AppMain
           uint run_mask)
         {
             this.DetachTask();
-            this.m_task_tcb = AppMain.amTaskMake(new AppMain.TaskProc(AppMain.ITaskLink.procedure), new AppMain.TaskProc(AppMain.ITaskLink.destructor), priority, user, attribute, name, stall_mask, group, run_mask);
-            this.m_task_tcb.work = (object)new AppMain.ITaskLink.SWork();
-            ((AppMain.ITaskLink.SWork)AppMain.amTaskGetWork(this.m_task_tcb)).owner = this;
+            this.m_task_tcb = amTaskMake(new TaskProc(procedure), new TaskProc(destructor), priority, user, attribute, name, stall_mask, group, run_mask);
+            this.m_task_tcb.work = new SWork();
+            ((SWork)amTaskGetWork(this.m_task_tcb)).owner = this;
         }
 
         public void DetachTask()
         {
             if (this.m_task_tcb == null)
                 return;
-            AppMain.amTaskSetDestructor(this.m_task_tcb, (AppMain.TaskProc)null);
-            AppMain.amTaskDelete(this.m_task_tcb);
-            this.TaskDestructor(AppMain.ITaskLink.EDestructorCbType.Type.DetachTask);
-            this.m_task_tcb = (AppMain.AMS_TCB)null;
+            amTaskSetDestructor(this.m_task_tcb, null);
+            amTaskDelete(this.m_task_tcb);
+            this.TaskDestructor(EDestructorCbType.Type.DetachTask);
+            this.m_task_tcb = null;
         }
 
-        public static AppMain.ITaskLink CastFromTaskTcb(AppMain.AMS_TCB tcb)
+        public static ITaskLink CastFromTaskTcb(AMS_TCB tcb)
         {
-            AppMain.mppAssertNotImpl();
-            return (AppMain.ITaskLink)null;
+            mppAssertNotImpl();
+            return null;
         }
 
-        public override AppMain.AMS_TCB GetTaskTcb()
+        public override AMS_TCB GetTaskTcb()
         {
             return this.m_task_tcb;
         }
@@ -108,10 +83,10 @@ public partial class AppMain
             return this.m_task_tcb != null;
         }
 
-        public ITaskLink(AppMain.IFunctor pFunctor)
+        public ITaskLink(IFunctor pFunctor)
           : base(pFunctor)
         {
-            this.m_task_tcb = (AppMain.AMS_TCB)null;
+            this.m_task_tcb = null;
         }
 
         ~ITaskLink()
@@ -119,23 +94,23 @@ public partial class AppMain
             this.DetachTask();
         }
 
-        protected virtual void TaskDestructor(AppMain.ITaskLink.EDestructorCbType.Type type)
+        protected virtual void TaskDestructor(EDestructorCbType.Type type)
         {
         }
 
         private void TcbLinkDestructorCb()
         {
-            AppMain.mppAssertNotImpl();
+            mppAssertNotImpl();
         }
 
-        private static void procedure(AppMain.AMS_TCB tcb)
+        private static void procedure(AMS_TCB tcb)
         {
-            ((AppMain.ITaskLink.SWork)AppMain.amTaskGetWork(tcb)).owner.operator_brackets();
+            ((SWork)amTaskGetWork(tcb)).owner.operator_brackets();
         }
 
-        private static void destructor(AppMain.AMS_TCB tcb)
+        private static void destructor(AMS_TCB tcb)
         {
-            AppMain.mppAssertNotImpl();
+            mppAssertNotImpl();
         }
 
         [StructLayout(LayoutKind.Sequential, Size = 1)]
@@ -152,7 +127,7 @@ public partial class AppMain
 
         private class SWork
         {
-            public AppMain.ITaskLink owner;
+            public ITaskLink owner;
         }
     }
 }

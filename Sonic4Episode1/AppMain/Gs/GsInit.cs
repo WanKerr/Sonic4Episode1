@@ -1,30 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
 
 public partial class AppMain
 {
 
 
-    private static void gsInitTaskProcedure(AppMain.AMS_TCB tcb)
+    private static void gsInitTaskProcedure(AMS_TCB tcb)
     {
-        AppMain.GSS_INIT_WORK work = (AppMain.GSS_INIT_WORK)AppMain.amTaskGetWork(tcb);
+        GSS_INIT_WORK work = (GSS_INIT_WORK)amTaskGetWork(tcb);
         if (work.proc == null)
         {
-            AppMain.amTaskDelete(tcb);
+            amTaskDelete(tcb);
         }
         else
         {
-            Delegate proc = (Delegate)work.proc;
+            Delegate proc = work.proc;
             work.proc(work);
-            if ((object)work.proc != (object)proc)
+            if (work.proc != proc)
             {
                 work.count = 0;
             }
@@ -37,112 +28,114 @@ public partial class AppMain
         }
     }
 
-    private static void gsInitTaskDestructor(AppMain.AMS_TCB tcb)
+    private static void gsInitTaskDestructor(AMS_TCB tcb)
     {
-        AppMain.g_gs_init_tcb = (AppMain.AMS_TCB)null;
+        g_gs_init_tcb = null;
     }
 
-    private static void gsInitProcSysFirst(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcSysFirst(GSS_INIT_WORK work)
     {
-        AppMain.GsEnvInit();
-        AppMain.GsFontInit();
-        AppMain.AoSysInit();
-        AppMain.AoActSysInit(256U, 256U, 256U, 32U);
-        AppMain.GsSystemBgmInit();
-        AppMain.GsSystemBgmSetEnable(true);
-        AppMain.GsRebootInit();
+        GsEnvInit();
+        GsFontInit();
+        AoSysInit();
+        AoActSysInit(256U, 256U, 256U, 32U);
+        GsSystemBgmInit();
+        GsSystemBgmSetEnable(true);
+        GsRebootInit();
         bool flag = true;
-        AppMain.GsRebootIsTitleReboot();
+        GsRebootIsTitleReboot();
         if (flag)
-            AppMain.IzFadeInitEasyTask(0U, byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue, 1f);
+            IzFadeInitEasyTask(0U, byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue, 1f);
         else
-            AppMain.IzFadeInitEasyTask(0U, (byte)0, (byte)0, (byte)0, byte.MaxValue, (byte)0, (byte)0, (byte)0, byte.MaxValue, 1f);
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcStrapLoad);
+            IzFadeInitEasyTask(0U, 0, 0, 0, byte.MaxValue, 0, 0, 0, byte.MaxValue, 1f);
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcStrapLoad);
     }
 
-    private static void gsInitProcStrapLoad(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcStrapLoad(GSS_INIT_WORK work)
     {
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcLoadLoadingFile);
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcLoadLoadingFile);
     }
 
-    private static void gsInitProcLoadLoadingFile(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcLoadLoadingFile(GSS_INIT_WORK work)
     {
         if (work.fs == null)
-            work.fs = AppMain.amFsReadBackground(AppMain.g_gs_init_loading_file_path);
-        if (!AppMain.amFsIsComplete(work.fs))
+            work.fs = amFsReadBackground(g_gs_init_loading_file_path);
+        if (!amFsIsComplete(work.fs))
             return;
-        AppMain.DmLoadingBuild(work.fs);
-        AppMain.amFsClearRequest(work.fs);
-        work.fs = (AppMain.AMS_FS)null;
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcBuildLoadingFile);
+        DmLoadingBuild(work.fs);
+        amFsClearRequest(work.fs);
+        work.fs = null;
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcBuildLoadingFile);
     }
 
-    private static void gsInitProcBuildLoadingFile(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcBuildLoadingFile(GSS_INIT_WORK work)
     {
-        if (!AppMain.DmLoadingBuildCheck())
+        if (!DmLoadingBuildCheck())
             return;
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcLoadSysMsgFile);
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcLoadSysMsgFile);
     }
 
-    private static void gsInitProcLoadSysMsgFile(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcLoadSysMsgFile(GSS_INIT_WORK work)
     {
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcLoadSaveMsgFile);
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcLoadSaveMsgFile);
     }
 
-    private static void gsInitProcLoadSaveMsgFile(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcLoadSaveMsgFile(GSS_INIT_WORK work)
     {
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcSysLast);
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcSysLast);
     }
 
-    private static void gsInitProcSysLast(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcSysLast(GSS_INIT_WORK work)
     {
-        AppMain.AoAccountInit();
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcCheckTrial);
+        AoAccountInit();
+        //AoStorageInit();
+        //DmRankSysInit();
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcCheckTrial);
     }
 
-    private static void gsInitProcCheckTrial(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcCheckTrial(GSS_INIT_WORK work)
     {
         if (work.count == 0)
-            AppMain.GsTrialInitStart();
-        if (!AppMain.GsTrialInitIsFinished())
+            GsTrialInitStart();
+        if (!GsTrialInitIsFinished())
             return;
-        AppMain.amSystemLog("\n================================================\n");
-        if (AppMain.GsTrialIsTrial())
-            AppMain.amSystemLog("gsInit - product mode : Trial\n");
+        amSystemLog("\n================================================\n");
+        if (GsTrialIsTrial())
+            amSystemLog("gsInit - product mode : Trial\n");
         else
-            AppMain.amSystemLog("gsInit - product mode : Full\n");
-        AppMain.amSystemLog("================================================\n\n");
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcInitTorphy);
+            amSystemLog("gsInit - product mode : Full\n");
+        amSystemLog("================================================\n\n");
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcInitTorphy);
     }
 
-    private static void gsInitProcInitTorphy(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcInitTorphy(GSS_INIT_WORK work)
     {
-        AppMain.GsTrophyInit();
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcInstallTorphy);
+        GsTrophyInit();
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcInstallTorphy);
     }
 
-    private static void gsInitProcInstallTorphy(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcInstallTorphy(GSS_INIT_WORK work)
     {
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcPresence);
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcPresence);
     }
 
-    private static void gsInitProcPresence(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcPresence(GSS_INIT_WORK work)
     {
         if (work.count == 0)
-            AppMain.AoPresenceInit();
-        if (!AppMain.AoPresenceInitialized())
+            AoPresenceInit();
+        if (!AoPresenceInitialized())
             return;
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcWaitPadEnable);
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcWaitPadEnable);
     }
 
-    private static void gsInitProcWaitPadEnable(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcWaitPadEnable(GSS_INIT_WORK work)
     {
-        work.proc = new AppMain.GSS_INIT_WORK.ProcDelegate(AppMain.gsInitProcEnd);
+        work.proc = new GSS_INIT_WORK.ProcDelegate(gsInitProcEnd);
     }
 
-    private static void gsInitProcEnd(AppMain.GSS_INIT_WORK work)
+    private static void gsInitProcEnd(GSS_INIT_WORK work)
     {
-        work.proc = (AppMain.GSS_INIT_WORK.ProcDelegate)null;
+        work.proc = null;
     }
 
 }

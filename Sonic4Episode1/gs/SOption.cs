@@ -5,7 +5,6 @@
 // Assembly location: C:\Users\wamwo\Documents\GitHub\Sonic4Ep1-WP7-Decompilation\XAP\Sonic4 ep I.dll
 
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
 
 namespace gs.backup
@@ -42,7 +41,7 @@ namespace gs.backup
             return (uint)(save.Options.SEVolume * 100f);
         }
 
-        public SOption.EControl.Type GetControl()
+        public EControl.Type GetControl()
         {
             return (EControl.Type)save.Options.ControlType;
         }
@@ -82,10 +81,10 @@ namespace gs.backup
             save.Options.SEVolume = (volume_se / 100f);
         }
 
-        public void SetControl(SOption.EControl.Type control)
+        public void SetControl(EControl.Type control)
         {
             this.isDirty = true;
-            control = (SOption.EControl.Type)Math.Min((uint)control, 3U);
+            control = (EControl.Type)Math.Min((uint)control, 3U);
             save.Options.ControlType = (ControlType)control;
         }
 

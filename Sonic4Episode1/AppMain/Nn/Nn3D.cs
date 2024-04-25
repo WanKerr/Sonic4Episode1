@@ -1,124 +1,116 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
+﻿using Microsoft.Xna.Framework;
 using mpp;
 
 public partial class AppMain
 {
-    private int nnGetMaterialIndex(AppMain.NNS_NODENAMELIST pMaterialNameList, string MaterialName)
+    private int nnGetMaterialIndex(NNS_NODENAMELIST pMaterialNameList, string MaterialName)
     {
         return this.nnGetNodeIndex(pMaterialNameList, MaterialName);
     }
 
-    private string nnGetMaterialName(AppMain.NNS_NODENAMELIST pMaterialNameList, int MaterialIndex)
+    private string nnGetMaterialName(NNS_NODENAMELIST pMaterialNameList, int MaterialIndex)
     {
         return this.nnGetNodeName(pMaterialNameList, MaterialIndex);
     }
 
     private static void nnSetPrimitive3DMaterial(
-      ref AppMain.NNS_RGBA diffuse,
-      ref AppMain.SNNS_RGB ambient,
+      ref NNS_RGBA diffuse,
+      ref SNNS_RGB ambient,
       float specular)
     {
-        AppMain.nndrawprim3d.nnsDiffuse[0] = diffuse.r;
-        AppMain.nndrawprim3d.nnsDiffuse[1] = diffuse.g;
-        AppMain.nndrawprim3d.nnsDiffuse[2] = diffuse.b;
-        AppMain.nndrawprim3d.nnsDiffuse[3] = diffuse.a;
-        AppMain.nndrawprim3d.nnsAmbient[0] = ambient.r;
-        AppMain.nndrawprim3d.nnsAmbient[1] = ambient.g;
-        AppMain.nndrawprim3d.nnsAmbient[2] = ambient.b;
-        AppMain.nndrawprim3d.nnsAmbient[3] = 1f;
-        AppMain.nndrawprim3d.nnsSpecular[0] = specular;
-        AppMain.nndrawprim3d.nnsSpecular[1] = specular;
-        AppMain.nndrawprim3d.nnsSpecular[2] = specular;
-        AppMain.nndrawprim3d.nnsSpecular[3] = 1f;
+        nndrawprim3d.nnsDiffuse[0] = diffuse.r;
+        nndrawprim3d.nnsDiffuse[1] = diffuse.g;
+        nndrawprim3d.nnsDiffuse[2] = diffuse.b;
+        nndrawprim3d.nnsDiffuse[3] = diffuse.a;
+        nndrawprim3d.nnsAmbient[0] = ambient.r;
+        nndrawprim3d.nnsAmbient[1] = ambient.g;
+        nndrawprim3d.nnsAmbient[2] = ambient.b;
+        nndrawprim3d.nnsAmbient[3] = 1f;
+        nndrawprim3d.nnsSpecular[0] = specular;
+        nndrawprim3d.nnsSpecular[1] = specular;
+        nndrawprim3d.nnsSpecular[2] = specular;
+        nndrawprim3d.nnsSpecular[3] = 1f;
     }
 
     private static void nnSetPrimitive3DMaterial(
-      ref AppMain.NNS_RGBA diffuse,
-      ref AppMain.NNS_RGB ambient,
+      ref NNS_RGBA diffuse,
+      ref NNS_RGB ambient,
       float specular)
     {
-        AppMain.nndrawprim3d.nnsDiffuse[0] = diffuse.r;
-        AppMain.nndrawprim3d.nnsDiffuse[1] = diffuse.g;
-        AppMain.nndrawprim3d.nnsDiffuse[2] = diffuse.b;
-        AppMain.nndrawprim3d.nnsDiffuse[3] = diffuse.a;
-        AppMain.nndrawprim3d.nnsAmbient[0] = ambient.r;
-        AppMain.nndrawprim3d.nnsAmbient[1] = ambient.g;
-        AppMain.nndrawprim3d.nnsAmbient[2] = ambient.b;
-        AppMain.nndrawprim3d.nnsAmbient[3] = 1f;
-        AppMain.nndrawprim3d.nnsSpecular[0] = specular;
-        AppMain.nndrawprim3d.nnsSpecular[1] = specular;
-        AppMain.nndrawprim3d.nnsSpecular[2] = specular;
-        AppMain.nndrawprim3d.nnsSpecular[3] = 1f;
+        nndrawprim3d.nnsDiffuse[0] = diffuse.r;
+        nndrawprim3d.nnsDiffuse[1] = diffuse.g;
+        nndrawprim3d.nnsDiffuse[2] = diffuse.b;
+        nndrawprim3d.nnsDiffuse[3] = diffuse.a;
+        nndrawprim3d.nnsAmbient[0] = ambient.r;
+        nndrawprim3d.nnsAmbient[1] = ambient.g;
+        nndrawprim3d.nnsAmbient[2] = ambient.b;
+        nndrawprim3d.nnsAmbient[3] = 1f;
+        nndrawprim3d.nnsSpecular[0] = specular;
+        nndrawprim3d.nnsSpecular[1] = specular;
+        nndrawprim3d.nnsSpecular[2] = specular;
+        nndrawprim3d.nnsSpecular[3] = 1f;
     }
 
     private static void nnSetPrimitive3DMaterialGL(
-      ref AppMain.NNS_RGBA diffuse,
-      ref AppMain.NNS_RGBA ambient,
-      ref AppMain.NNS_RGBA specular,
+      ref NNS_RGBA diffuse,
+      ref NNS_RGBA ambient,
+      ref NNS_RGBA specular,
       float shininess,
-      ref AppMain.NNS_RGBA emission)
+      ref NNS_RGBA emission)
     {
-        AppMain.nndrawprim3d.nnsDiffuse[0] = diffuse.r;
-        AppMain.nndrawprim3d.nnsDiffuse[1] = diffuse.g;
-        AppMain.nndrawprim3d.nnsDiffuse[2] = diffuse.b;
-        AppMain.nndrawprim3d.nnsDiffuse[3] = diffuse.a;
-        AppMain.nndrawprim3d.nnsAmbient[0] = ambient.r;
-        AppMain.nndrawprim3d.nnsAmbient[1] = ambient.g;
-        AppMain.nndrawprim3d.nnsAmbient[2] = ambient.b;
-        AppMain.nndrawprim3d.nnsAmbient[3] = ambient.a;
-        AppMain.nndrawprim3d.nnsSpecular[0] = specular.r;
-        AppMain.nndrawprim3d.nnsSpecular[1] = specular.g;
-        AppMain.nndrawprim3d.nnsSpecular[2] = specular.b;
-        AppMain.nndrawprim3d.nnsSpecular[3] = specular.a;
-        AppMain.nndrawprim3d.nnsShininess = shininess;
-        AppMain.nndrawprim3d.nnsEmission[0] = emission.r;
-        AppMain.nndrawprim3d.nnsEmission[1] = emission.g;
-        AppMain.nndrawprim3d.nnsEmission[2] = emission.b;
-        AppMain.nndrawprim3d.nnsEmission[3] = emission.a;
+        nndrawprim3d.nnsDiffuse[0] = diffuse.r;
+        nndrawprim3d.nnsDiffuse[1] = diffuse.g;
+        nndrawprim3d.nnsDiffuse[2] = diffuse.b;
+        nndrawprim3d.nnsDiffuse[3] = diffuse.a;
+        nndrawprim3d.nnsAmbient[0] = ambient.r;
+        nndrawprim3d.nnsAmbient[1] = ambient.g;
+        nndrawprim3d.nnsAmbient[2] = ambient.b;
+        nndrawprim3d.nnsAmbient[3] = ambient.a;
+        nndrawprim3d.nnsSpecular[0] = specular.r;
+        nndrawprim3d.nnsSpecular[1] = specular.g;
+        nndrawprim3d.nnsSpecular[2] = specular.b;
+        nndrawprim3d.nnsSpecular[3] = specular.a;
+        nndrawprim3d.nnsShininess = shininess;
+        nndrawprim3d.nnsEmission[0] = emission.r;
+        nndrawprim3d.nnsEmission[1] = emission.g;
+        nndrawprim3d.nnsEmission[2] = emission.b;
+        nndrawprim3d.nnsEmission[3] = emission.a;
     }
 
-    private static void nnSetPrimitive3DMatrix(ref AppMain.SNNS_MATRIX mtx)
+    private static void nnSetPrimitive3DMatrix(ref SNNS_MATRIX mtx)
     {
-        AppMain.nnCopyMatrix(AppMain.nndrawprim3d.nnsPrim3DMatrix, ref mtx);
+        nnCopyMatrix(nndrawprim3d.nnsPrim3DMatrix, ref mtx);
     }
 
-    private static void nnSetPrimitive3DMatrix(AppMain.NNS_MATRIX mtx)
+    private static void nnSetPrimitive3DMatrix(NNS_MATRIX mtx)
     {
-        AppMain.nnCopyMatrix(AppMain.nndrawprim3d.nnsPrim3DMatrix, mtx);
+        nnCopyMatrix(nndrawprim3d.nnsPrim3DMatrix, mtx);
     }
 
-    private static void nnChangePrimitive3DMatrix(AppMain.NNS_MATRIX mtx)
+    private static void nnChangePrimitive3DMatrix(NNS_MATRIX mtx)
     {
         OpenGL.glMatrixMode(5888U);
         Matrix matrix = (Matrix)mtx;
         OpenGL.glLoadMatrixf(ref matrix);
-        if (AppMain.nngDrawPrimTexCoord != 1)
+        if (nngDrawPrimTexCoord != 1)
             return;
-        AppMain.nnPutEnvironmentTextureMatrix(mtx);
+        nnPutEnvironmentTextureMatrix(mtx);
     }
 
     private static void nnSetPrimitive3DAlphaFuncGL(uint func, float _ref)
     {
-        AppMain.nndrawprim3d.nnsAlphaFunc = func;
-        AppMain.nndrawprim3d.nnsAlphaFuncRef = _ref;
+        nndrawprim3d.nnsAlphaFunc = func;
+        nndrawprim3d.nnsAlphaFuncRef = _ref;
     }
 
     private static void nnSetPrimitive3DDepthFuncGL(uint func)
     {
-        AppMain.nndrawprim3d.nnsDepthFunc = func;
+        nndrawprim3d.nnsDepthFunc = func;
     }
 
     private static void nnSetPrimitive3DDepthMaskGL(bool flag)
     {
-        AppMain.nndrawprim3d.nnsDepthMask = flag;
+        nndrawprim3d.nnsDepthMask = flag;
     }
 
     private static void nnBeginDrawPrimitive3DCore(int fmt, int blend, int light)
@@ -126,11 +118,11 @@ public partial class AppMain
         OpenGL.glShadeModel(7425U);
         OpenGL.glLightModelf(2898U, 0.0f);
         OpenGL.glEnable(3008U);
-        OpenGL.glAlphaFunc(AppMain.nndrawprim3d.nnsAlphaFunc, AppMain.nndrawprim3d.nnsAlphaFuncRef);
+        OpenGL.glAlphaFunc(nndrawprim3d.nnsAlphaFunc, nndrawprim3d.nnsAlphaFuncRef);
         OpenGL.glEnable(2929U);
-        OpenGL.glDepthFunc(AppMain.nndrawprim3d.nnsDepthFunc);
-        OpenGL.glDepthMask(AppMain.nndrawprim3d.nnsDepthMask);
-        OpenGL.glColorMask((byte)1, (byte)1, (byte)1, (byte)1);
+        OpenGL.glDepthFunc(nndrawprim3d.nnsDepthFunc);
+        OpenGL.glDepthMask(nndrawprim3d.nnsDepthMask);
+        OpenGL.glColorMask(1, 1, 1, 1);
         OpenGL.glBindBuffer(34962U, 0U);
         OpenGL.glBindBuffer(34963U, 0U);
         OpenGL.glDisableClientState(34477U);
@@ -138,7 +130,7 @@ public partial class AppMain
         if (blend == 1)
         {
             OpenGL.glEnable(3042U);
-            switch (AppMain.nngDrawPrimBlend)
+            switch (nngDrawPrimBlend)
             {
                 case 0:
                     OpenGL.glBlendFunc(770U, 1U);
@@ -152,52 +144,52 @@ public partial class AppMain
         }
         else
             OpenGL.glDisable(3042U);
-        AppMain.nnPutFogSwitchGL(AppMain.nngFogSwitch);
+        nnPutFogSwitchGL(nngFogSwitch);
         switch (light)
         {
             case 0:
                 OpenGL.glDisable(2896U);
-                OpenGL.glMaterialfv(1032U, 4609U, (OpenGL.glArray4f)AppMain.nngColorWhite);
-                OpenGL.glColor4fv(AppMain.nndrawprim3d.nnsDiffuse);
+                OpenGL.glMaterialfv(1032U, 4609U, (OpenGL.glArray4f)nngColorWhite);
+                OpenGL.glColor4fv(nndrawprim3d.nnsDiffuse);
                 break;
             case 1:
                 OpenGL.glEnable(2896U);
-                OpenGL.glMaterialfv(1032U, 4608U, AppMain.nndrawprim3d.nnsAmbient);
-                OpenGL.glMaterialfv(1032U, 4609U, AppMain.nndrawprim3d.nnsDiffuse);
-                OpenGL.glMaterialfv(1032U, 4610U, (OpenGL.glArray4f)AppMain.nngColorBlack);
+                OpenGL.glMaterialfv(1032U, 4608U, nndrawprim3d.nnsAmbient);
+                OpenGL.glMaterialfv(1032U, 4609U, nndrawprim3d.nnsDiffuse);
+                OpenGL.glMaterialfv(1032U, 4610U, (OpenGL.glArray4f)nngColorBlack);
                 OpenGL.glMaterialf(1032U, 5633U, 0.0f);
-                OpenGL.glMaterialfv(1032U, 5632U, (OpenGL.glArray4f)AppMain.nngColorBlack);
-                OpenGL.glColor4fv((OpenGL.glArray4f)AppMain.nngColorWhite);
+                OpenGL.glMaterialfv(1032U, 5632U, (OpenGL.glArray4f)nngColorBlack);
+                OpenGL.glColor4fv((OpenGL.glArray4f)nngColorWhite);
                 break;
             case 2:
                 OpenGL.glEnable(2896U);
-                OpenGL.glMaterialfv(1032U, 4608U, AppMain.nndrawprim3d.nnsAmbient);
-                OpenGL.glMaterialfv(1032U, 4609U, AppMain.nndrawprim3d.nnsDiffuse);
-                OpenGL.glMaterialfv(1032U, 4610U, AppMain.nndrawprim3d.nnsSpecular);
-                OpenGL.glMaterialf(1032U, 5633U, AppMain.nndrawprim3d.nnsShininess);
-                OpenGL.glMaterialfv(1032U, 5632U, AppMain.nndrawprim3d.nnsEmission);
-                OpenGL.glColor4fv((OpenGL.glArray4f)AppMain.nngColorWhite);
+                OpenGL.glMaterialfv(1032U, 4608U, nndrawprim3d.nnsAmbient);
+                OpenGL.glMaterialfv(1032U, 4609U, nndrawprim3d.nnsDiffuse);
+                OpenGL.glMaterialfv(1032U, 4610U, nndrawprim3d.nnsSpecular);
+                OpenGL.glMaterialf(1032U, 5633U, nndrawprim3d.nnsShininess);
+                OpenGL.glMaterialfv(1032U, 5632U, nndrawprim3d.nnsEmission);
+                OpenGL.glColor4fv((OpenGL.glArray4f)nngColorWhite);
                 break;
         }
-        AppMain.nndrawprim3d.nnsFormat = fmt;
+        nndrawprim3d.nnsFormat = fmt;
         switch (fmt)
         {
             case 1:
                 OpenGL.glEnableClientState(32884U);
                 OpenGL.glEnableClientState(32885U);
                 OpenGL.glDisableClientState(32886U);
-                if (AppMain.nngDrawPrimTexCoord == 1)
+                if (nngDrawPrimTexCoord == 1)
                 {
                     OpenGL.glClientActiveTexture(33984U);
                     OpenGL.glEnableClientState(32888U);
-                    AppMain.nnPutPrimitiveTexParameter();
-                    AppMain.nnSetTexCoordSrc(0, 3);
-                    AppMain.nnSetTexCoordSrc(1, 0);
-                    AppMain.nnSetNormalFormatType(5126U);
-                    AppMain.nnPutEnvironmentTextureMatrix(AppMain.nndrawprim3d.nnsPrim3DMatrix);
+                    nnPutPrimitiveTexParameter();
+                    nnSetTexCoordSrc(0, 3);
+                    nnSetTexCoordSrc(1, 0);
+                    nnSetNormalFormatType(5126U);
+                    nnPutEnvironmentTextureMatrix(nndrawprim3d.nnsPrim3DMatrix);
                     break;
                 }
-                AppMain.nnPutPrimitiveNoTexture();
+                nnPutPrimitiveNoTexture();
                 break;
             case 2:
                 OpenGL.glEnableClientState(32884U);
@@ -205,7 +197,7 @@ public partial class AppMain
                 OpenGL.glEnableClientState(32886U);
                 OpenGL.glClientActiveTexture(33984U);
                 OpenGL.glEnableClientState(32888U);
-                AppMain.nnPutPrimitiveNoTexture();
+                nnPutPrimitiveNoTexture();
                 break;
             case 3:
                 OpenGL.glEnableClientState(32884U);
@@ -213,7 +205,7 @@ public partial class AppMain
                 OpenGL.glDisableClientState(32886U);
                 OpenGL.glClientActiveTexture(33984U);
                 OpenGL.glEnableClientState(32888U);
-                AppMain.nnPutPrimitiveTexParameter();
+                nnPutPrimitiveTexParameter();
                 OpenGL.glMatrixMode(5890U);
                 OpenGL.glLoadIdentity();
                 OpenGL.glTranslatef(0.0f, 1f, 0.0f);
@@ -225,7 +217,7 @@ public partial class AppMain
                 OpenGL.glEnableClientState(32886U);
                 OpenGL.glClientActiveTexture(33984U);
                 OpenGL.glEnableClientState(32888U);
-                AppMain.nnPutPrimitiveTexParameter();
+                nnPutPrimitiveTexParameter();
                 OpenGL.glMatrixMode(5890U);
                 OpenGL.glLoadIdentity();
                 OpenGL.glTranslatef(0.0f, 1f, 0.0f);
@@ -235,37 +227,37 @@ public partial class AppMain
                 OpenGL.glEnableClientState(32884U);
                 OpenGL.glDisableClientState(32885U);
                 OpenGL.glDisableClientState(32886U);
-                AppMain.nnPutPrimitiveNoTexture();
+                nnPutPrimitiveNoTexture();
                 break;
         }
         OpenGL.glMatrixMode(5888U);
-        Matrix nnsPrim3Dmatrix = (Matrix)AppMain.nndrawprim3d.nnsPrim3DMatrix;
+        Matrix nnsPrim3Dmatrix = (Matrix)nndrawprim3d.nnsPrim3DMatrix;
         OpenGL.glLoadMatrixf(ref nnsPrim3Dmatrix);
     }
 
     private static void nnDrawPrimitive3DCore(uint mode, object vtx, int count)
     {
-        switch (AppMain.nndrawprim3d.nnsFormat)
+        switch (nndrawprim3d.nnsFormat)
         {
             case 0:
-                AppMain.mppOpenGLFeatureNotImplAssert();
+                mppOpenGLFeatureNotImplAssert();
                 break;
             case 1:
-                AppMain.mppOpenGLFeatureNotImplAssert();
+                mppOpenGLFeatureNotImplAssert();
                 break;
             case 2:
-                AppMain.NNS_PRIM3D_PC[] data = (AppMain.NNS_PRIM3D_PC[])vtx;
+                NNS_PRIM3D_PC[] data = (NNS_PRIM3D_PC[])vtx;
                 int count1 = 0;
-                AppMain.RGBA_U8[] cbuf = AppMain._nnDrawPrimitive3DCore.cbuf;
-                AppMain._nnDrawPrimitive3DCore.colorData.Init(cbuf, 0);
-                OpenGL.glColorPointer(4, 5121U, 0, (OpenGL.GLVertexData)AppMain._nnDrawPrimitive3DCore.colorData);
+                RGBA_U8[] cbuf = _nnDrawPrimitive3DCore.cbuf;
+                _nnDrawPrimitive3DCore.colorData.Init(cbuf, 0);
+                OpenGL.glColorPointer(4, 5121U, 0, _nnDrawPrimitive3DCore.colorData);
                 int index1;
                 for (index1 = 0; index1 < count; ++index1)
                 {
                     uint col = data[index1].Col;
                     if (count1 >= 6)
                     {
-                        OpenGL.glVertexPointer(3, 5126U, 0, (OpenGL.GLVertexData)new AppMain.NNS_PRIM3D_PC_VertexData(data, index1 - count1));
+                        OpenGL.glVertexPointer(3, 5126U, 0, new NNS_PRIM3D_PC_VertexData(data, index1 - count1));
                         OpenGL.glDrawArrays(mode, 0, count1);
                         switch (mode)
                         {
@@ -291,37 +283,37 @@ public partial class AppMain
                 }
                 if (count1 <= 0)
                     break;
-                AppMain._nnDrawPrimitive3DCore.vertexDataPC.Init(data, index1 - count1);
-                OpenGL.glVertexPointer(3, 5126U, 0, (OpenGL.GLVertexData)AppMain._nnDrawPrimitive3DCore.vertexDataPC);
+                _nnDrawPrimitive3DCore.vertexDataPC.Init(data, index1 - count1);
+                OpenGL.glVertexPointer(3, 5126U, 0, _nnDrawPrimitive3DCore.vertexDataPC);
                 OpenGL.glDrawArrays(mode, 0, count1);
                 break;
             case 3:
-                AppMain.mppOpenGLFeatureNotImplAssert();
+                mppOpenGLFeatureNotImplAssert();
                 break;
             case 4:
-                AppMain.NNS_PRIM3D_PCT_ARRAY nnsPriM3DPctArray = (AppMain.NNS_PRIM3D_PCT_ARRAY)vtx;
-                AppMain.NNS_PRIM3D_PCT[] buffer = nnsPriM3DPctArray.buffer;
+                NNS_PRIM3D_PCT_ARRAY nnsPriM3DPctArray = (NNS_PRIM3D_PCT_ARRAY)vtx;
+                NNS_PRIM3D_PCT[] buffer = nnsPriM3DPctArray.buffer;
                 int offset = nnsPriM3DPctArray.offset;
                 int num = count;
                 switch (mode)
                 {
                     case 3:
-                        AppMain.mppAssertNotImpl();
+                        mppAssertNotImpl();
                         break;
                     case 5:
                         num = (num - 2) * 3;
                         break;
                 }
-                if (AppMain._nnDrawPrimitive3DCore.prim_d == null || AppMain._nnDrawPrimitive3DCore.prim_d.Length < num)
+                if (_nnDrawPrimitive3DCore.prim_d == null || _nnDrawPrimitive3DCore.prim_d.Length < num)
                 {
-                    AppMain._nnDrawPrimitive3DCore.prim_d = new AppMain.NNS_PRIM3D_PCT[num * 2];
-                    AppMain._nnDrawPrimitive3DCore.prim_c = new AppMain.RGBA_U8[num * 2];
+                    _nnDrawPrimitive3DCore.prim_d = new NNS_PRIM3D_PCT[num * 2];
+                    _nnDrawPrimitive3DCore.prim_c = new RGBA_U8[num * 2];
                 }
-                AppMain.NNS_PRIM3D_PCT[] primD = AppMain._nnDrawPrimitive3DCore.prim_d;
-                AppMain.RGBA_U8[] primC = AppMain._nnDrawPrimitive3DCore.prim_c;
+                NNS_PRIM3D_PCT[] primD = _nnDrawPrimitive3DCore.prim_d;
+                RGBA_U8[] primC = _nnDrawPrimitive3DCore.prim_c;
                 int count2 = 0;
-                AppMain._nnDrawPrimitive3DCore.colorData.Init(primC, 0);
-                OpenGL.glColorPointer(4, 5121U, 0, (OpenGL.GLVertexData)AppMain._nnDrawPrimitive3DCore.colorData);
+                _nnDrawPrimitive3DCore.colorData.Init(primC, 0);
+                OpenGL.glColorPointer(4, 5121U, 0, _nnDrawPrimitive3DCore.colorData);
                 OpenGL.glClientActiveTexture(33984U);
                 for (int index2 = 0; index2 < count; ++index2)
                 {
@@ -351,10 +343,10 @@ public partial class AppMain
                     primD[count2] = buffer[offset + index2];
                     ++count2;
                 }
-                AppMain._nnDrawPrimitive3DCore.vertexData.Init(primD, 0);
-                AppMain._nnDrawPrimitive3DCore.texCoordData.Init(primD, 0);
-                OpenGL.glVertexPointer(3, 5126U, 0, (OpenGL.GLVertexData)AppMain._nnDrawPrimitive3DCore.vertexData);
-                OpenGL.glTexCoordPointer(2, 5126U, 0, (OpenGL.GLVertexData)AppMain._nnDrawPrimitive3DCore.texCoordData);
+                _nnDrawPrimitive3DCore.vertexData.Init(primD, 0);
+                _nnDrawPrimitive3DCore.texCoordData.Init(primD, 0);
+                OpenGL.glVertexPointer(3, 5126U, 0, _nnDrawPrimitive3DCore.vertexData);
+                OpenGL.glTexCoordPointer(2, 5126U, 0, _nnDrawPrimitive3DCore.texCoordData);
                 OpenGL.glDrawArrays(mode, 0, count2);
                 break;
         }
@@ -366,7 +358,7 @@ public partial class AppMain
 
     private static void nnBeginDrawPrimitive3D(int fmt, int blend, int light, int cull)
     {
-        AppMain.nnBeginDrawPrimitive3DCore(fmt, blend, light);
+        nnBeginDrawPrimitive3DCore(fmt, blend, light);
         switch (cull)
         {
             case 0:
@@ -395,48 +387,48 @@ public partial class AppMain
                 mode = 5U;
                 break;
         }
-        AppMain.nnDrawPrimitive3DCore(mode, vtx, count);
+        nnDrawPrimitive3DCore(mode, vtx, count);
     }
 
     private static void nnEndDrawPrimitive3D()
     {
-        AppMain.nnEndDrawPrimitive3DCore();
+        nnEndDrawPrimitive3DCore();
     }
 
-    private static void nnBeginDrawPrimitiveLine3D(ref AppMain.NNS_RGBA col, int blend)
+    private static void nnBeginDrawPrimitiveLine3D(ref NNS_RGBA col, int blend)
     {
-        AppMain.nnBeginDrawPrimitive3DCore(0, blend, 0);
+        nnBeginDrawPrimitive3DCore(0, blend, 0);
         OpenGL.glDisable(2896U);
         OpenGL.glColor4fv((OpenGL.glArray4f)col);
     }
 
-    private static void nnDrawPrimitiveLine3D(AppMain.NNE_PRIM_LINE type, object vtx, int count)
+    private static void nnDrawPrimitiveLine3D(NNE_PRIM_LINE type, object vtx, int count)
     {
         uint mode;
         switch (type)
         {
-            case AppMain.NNE_PRIM_LINE.NNE_PRIM_LINE_LIST:
+            case NNE_PRIM_LINE.NNE_PRIM_LINE_LIST:
                 mode = 1U;
                 break;
             default:
                 mode = 3U;
                 break;
         }
-        AppMain.nnDrawPrimitive3DCore(mode, vtx, count);
+        nnDrawPrimitive3DCore(mode, vtx, count);
     }
 
     private static void nnEndDrawPrimitiveLine3D()
     {
-        AppMain.nnEndDrawPrimitive3DCore();
+        nnEndDrawPrimitive3DCore();
     }
 
     private static void nnDrawPrimitivePoint3D(object vtx, int count)
     {
-        AppMain.nnDrawPrimitive3DCore(0U, vtx, count);
+        nnDrawPrimitive3DCore(0U, vtx, count);
     }
 
     private static void nnEndDrawPrimitivePoint3D()
     {
-        AppMain.nnEndDrawPrimitive3DCore();
+        nnEndDrawPrimitive3DCore();
     }
 }

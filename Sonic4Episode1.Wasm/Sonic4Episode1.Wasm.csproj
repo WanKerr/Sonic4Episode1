@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<DefineConstants>TRACE;FNA;AOT;WASM;ASYNC_IO;</DefineConstants>
+		<RunAOTCompilation>true</RunAOTCompilation>
+		<WasmStripILAfterAOT>true</WasmStripILAfterAOT>
+		<!--<CompressionEnabled>false</CompressionEnabled>-->
+	</PropertyGroup>
+
+	<Import Project="..\Sonic4Episode1\Sonic4Episode1.projitems" Label="Shared" />
+	
+	<PropertyGroup>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>full</TrimMode>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<EmccLinkOptimizationFlag>-O1</EmccLinkOptimizationFlag>
+		<EmccExtraLDFlags>--js-library $(MSBuildProjectDirectory.Replace('\', '/'))/js/library-fixemscripten.js -sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$allocate,$ALLOC_NORMAL -sFULL_ES3 -lidbfs.js</EmccExtraLDFlags>
+		<WasmEmitSymbolMap>true</WasmEmitSymbolMap>
+		<WasmAllowUndefinedSymbols>true</WasmAllowUndefinedSymbols>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<NativeFileReference Include=".\lib\SDL2.a" />
+		<NativeFileReference Include=".\lib\FNA3D.a" />
+		<NativeFileReference Include=".\lib\FAudio.a" />
+		<NativeFileReference Include=".\lib\libmojoshader.a" />
+		<EmccExportedRuntimeMethod Include="SDL" />
+		<EmccExportedRuntimeMethod Include="GL" />
+		<EmccExportedRuntimeMethod Include="FS" />
+		<EmccExportedRuntimeMethod Include="IDBFS" />
+		<EmccExportedRuntimeMethod Include="setMainLoop" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\Submodules\FNA\FNA.Core.csproj" />
+	</ItemGroup>
+</Project>

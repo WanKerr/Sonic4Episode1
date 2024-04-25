@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!--  Licensed to the .NET Foundation under one or more agreements. -->
+<!-- The .NET Foundation licenses this file to you under the MIT license. -->
+<html>
+
+<head>
+    <title>Sonic the Hedgehog 4 - Episode I</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" type="text/css" href="./css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="./css/uno-bootstrap.css" />
+
+    <style>
+        :root {
+            background-color: #000;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="uno-body" class="container-fluid uno-body">
+        <div class="uno-loader" loading-position="bottom" loading-alert="none" style="z-index:10;">
+
+            <!-- Logo: change src to customize the logo -->
+            <img class="logo" src="logo.png" title="Sonic the Hedgehog 4: Episode 1" />
+
+            <progress id="progress"></progress>
+            <span id="status" class="alert"></span>
+        </div>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="canvas" width="800" height="480"></canvas>
+    </div>
+
+    <div id="tap-to-play">
+        <button>Tap to play!</button>
+    </div>
+
+    <noscript>
+        <p>This application requires Javascript and WebAssembly to be enabled.</p>
+    </noscript>
+
+    <script type='module' src="./js/index.js"></script>
+    <script defer src="https://stats.wamwoowam.co.uk/script.js" data-website-id="64a797d9-e86f-4f0d-a6de-705e6ea54e1f"></script>
+</body>
+
+</html>

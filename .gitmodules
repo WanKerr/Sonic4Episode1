@@ -1,0 +1,9 @@
+[submodule "Submodules/SonicAudioTools"]
+	path = Submodules/SonicAudioTools
+	url = https://github.com/blueskythlikesclouds/SonicAudioTools.git
+[submodule "Submodules/MonoGame"]
+	path = Submodules/MonoGame
+	url = https://github.com/WamWooWam/MonoGame
+[submodule "FNA-XNA"]
+	path = Submodules/FNA
+	url = https://github.com/FNA-XNA/FNA.git

@@ -4,93 +4,81 @@
 // MVID: 093CE2FC-33E2-4332-B0FE-1EA1E44D3AE7
 // Assembly location: C:\Users\wamwo\Documents\GitHub\Sonic4Ep1-WP7-Decompilation\XAP\Sonic4 ep I.dll
 
+using System;
 using Microsoft.Xna.Framework;
 using mpp;
-using System;
 
 public class GLColorData : OpenGL.GLVertexData
 {
-  protected OpenGL.GLVertexElementType[] compType_ = new OpenGL.GLVertexElementType[1]
-  {
+    protected OpenGL.GLVertexElementType[] compType_ = new OpenGL.GLVertexElementType[1]
+    {
     OpenGL.GLVertexElementType.Color
-  };
-  protected readonly Color[] data_;
+    };
+    protected readonly Color[] data_;
 
-  public GLColorData(ByteBuffer buffer, int size, uint type, int stride, int elCount)
-  {
-    stride = stride == 0 ? OpenGL.SizeOf(type) * size : stride;
-    this.data_ = new Color[elCount];
-    switch (type)
+    public GLColorData(ByteBuffer buffer, int size, uint type, int stride, int elCount)
     {
-      case 5121:
-        if (size > 3)
+        stride = stride == 0 ? OpenGL.SizeOf(type) * size : stride;
+        this.data_ = new Color[elCount];
+        switch (type)
         {
-          this.extract4ByteData(buffer, stride);
-          break;
+            case 5121:
+                if (size > 3)
+                {
+                    this.extract4ByteData(buffer, stride);
+                    break;
+                }
+                this.extract3ByteData(buffer, stride);
+                break;
+            case 5123:
+                throw new NotImplementedException();
+            case 5126:
+                throw new NotImplementedException();
         }
-        this.extract3ByteData(buffer, stride);
-        break;
-      case 5123:
-        throw new NotImplementedException();
-      case 5126:
-        throw new NotImplementedException();
     }
-  }
 
-  public OpenGL.GLVertexElementType[] DataComponents
-  {
-    get
+    public OpenGL.GLVertexElementType[] DataComponents => this.compType_;
+
+    public int VertexCount => this.data_.Length;
+
+    public void ExtractTo(OpenGL.Vertex[] dst, int count)
     {
-      return this.compType_;
+        for (int index = 0; index < count; ++index)
+            dst[index].Color = this.data_[index];
     }
-  }
 
-  public int VertexCount
-  {
-    get
+    public void ExtractTo(OpenGL.VertexPosTexColNorm[] dst, int dstOffset, int count)
     {
-      return this.data_.Length;
+        for (int index = 0; index < count; ++index)
+            dst[index + dstOffset].Color = this.data_[index];
     }
-  }
 
-  public void ExtractTo(OpenGL.Vertex[] dst, int count)
-  {
-    for (int index = 0; index < count; ++index)
-      dst[index].Color = this.data_[index];
-  }
-
-  public void ExtractTo(OpenGL.VertexPosTexColNorm[] dst, int dstOffset, int count)
-  {
-    for (int index = 0; index < count; ++index)
-      dst[index + dstOffset].Color = this.data_[index];
-  }
-
-  private void extract4ByteData(ByteBuffer buffer, int stride)
-  {
-    int length = this.data_.Length;
-    int index1 = 0;
-    for (int index2 = 0; index2 < length; ++index2)
+    private void extract4ByteData(ByteBuffer buffer, int stride)
     {
-      byte num1 = buffer[index1];
-      byte num2 = buffer[index1 + 1];
-      byte num3 = buffer[index1 + 2];
-      byte num4 = buffer[index1 + 3];
-      this.data_[index2] = new Color((int) num1, (int) num2, (int) num3, (int) num4);
-      index1 += stride;
+        int length = this.data_.Length;
+        int index1 = 0;
+        for (int index2 = 0; index2 < length; ++index2)
+        {
+            byte num1 = buffer[index1];
+            byte num2 = buffer[index1 + 1];
+            byte num3 = buffer[index1 + 2];
+            byte num4 = buffer[index1 + 3];
+            this.data_[index2] = new Color(num1, num2, num3, (int)num4);
+            index1 += stride;
+        }
     }
-  }
 
-  private void extract3ByteData(ByteBuffer buffer, int stride)
-  {
-    int length = this.data_.Length;
-    int index1 = 0;
-    for (int index2 = 0; index2 < length; ++index2)
+    private void extract3ByteData(ByteBuffer buffer, int stride)
     {
-      byte num1 = buffer[index1];
-      byte num2 = buffer[index1 + 1];
-      byte num3 = buffer[index1 + 2];
-      this.data_[index2] = new Color((int) num1, (int) num2, (int) num3);
-      index1 += stride;
+        int length = this.data_.Length;
+        int index1 = 0;
+        for (int index2 = 0; index2 < length; ++index2)
+        {
+            byte num1 = buffer[index1];
+            byte num2 = buffer[index1 + 1];
+            byte num3 = buffer[index1 + 2];
+            this.data_[index2] = new Color(num1, num2, num3);
+            index1 += stride;
+        }
     }
-  }
 }

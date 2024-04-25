@@ -1,46 +1,19 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
-
 public partial class AppMain
 {
-    public class GMS_PLAYER_WORK : AppMain.IOBS_OBJECT_WORK
+    public class GMS_PLAYER_WORK : IOBS_OBJECT_WORK
     {
-        public readonly AppMain.OBS_ACTION3D_NN_WORK[] obj_3d = new AppMain.OBS_ACTION3D_NN_WORK[4];
-        public readonly AppMain.OBS_ACTION3D_NN_WORK[] obj_3d_work = AppMain.New<AppMain.OBS_ACTION3D_NN_WORK>(8);
-        public readonly AppMain.OBS_RECT_WORK[] rect_work = AppMain.New<AppMain.OBS_RECT_WORK>(3);
-        public readonly AppMain.NNS_MATRIX ex_obj_mtx_r = AppMain.GlobalPool<AppMain.NNS_MATRIX>.Alloc();
-        public AppMain.VecFx32 boost_pos1 = new AppMain.VecFx32();
-        public AppMain.VecFx32 boost_pos2 = new AppMain.VecFx32();
-        public readonly AppMain.NNS_MATRIX truck_mtx_ply_mtn_pos = AppMain.GlobalPool<AppMain.NNS_MATRIX>.Alloc();
-        public readonly AppMain.NNS_VECTOR calc_accel = AppMain.GlobalPool<AppMain.NNS_VECTOR>.Alloc();
+        public readonly OBS_ACTION3D_NN_WORK[] obj_3d = new OBS_ACTION3D_NN_WORK[4];
+        public readonly OBS_ACTION3D_NN_WORK[] obj_3d_work = New<OBS_ACTION3D_NN_WORK>(8);
+        public readonly OBS_RECT_WORK[] rect_work = New<OBS_RECT_WORK>(3);
+        public readonly NNS_MATRIX ex_obj_mtx_r = GlobalPool<NNS_MATRIX>.Alloc();
+        public VecFx32 boost_pos1 = new VecFx32();
+        public VecFx32 boost_pos2 = new VecFx32();
+        public readonly NNS_MATRIX truck_mtx_ply_mtn_pos = GlobalPool<NNS_MATRIX>.Alloc();
+        public readonly NNS_VECTOR calc_accel = GlobalPool<NNS_VECTOR>.Alloc();
         public readonly ushort[] key_map = new ushort[8];
         public readonly int[] key_repeat_timer = new int[8];
-        public readonly AppMain.GMS_PLAYER_PACKET[] player_packet = AppMain.New<AppMain.GMS_PLAYER_PACKET>(4);
-        public readonly AppMain.OBS_OBJECT_WORK obj_work;
+        public readonly GMS_PLAYER_PACKET[] player_packet = New<GMS_PLAYER_PACKET>(4);
+        public readonly OBS_OBJECT_WORK obj_work;
         public byte char_id;
         public byte player_id;
         public byte ctrl_id;
@@ -56,9 +29,9 @@ public partial class AppMain
         public uint gmk_flag2;
         public int dash_power;
         public int prev_walk_roll_spd_max;
-        public AppMain.seq_func_delegate seq_func;
-        public AppMain.seq_func_delegate[] seq_init_tbl;
-        public AppMain.GMS_PLY_SEQ_STATE_DATA[] seq_state_data_tbl;
+        public seq_func_delegate seq_func;
+        public seq_func_delegate[] seq_init_tbl;
+        public GMS_PLY_SEQ_STATE_DATA[] seq_state_data_tbl;
         public short spin_se_timer;
         public short spin_back_se_timer;
         public short tension;
@@ -116,8 +89,8 @@ public partial class AppMain
         public int camera_ofst_tag_x;
         public int camera_ofst_tag_y;
         public int camera_jump_pos_y;
-        public AppMain.OBS_OBJECT_WORK enemy_obj;
-        public AppMain.OBS_OBJECT_WORK cursol_enemy_obj;
+        public OBS_OBJECT_WORK enemy_obj;
+        public OBS_OBJECT_WORK cursol_enemy_obj;
         public ushort pgm_turn_dir;
         public ushort pgm_turn_spd;
         public ushort[] pgm_turn_dir_tbl;
@@ -126,7 +99,7 @@ public partial class AppMain
         public int fall_act_state;
         public int scroll_spd_x;
         public uint score_combo_cnt;
-        public AppMain.OBS_OBJECT_WORK gmk_obj;
+        public OBS_OBJECT_WORK gmk_obj;
         public short gmk_camera_ofst_x;
         public short gmk_camera_ofst_y;
         public short gmk_camera_center_ofst_x;
@@ -151,15 +124,15 @@ public partial class AppMain
         public ushort jump_pseudofall_eve_id_cur;
         public ushort jump_pseudofall_eve_id_wait;
         public int truck_left_flip_timer;
-        public AppMain.OBS_OBJECT_WORK truck_obj;
+        public OBS_OBJECT_WORK truck_obj;
         public ushort truck_prev_dir;
         public ushort truck_prev_dir_fall;
         public ushort truck_stick_prev_dir;
-        public AppMain.OBS_OBJECT_WORK efct_spin_jump_blur;
-        public AppMain.OBS_OBJECT_WORK efct_spin_dash_blur;
-        public AppMain.OBS_OBJECT_WORK efct_spin_dash_cir_blur;
-        public AppMain.OBS_OBJECT_WORK efct_spin_start_blur;
-        public AppMain.OBS_OBJECT_WORK efct_run_spray;
+        public OBS_OBJECT_WORK efct_spin_jump_blur;
+        public OBS_OBJECT_WORK efct_spin_dash_blur;
+        public OBS_OBJECT_WORK efct_spin_dash_cir_blur;
+        public OBS_OBJECT_WORK efct_spin_start_blur;
+        public OBS_OBJECT_WORK efct_run_spray;
         public float light_rate;
         public int light_anm_flag;
         public short speed_curse;
@@ -191,21 +164,22 @@ public partial class AppMain
         public int packet_camera_pos_x;
         public int packet_camera_pos_y;
         public short use_packet_buf_no;
+        public short key_z_rot;
         public GSS_SND_SE_HANDLE spinHandle = GsSoundAllocSeHandle();
 
-        public static explicit operator AppMain.OBS_OBJECT_WORK(AppMain.GMS_PLAYER_WORK work)
+        public static explicit operator OBS_OBJECT_WORK(GMS_PLAYER_WORK work)
         {
             return work?.obj_work;
         }
 
-        public AppMain.OBS_OBJECT_WORK Cast()
+        public OBS_OBJECT_WORK Cast()
         {
             return this.obj_work;
         }
 
         public GMS_PLAYER_WORK()
         {
-            this.obj_work = AppMain.OBS_OBJECT_WORK.Create((object)this);
+            this.obj_work = OBS_OBJECT_WORK.Create(this);
         }
     }
 }

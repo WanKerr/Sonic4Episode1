@@ -6,20 +6,14 @@
 
 public class ShortBuffer : ByteBuffer
 {
-  public ShortBuffer(ByteBuffer buffer)
-    : base(buffer.data, buffer.offset)
-  {
-  }
+    public ShortBuffer(ByteBuffer buffer)
+      : base(buffer.data, buffer.offset)
+    {
+    }
 
-  public short this[int index]
-  {
-    get
+    public short this[int index]
     {
-      return this.GetShort(index * 2);
+        get => this.GetShort(index * 2);
+        set => this.PutShort(value, index * 2);
     }
-    set
-    {
-      this.PutShort(value, index * 2);
-    }
-  }
 }

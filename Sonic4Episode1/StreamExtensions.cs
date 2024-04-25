@@ -9,14 +9,14 @@ using System.IO;
 
 internal static class StreamExtensions
 {
-  private static byte[] buffer = new byte[16384];
+    private static byte[] buffer = new byte[16384];
 
-  public static void CopyTo(this Stream self, Stream dst)
-  {
-    for (int count = Math.Min((int) self.Length - (int) self.Position, StreamExtensions.buffer.Length); count > 0; count = Math.Min((int) self.Length - (int) self.Position, StreamExtensions.buffer.Length))
+    public static void CopyTo(this Stream self, Stream dst)
     {
-      self.Read(StreamExtensions.buffer, 0, count);
-      dst.Write(StreamExtensions.buffer, 0, count);
+        for (int count = Math.Min((int)self.Length - (int)self.Position, buffer.Length); count > 0; count = Math.Min((int)self.Length - (int)self.Position, buffer.Length))
+        {
+            self.Read(buffer, 0, count);
+            dst.Write(buffer, 0, count);
+        }
     }
-  }
 }

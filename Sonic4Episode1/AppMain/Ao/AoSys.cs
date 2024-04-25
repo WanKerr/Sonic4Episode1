@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Media;
-using mpp;
 
 public partial class AppMain
 {
     private static void AoSysInit()
     {
-        AppMain.g_ao_sys_global.is_show_ui = false;
-        AppMain.g_ao_sys_global.is_signin_changed = false;
+        g_ao_sys_global.is_show_ui = false;
+        g_ao_sys_global.is_signin_changed = false;
         if (!MediaPlayer.GameHasControl || MediaPlayer.State == MediaState.Playing)
         {
-            AppMain.g_ao_sys_global.is_playing_device_bgm_music = true;
+            g_ao_sys_global.is_playing_device_bgm_music = true;
             List<string> stringList = new List<string>();
             stringList.Add(Sonic4ep1.Strings.ID_YES);
             stringList.Add(Sonic4ep1.Strings.ID_NO);
@@ -26,33 +18,33 @@ public partial class AppMain
             // show message?
         }
         else
-            AppMain.g_ao_sys_global.is_playing_device_bgm_music = false;
-        AppMain.aoSysInit();
+            g_ao_sys_global.is_playing_device_bgm_music = false;
+        aoSysInit();
     }
 
     private static void AoSysExit()
     {
-        AppMain.aoSysExit();
+        aoSysExit();
     }
 
     private static bool AoSysIsShowPlatformUI()
     {
-        return AppMain.g_ao_sys_global.is_show_ui;
+        return g_ao_sys_global.is_show_ui;
     }
 
     private static bool AoSysIsChangeSigninState()
     {
-        return AppMain.g_ao_sys_global.is_signin_changed;
+        return g_ao_sys_global.is_signin_changed;
     }
 
     private static void AoSysClearSigninState()
     {
-        AppMain.g_ao_sys_global.is_signin_changed = false;
+        g_ao_sys_global.is_signin_changed = false;
     }
 
     private static bool AoSysIsPlaySystemBgm()
     {
-        return AppMain.g_ao_sys_global.is_playing_device_bgm_music;
+        return g_ao_sys_global.is_playing_device_bgm_music;
     }
 
     private static void aoSysInit()
@@ -69,7 +61,7 @@ public partial class AppMain
 
     private static object AoSysMsgGetBaseMsgFile()
     {
-        return (object)null;
+        return null;
     }
 
     private static void AoSysMsgStart(int id, int select)
@@ -96,7 +88,7 @@ public partial class AppMain
 
     private static bool AoSysMsgIsShow()
     {
-        return AppMain.AoSysMsgIsShowReal();
+        return AoSysMsgIsShowReal();
     }
 
     private static bool AoSysMsgIsShowReal()

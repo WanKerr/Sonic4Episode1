@@ -1,35 +1,8 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
-
 public partial class AppMain
 {
-    public abstract class ITaskLinkAsv : AppMain.ITaskAsv
+    public abstract class ITaskLinkAsv : ITaskAsv
     {
-        private AppMain.AMS_TCB m_task_tcb;
+        private AMS_TCB m_task_tcb;
 
         public void AttachTask()
         {
@@ -82,33 +55,33 @@ public partial class AppMain
           uint run_mask)
         {
             this.DetachTask();
-            this.m_task_tcb = AppMain.amTaskMake(new AppMain.TaskProc(AppMain.ITaskLinkAsv.procedure), new AppMain.TaskProc(AppMain.ITaskLinkAsv.destructor), priority, user, attribute, name, stall_mask, group, run_mask);
-            this.m_task_tcb.work = (object)new AppMain.ITaskLinkAsv.SWork();
-            ((AppMain.ITaskLinkAsv.SWork)AppMain.amTaskGetWork(this.m_task_tcb)).owner = this;
+            this.m_task_tcb = amTaskMake(new TaskProc(procedure), new TaskProc(destructor), priority, user, attribute, name, stall_mask, group, run_mask);
+            this.m_task_tcb.work = new SWork();
+            ((SWork)amTaskGetWork(this.m_task_tcb)).owner = this;
         }
 
         public void DetachTask()
         {
             if (this.m_task_tcb == null)
                 return;
-            AppMain.amTaskSetDestructor(this.m_task_tcb, (AppMain.TaskProc)null);
-            AppMain.amTaskDelete(this.m_task_tcb);
+            amTaskSetDestructor(this.m_task_tcb, null);
+            amTaskDelete(this.m_task_tcb);
             this.TaskDestructor(0);
-            this.m_task_tcb = (AppMain.AMS_TCB)null;
+            this.m_task_tcb = null;
         }
 
-        public static AppMain.ITaskLinkAsv CastFromTaskTcb(AppMain.AMS_TCB tcb)
+        public static ITaskLinkAsv CastFromTaskTcb(AMS_TCB tcb)
         {
-            if (new AppMain.TaskProc(AppMain.ITaskLinkAsv.procedure) == tcb.procedure || new AppMain.TaskProc(AppMain.ITaskLinkAsv.destructor) == tcb.destructor)
+            if (new TaskProc(procedure) == tcb.procedure || new TaskProc(destructor) == tcb.destructor)
             {
-                AppMain.ITaskLinkAsv.SWork work = (AppMain.ITaskLinkAsv.SWork)AppMain.amTaskGetWork(tcb);
+                SWork work = (SWork)amTaskGetWork(tcb);
                 if (work.owner != null && work.owner.m_task_tcb == tcb)
                     return work.owner;
             }
-            return (AppMain.ITaskLinkAsv)null;
+            return null;
         }
 
-        public override AppMain.AMS_TCB GetTaskTcb()
+        public override AMS_TCB GetTaskTcb()
         {
             return this.m_task_tcb;
         }
@@ -125,17 +98,17 @@ public partial class AppMain
         private void TcbLinkDestructorCb()
         {
             this.TaskDestructor(1);
-            this.m_task_tcb = (AppMain.AMS_TCB)null;
+            this.m_task_tcb = null;
         }
 
-        private static void procedure(AppMain.AMS_TCB tcb)
+        private static void procedure(AMS_TCB tcb)
         {
-            ((AppMain.ITaskLinkAsv.SWork)AppMain.amTaskGetWork(tcb)).owner.operator_brackets();
+            ((SWork)amTaskGetWork(tcb)).owner.operator_brackets();
         }
 
-        private static void destructor(AppMain.AMS_TCB tcb)
+        private static void destructor(AMS_TCB tcb)
         {
-            ((AppMain.ITaskLinkAsv.SWork)AppMain.amTaskGetWork(tcb)).owner.TcbLinkDestructorCb();
+            ((SWork)amTaskGetWork(tcb)).owner.TcbLinkDestructorCb();
         }
 
         protected class EDestructorCbType
@@ -148,7 +121,7 @@ public partial class AppMain
 
         private class SWork
         {
-            public AppMain.ITaskLinkAsv owner;
+            public ITaskLinkAsv owner;
         }
     }
 }

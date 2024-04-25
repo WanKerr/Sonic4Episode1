@@ -1,39 +1,14 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using mpp;
-using setting;
 
 public partial class AppMain
 {
     public class NNS_MATERIAL_COLOR
     {
         public uint fFlag;
-        public AppMain.NNS_RGBA Ambient;
-        public AppMain.NNS_RGBA Diffuse;
-        public AppMain.NNS_RGBA Specular;
-        public AppMain.NNS_RGBA Emission;
+        public NNS_RGBA Ambient;
+        public NNS_RGBA Diffuse;
+        public NNS_RGBA Specular;
+        public NNS_RGBA Emission;
         public float Shininess;
         public uint VtxColMaterial;
 
@@ -41,7 +16,7 @@ public partial class AppMain
         {
         }
 
-        public NNS_MATERIAL_COLOR(AppMain.NNS_MATERIAL_COLOR matColor)
+        public NNS_MATERIAL_COLOR(NNS_MATERIAL_COLOR matColor)
         {
             this.fFlag = matColor.fFlag;
             this.Ambient = matColor.Ambient;
@@ -52,7 +27,7 @@ public partial class AppMain
             this.VtxColMaterial = matColor.VtxColMaterial;
         }
 
-        public AppMain.NNS_MATERIAL_COLOR Assign(AppMain.NNS_MATERIAL_COLOR matColor)
+        public NNS_MATERIAL_COLOR Assign(NNS_MATERIAL_COLOR matColor)
         {
             this.fFlag = matColor.fFlag;
             this.Ambient = matColor.Ambient;
@@ -64,10 +39,10 @@ public partial class AppMain
             return this;
         }
 
-        public static explicit operator AppMain.NNS_MATERIAL_STDSHADER_COLOR(
-          AppMain.NNS_MATERIAL_COLOR color)
+        public static explicit operator NNS_MATERIAL_STDSHADER_COLOR(
+          NNS_MATERIAL_COLOR color)
         {
-            return new AppMain.NNS_MATERIAL_STDSHADER_COLOR()
+            return new NNS_MATERIAL_STDSHADER_COLOR()
             {
                 Ambient = color.Ambient,
                 Diffuse = color.Diffuse,

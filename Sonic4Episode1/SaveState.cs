@@ -4,15 +4,34 @@
 // MVID: 093CE2FC-33E2-4332-B0FE-1EA1E44D3AE7
 // Assembly location: C:\Users\wamwo\Documents\GitHub\Sonic4Ep1-WP7-Decompilation\XAP\Sonic4 ep I.dll
 
-using Sonic4ep1;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.IsolatedStorage;
 using System.Threading;
+using System.Threading.Tasks;
+using Sonic4ep1;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.GamerServices;
 
-public class SaveState
+#if WASM
+using System.Runtime.InteropServices.JavaScript;
+#endif
+
+public partial class SaveState
 {
+#if WASM
+    [JSImport("SaveState_GetSaveState", "main.js")]
+    internal static partial string GetSaveState();
+    [JSImport("SaveState_SetSaveState", "main.js")]
+    internal static partial void SetSaveState(string value);
+
+    [JSImport("SaveState_HasSaveState", "main.js")]
+    internal static partial bool HasSaveState();
+
+    [JSImport("SaveState_DeleteSaveState", "main.js")]
+    internal static partial void DeleteSaveState();
+#endif
+
     public static bool saveLater = false;
     private static bool resumeStarting = false;
     private static bool beginResume = false;
@@ -20,61 +39,91 @@ public class SaveState
     public const int SAVE_AFTER_RESPAWN = 0;
     public const int SAVE_AFTER_CHECKPOINT = 1;
     private const string filename = "laststate.dat";
-    public static SaveState.SaveData save;
+    public static SaveData save;
+
+#if USE_THREADS
     private static Thread saveThread;
+#else
+    private static Task saveThread;
+#endif
 
     public static void saveCurrentState(int mode)
     {
         if (AppMain.GsTrialIsTrial())
             return;
-        SaveState.save.player_pos_x = AppMain.g_gm_main_system.ply_work[0].obj_work.pos.x;
-        SaveState.save.player_pos_y = AppMain.g_gm_main_system.ply_work[0].obj_work.pos.y;
-        SaveState.save.resume_pos_x = AppMain.g_gm_main_system.resume_pos_x;
-        SaveState.save.resume_pos_y = AppMain.g_gm_main_system.resume_pos_y;
-        SaveState.save.game_time = AppMain.g_gm_main_system.game_time;
-        SaveState.save.time_save = AppMain.g_gm_main_system.time_save;
-        SaveState.save.marker_pri = AppMain.g_gm_main_system.marker_pri;
-        SaveState.save.water_levell = AppMain.g_gm_main_system.water_level;
-        SaveState.save.pseudofall_dir = AppMain.g_gm_main_system.pseudofall_dir;
-        SaveState.save.rest_num = AppMain.g_gm_main_system.player_rest_num[0];
-        SaveState.save.stage_id = AppMain.g_gs_main_sys_info.stage_id;
-        SaveState.save.level = AppMain.g_gs_main_sys_info.level;
-        SaveState.save.game_mode = AppMain.g_gs_main_sys_info.game_mode;
-        SaveState.save.boss_load_no = AppMain.g_gm_main_system.boss_load_no;
-        SaveState.save.player_flag = AppMain.g_gm_main_system.ply_work[0].player_flag;
-        SaveState.save.ring_num = AppMain.g_gm_main_system.ply_work[0].ring_num;
-        SaveState.save.ring_stage_num = AppMain.g_gm_main_system.ply_work[0].ring_stage_num;
-        SaveState.save.score = AppMain.g_gm_main_system.ply_work[0].score;
+        save.player_pos_x = AppMain.g_gm_main_system.ply_work[0].obj_work.pos.x;
+        save.player_pos_y = AppMain.g_gm_main_system.ply_work[0].obj_work.pos.y;
+        save.resume_pos_x = AppMain.g_gm_main_system.resume_pos_x;
+        save.resume_pos_y = AppMain.g_gm_main_system.resume_pos_y;
+        save.game_time = AppMain.g_gm_main_system.game_time;
+        save.time_save = AppMain.g_gm_main_system.time_save;
+        save.marker_pri = AppMain.g_gm_main_system.marker_pri;
+        save.water_levell = AppMain.g_gm_main_system.water_level;
+        save.pseudofall_dir = AppMain.g_gm_main_system.pseudofall_dir;
+        save.rest_num = AppMain.g_gm_main_system.player_rest_num[0];
+        save.stage_id = AppMain.g_gs_main_sys_info.stage_id;
+        save.level = AppMain.g_gs_main_sys_info.level;
+        save.game_mode = AppMain.g_gs_main_sys_info.game_mode;
+        save.boss_load_no = AppMain.g_gm_main_system.boss_load_no;
+        save.player_flag = AppMain.g_gm_main_system.ply_work[0].player_flag;
+        save.ring_num = AppMain.g_gm_main_system.ply_work[0].ring_num;
+        save.ring_stage_num = AppMain.g_gm_main_system.ply_work[0].ring_stage_num;
+        save.score = AppMain.g_gm_main_system.ply_work[0].score;
         if (mode == 1)
         {
-            SaveState.save.gm_eve_data = AppMain.gm_eve_data.saveData();
-            SaveState.save.gm_ring_data = AppMain.gm_ring_data.saveData();
-            SaveState.saveLater = false;
+            save.gm_eve_data = AppMain.gm_eve_data.saveData();
+            save.gm_ring_data = AppMain.gm_ring_data.saveData();
+            saveLater = false;
         }
         else
         {
-            SaveState.save.gm_eve_data = (byte[])null;
-            SaveState.save.gm_ring_data = (byte[])null;
-            SaveState.saveLater = false;
+            save.gm_eve_data = null;
+            save.gm_ring_data = null;
+            saveLater = false;
         }
-        if (SaveState.saveLater)
+        if (saveLater)
             return;
-        if (SaveState.saveThread != null)
-            SaveState.saveThread = (Thread)null;
-        SaveState.saveThread = new Thread(new ParameterizedThreadStart(SaveState._saveFile));
-        SaveState.SaveData save = SaveState.save;
-        SaveState.saveThread.Start((object)save);
+
+#if WASM
+        _saveFile(save);
+#else
+        if (saveThread != null)
+            saveThread = null;
+#if USE_THREADS
+        saveThread = new Thread(() => _saveFile(save));
+        saveThread.Start();
+#elif ASYNC_TARGETING_PACK
+        saveThread = TaskEx.Run(() => _saveFile(save));
+#else
+        saveThread = Task.Run(() => _saveFile(save));
+#endif
+#endif
     }
 
-    public static void _saveFile(object o)
+    public static void _saveFile(SaveData saveData)
     {
-        SaveState.saveLater = false;
-        SaveState.SaveData saveData = (SaveState.SaveData)o;
-        var path = Path.Combine(AppMain.storePath, "laststate.dat");
-        if (File.Exists(path))
-            File.Delete(path);
-        using (var file = File.Create(path))
-            saveData.Serialize((Stream)file);
+        try
+        {
+            saveLater = false;
+#if WASM
+            using var memoryStream = new MemoryStream();
+            saveData.Serialize(memoryStream);
+
+            var str = Convert.ToBase64String(memoryStream.ToArray());
+            SetSaveState(str);
+#else
+            // TODO: WP7 IsolatedStorage implementation
+            var path = Path.Combine(AppMain.storePath, "laststate.dat");
+            if (File.Exists(path))
+                File.Delete(path);
+            using (var file = File.Create(path))
+                saveData.Serialize(file);
+#endif
+        }
+        catch (Exception)
+        {
+
+        }
     }
 
     public static bool isSaveAvailable()
@@ -84,7 +133,11 @@ public class SaveState
         var path = Path.Combine(AppMain.storePath, "laststate.dat");
         try
         {
+#if WASM
+            return HasSaveState();
+#else
             return File.Exists(path);
+#endif
         }
         catch (Exception ex)
         {
@@ -100,11 +153,21 @@ public class SaveState
         var path = Path.Combine(AppMain.storePath, "laststate.dat");
         try
         {
+#if WASM
+            if (!HasSaveState()) return false;
+
+            var str = GetSaveState();
+            using var memoryStream = new MemoryStream(Convert.FromBase64String(str));
+            save.UnSerialize(memoryStream);
+
+            return true;
+#else
             if (!File.Exists(path))
                 return false;
             using (var storageFileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
-                SaveState.save.UnSerialize((Stream)storageFileStream);
+                save.UnSerialize(storageFileStream);
             return true;
+#endif
         }
         catch (Exception ex)
         {
@@ -116,37 +179,37 @@ public class SaveState
     {
         if (AppMain.GsTrialIsTrial())
             return;
-        AppMain.g_gm_main_system.resume_pos_x = SaveState.save.resume_pos_x;
-        AppMain.g_gm_main_system.resume_pos_y = SaveState.save.resume_pos_y;
-        AppMain.g_gm_main_system.game_time = SaveState.save.game_time;
-        AppMain.g_gm_main_system.time_save = SaveState.save.time_save;
-        AppMain.g_gm_main_system.marker_pri = SaveState.save.marker_pri;
-        AppMain.g_gm_main_system.water_level = SaveState.save.water_levell;
-        AppMain.g_gm_main_system.pseudofall_dir = SaveState.save.pseudofall_dir;
-        AppMain.g_gm_main_system.player_rest_num[0] = SaveState.save.rest_num;
-        SaveState.resumeStarting = true;
+        AppMain.g_gm_main_system.resume_pos_x = save.resume_pos_x;
+        AppMain.g_gm_main_system.resume_pos_y = save.resume_pos_y;
+        AppMain.g_gm_main_system.game_time = save.game_time;
+        AppMain.g_gm_main_system.time_save = save.time_save;
+        AppMain.g_gm_main_system.marker_pri = save.marker_pri;
+        AppMain.g_gm_main_system.water_level = save.water_levell;
+        AppMain.g_gm_main_system.pseudofall_dir = save.pseudofall_dir;
+        AppMain.g_gm_main_system.player_rest_num[0] = save.rest_num;
+        resumeStarting = true;
     }
 
     public static bool resumePlayer_2(AppMain.GMS_PLAYER_WORK ply_work)
     {
         if (AppMain.GsTrialIsTrial())
             return false;
-        SaveState.beginResume = false;
-        if (!SaveState.resumeStarting)
+        beginResume = false;
+        if (!resumeStarting)
             return false;
         AppMain.GMS_PLAYER_WORK ply_work1 = ply_work;
-        ply_work1.ring_num = SaveState.save.ring_num;
-        ply_work1.ring_stage_num = SaveState.save.ring_stage_num;
-        ply_work1.score = SaveState.save.score;
-        ply_work1.obj_work.pos.x = SaveState.save.player_pos_x;
-        ply_work1.obj_work.pos.y = SaveState.save.player_pos_y;
-        AppMain.g_gm_main_system.resume_pos_x = SaveState.save.resume_pos_x;
-        AppMain.g_gm_main_system.resume_pos_y = SaveState.save.resume_pos_y;
+        ply_work1.ring_num = save.ring_num;
+        ply_work1.ring_stage_num = save.ring_stage_num;
+        ply_work1.score = save.score;
+        ply_work1.obj_work.pos.x = save.player_pos_x;
+        ply_work1.obj_work.pos.y = save.player_pos_y;
+        AppMain.g_gm_main_system.resume_pos_x = save.resume_pos_x;
+        AppMain.g_gm_main_system.resume_pos_y = save.resume_pos_y;
         AppMain.GmCameraPosSet(AppMain.g_gm_main_system.resume_pos_x, AppMain.g_gm_main_system.resume_pos_y, 0);
         AppMain.OBS_CAMERA obj_camera = AppMain.ObjCameraGet(AppMain.g_obj.glb_camera_id);
-        AppMain.ObjObjectCameraSet(AppMain.FXM_FLOAT_TO_FX32(obj_camera.disp_pos.x - (float)((int)AppMain.OBD_LCD_X / 2)), AppMain.FXM_FLOAT_TO_FX32(-obj_camera.disp_pos.y - (float)((int)AppMain.OBD_LCD_Y / 2)), AppMain.FXM_FLOAT_TO_FX32(obj_camera.disp_pos.x - (float)((int)AppMain.OBD_LCD_X / 2)), AppMain.FXM_FLOAT_TO_FX32(-obj_camera.disp_pos.y - (float)((int)AppMain.OBD_LCD_Y / 2)));
+        AppMain.ObjObjectCameraSet(AppMain.FXM_FLOAT_TO_FX32(obj_camera.disp_pos.x - AppMain.OBD_LCD_X / 2), AppMain.FXM_FLOAT_TO_FX32(-obj_camera.disp_pos.y - AppMain.OBD_LCD_Y / 2), AppMain.FXM_FLOAT_TO_FX32(obj_camera.disp_pos.x - AppMain.OBD_LCD_X / 2), AppMain.FXM_FLOAT_TO_FX32(-obj_camera.disp_pos.y - AppMain.OBD_LCD_Y / 2));
         AppMain.GmCameraSetClipCamera(obj_camera);
-        if ((16384 & (int)SaveState.save.player_flag) != 0)
+        if ((AppMain.GMD_PLF_SUPER_SONIC & (int)save.player_flag) != 0)
         {
             ply_work1.obj_work.user_timer = 249856;
             AppMain.gmPlySeqTransformSuperMain(ply_work1);
@@ -155,9 +218,9 @@ public class SaveState
         }
         if (AppMain.g_gm_main_system.boss_load_no == -1)
         {
-            int bossLoadNo = SaveState.save.boss_load_no;
+            int bossLoadNo = save.boss_load_no;
         }
-        SaveState.resumeStarting = false;
+        resumeStarting = false;
         return true;
     }
 
@@ -165,20 +228,20 @@ public class SaveState
     {
         if (AppMain.GsTrialIsTrial())
             return;
-        AppMain.g_gs_main_sys_info.stage_id = SaveState.save.stage_id;
-        AppMain.g_gs_main_sys_info.level = SaveState.save.level;
-        AppMain.g_gs_main_sys_info.game_mode = SaveState.save.game_mode;
+        AppMain.g_gs_main_sys_info.stage_id = save.stage_id;
+        AppMain.g_gs_main_sys_info.level = save.level;
+        AppMain.g_gs_main_sys_info.game_mode = save.game_mode;
     }
 
     public static void resumeMapData()
     {
         if (AppMain.GsTrialIsTrial())
             return;
-        if (SaveState.save.gm_eve_data != null && SaveState.save.gm_ring_data != null)
+        if (save.gm_eve_data != null && save.gm_ring_data != null)
         {
-            if (SaveState.save.boss_load_no == -1)
-                AppMain.gm_eve_data.loadData(SaveState.save.gm_eve_data);
-            AppMain.gm_ring_data.loadData(SaveState.save.gm_ring_data);
+            if (save.boss_load_no == -1)
+                AppMain.gm_eve_data.loadData(save.gm_eve_data);
+            AppMain.gm_ring_data.loadData(save.gm_ring_data);
         }
         else
             AppMain.g_gs_main_sys_info.game_flag |= 4U;
@@ -188,34 +251,56 @@ public class SaveState
     {
         if (AppMain.GsTrialIsTrial())
             return;
-        SaveState.saveLater = false;
-        SaveState.beginResume = false;
-        SaveState.save = new SaveState.SaveData();
-        var path = Path.Combine(AppMain.storePath, "laststate.dat");
-        if (!File.Exists(path))
-            return;
-        File.Delete(path);
+        saveLater = false;
+        beginResume = false;
+
+        try
+        {
+            save = new SaveData();
+#if WASM
+            DeleteSaveState();
+#else
+            var path = Path.Combine(AppMain.storePath, "laststate.dat");
+            File.Delete(path);
+#endif
+        }
+        catch (Exception)
+        {
+        }
     }
 
     public static bool shouldResume()
     {
-        return SaveState.beginResume;
+        return beginResume;
     }
 
     public static void showResumeWarning()
     {
-        if (!SaveState.firstShow)
+        if (!firstShow)
             return;
-        SaveState.firstShow = false;
-        if (!SaveState.isSaveAvailable() || !SaveState.loadState())
+        firstShow = false;
+        if (!isSaveAvailable() || !loadState())
             return;
-        List<string> stringList = new List<string>();
-        stringList.Add(Strings.ID_YES);
-        stringList.Add(Strings.ID_NO);
+        List<string> stringList = new List<string> { Strings.ID_YES, Strings.ID_NO };
         string idResumeCaption = Strings.ID_RESUME_CAPTION;
         string idResumeText = Strings.ID_RESUME_TEXT;
-        //AppMain.g_ao_sys_global.is_show_ui = true;
-        //Guide.BeginShowMessageBox(idResumeCaption, idResumeText, (IEnumerable<string>)stringList, 0, MessageBoxIcon.Warning, new AsyncCallback(SaveState.GetMBResult), (object)null);
+        AppMain.g_ao_sys_global.is_show_ui = true;
+        Guide.BeginShowMessageBox(idResumeCaption, idResumeText, stringList, 0, MessageBoxIcon.Warning, new AsyncCallback(GetMBResult), null);
+    }
+
+    protected static void GetMBResult(IAsyncResult r)
+    {
+        try
+        {
+            if (Guide.EndShowMessageBox(r) == 0 && SaveState.loadState())
+            {
+                SaveState.beginResume = true;
+            }
+        }
+        finally
+        {
+            AppMain.g_ao_sys_global.is_show_ui = false;
+        }
     }
 
     public struct SaveData

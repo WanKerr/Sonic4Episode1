@@ -6,29 +6,29 @@
 
 namespace dbg
 {
-  internal class CPadEmu
-  {
-    private static CPadEmu instance;
-
-    public static CPadEmu CreateInstance()
+    internal class CPadEmu
     {
-      if (CPadEmu.instance == null)
-        CPadEmu.instance = new CPadEmu();
-      return CPadEmu.instance;
-    }
+        private static CPadEmu instance;
 
-    public void Create(CPadEmu.EMode mode)
-    {
-    }
+        public static CPadEmu CreateInstance()
+        {
+            if (instance == null)
+                instance = new CPadEmu();
+            return instance;
+        }
 
-    public enum EMode
-    {
-      Tap,
-      Drag,
-      Game,
-      Dummy,
-      Max,
-      None,
+        public void Create(EMode mode)
+        {
+        }
+
+        public enum EMode
+        {
+            Tap,
+            Drag,
+            Game,
+            Dummy,
+            Max,
+            None,
+        }
     }
-  }
 }

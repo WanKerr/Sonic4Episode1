@@ -1,57 +1,43 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
+
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
 
-public partial class AppMain
+public struct SNNS_VECTOR
 {
-    public struct SNNS_VECTOR
+    public float x;
+    public float y;
+    public float z;
+
+    public SNNS_VECTOR(NNS_VECTOR vec)
     {
-        public float x;
-        public float y;
-        public float z;
+        this.x = vec.x;
+        this.y = vec.y;
+        this.z = vec.z;
+    }
 
-        public SNNS_VECTOR(AppMain.NNS_VECTOR vec)
-        {
-            this.x = vec.x;
-            this.y = vec.y;
-            this.z = vec.z;
-        }
+    public void Assign(float x, float y, float z)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 
-        public void Assign(AppMain.NNS_VECTOR vec)
-        {
-            this.x = vec.x;
-            this.y = vec.y;
-            this.z = vec.z;
-        }
+    public void Assign(NNS_VECTOR vec)
+    {
+        this.x = vec.x;
+        this.y = vec.y;
+        this.z = vec.z;
+    }
 
-        public void Assign(ref AppMain.SNNS_VECTOR vec)
-        {
-            this.x = vec.x;
-            this.y = vec.y;
-            this.z = vec.z;
-        }
+    public void Assign(ref SNNS_VECTOR vec)
+    {
+        this.x = vec.x;
+        this.y = vec.y;
+        this.z = vec.z;
+    }
+
+    public static explicit operator Vector3(SNNS_VECTOR vec)
+    {
+        return new Vector3(vec.x, vec.y, vec.z);
     }
 }
+

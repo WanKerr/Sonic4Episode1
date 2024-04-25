@@ -1,29 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
 
 public partial class AppMain
 {
@@ -32,16 +7,16 @@ public partial class AppMain
         public uint fType;
         public int iTexIdx;
         public int EnvMode;
-        public AppMain.NNS_TEXTURE_GLES11_COMBINE pCombine;
-        public AppMain.NNS_TEXCOORD Offset;
-        public AppMain.NNS_TEXCOORD Scale;
+        public NNS_TEXTURE_GLES11_COMBINE pCombine;
+        public NNS_TEXCOORD Offset;
+        public NNS_TEXCOORD Scale;
         public int WrapS;
         public int WrapT;
-        public AppMain.NNS_TEXTURE_FILTERMODE pFilterMode;
+        public NNS_TEXTURE_FILTERMODE pFilterMode;
         public float LODBias;
         public object pTexInfo;
 
-        public void Assign(ref AppMain.NNS_MATERIAL_GLES11_TEXMAP_DESC pPtr)
+        public void Assign(ref NNS_MATERIAL_GLES11_TEXMAP_DESC pPtr)
         {
             this.fType = pPtr.fType;
             this.iTexIdx = pPtr.iTexIdx;
@@ -56,7 +31,7 @@ public partial class AppMain
             this.pTexInfo = pPtr.pTexInfo;
         }
 
-        public NNS_MATERIAL_GLES11_TEXMAP_DESC(ref AppMain.NNS_MATERIAL_GLES11_TEXMAP_DESC desc)
+        public NNS_MATERIAL_GLES11_TEXMAP_DESC(ref NNS_MATERIAL_GLES11_TEXMAP_DESC desc)
         {
             this.fType = desc.fType;
             this.iTexIdx = desc.iTexIdx;
@@ -71,11 +46,11 @@ public partial class AppMain
             this.pTexInfo = desc.pTexInfo;
         }
 
-        public static AppMain.NNS_MATERIAL_GLES11_TEXMAP_DESC Read(
+        public static NNS_MATERIAL_GLES11_TEXMAP_DESC Read(
           BinaryReader reader,
           long data0Pos)
         {
-            AppMain.NNS_MATERIAL_GLES11_TEXMAP_DESC gleS11TexmapDesc = new AppMain.NNS_MATERIAL_GLES11_TEXMAP_DESC();
+            NNS_MATERIAL_GLES11_TEXMAP_DESC gleS11TexmapDesc = new NNS_MATERIAL_GLES11_TEXMAP_DESC();
             gleS11TexmapDesc.fType = reader.ReadUInt32();
             gleS11TexmapDesc.iTexIdx = reader.ReadInt32();
             gleS11TexmapDesc.EnvMode = reader.ReadInt32();
@@ -83,8 +58,8 @@ public partial class AppMain
             if (num1 != 0U)
             {
                 long position = reader.BaseStream.Position;
-                reader.BaseStream.Seek(data0Pos + (long)num1, SeekOrigin.Begin);
-                gleS11TexmapDesc.pCombine = AppMain.NNS_TEXTURE_GLES11_COMBINE.Read(reader);
+                reader.BaseStream.Seek(data0Pos + num1, SeekOrigin.Begin);
+                gleS11TexmapDesc.pCombine = NNS_TEXTURE_GLES11_COMBINE.Read(reader);
                 reader.BaseStream.Seek(position, SeekOrigin.Begin);
             }
             gleS11TexmapDesc.Offset.u = reader.ReadSingle();
@@ -97,8 +72,8 @@ public partial class AppMain
             if (num2 != 0U)
             {
                 long position = reader.BaseStream.Position;
-                reader.BaseStream.Seek(data0Pos + (long)num2, SeekOrigin.Begin);
-                gleS11TexmapDesc.pFilterMode = AppMain.NNS_TEXTURE_FILTERMODE.Read(reader);
+                reader.BaseStream.Seek(data0Pos + num2, SeekOrigin.Begin);
+                gleS11TexmapDesc.pFilterMode = NNS_TEXTURE_FILTERMODE.Read(reader);
                 reader.BaseStream.Seek(position, SeekOrigin.Begin);
             }
             gleS11TexmapDesc.LODBias = reader.ReadSingle();
@@ -106,8 +81,8 @@ public partial class AppMain
             if (num3 != 0U)
             {
                 long position = reader.BaseStream.Position;
-                reader.BaseStream.Seek(data0Pos + (long)num3, SeekOrigin.Begin);
-                gleS11TexmapDesc.pTexInfo = (object)AppMain.NNS_TEXINFO.Read(reader);
+                reader.BaseStream.Seek(data0Pos + num3, SeekOrigin.Begin);
+                gleS11TexmapDesc.pTexInfo = NNS_TEXINFO.Read(reader);
                 reader.BaseStream.Seek(position, SeekOrigin.Begin);
             }
             return gleS11TexmapDesc;

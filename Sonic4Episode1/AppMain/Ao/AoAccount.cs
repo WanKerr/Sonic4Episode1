@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-
-public partial class AppMain
+﻿public partial class AppMain
 {
     private static void AoAccountInit()
     {
-        AppMain.g_ao_account_current_id = -1;
+        g_ao_account_current_id = -1;
     }
 
     private static void AoAccountDebugInit()
@@ -26,12 +15,12 @@ public partial class AppMain
 
     private static void AoAccountClearCurrentId()
     {
-        AppMain.g_ao_account_current_id = -1;
+        g_ao_account_current_id = -1;
     }
 
     private static void AoAccountSetCurrentIdStart(uint id)
     {
-        AppMain.g_ao_account_current_id = (int)id;
+        g_ao_account_current_id = (int)id;
     }
 
     private static bool AoAccountSetCurrentIdIsFinished()
@@ -41,12 +30,12 @@ public partial class AppMain
 
     public static int AoAccountGetCurrentId()
     {
-        return AppMain.g_ao_account_current_id;
+        return g_ao_account_current_id;
     }
 
     private static bool AoAccountIsCurrentSignin()
     {
-        return AppMain.AoAccountGetCurrentId() >= 0;
+        return AoAccountGetCurrentId() >= 0;
     }
 
     private static bool AoAccountIsCurrentOnline()
@@ -56,7 +45,7 @@ public partial class AppMain
 
     public static bool AoAccountIsCurrentEnable()
     {
-        return (uint)AppMain.g_ao_account_current_id < 4U;
+        return (uint)g_ao_account_current_id < 4U;
     }
 
 

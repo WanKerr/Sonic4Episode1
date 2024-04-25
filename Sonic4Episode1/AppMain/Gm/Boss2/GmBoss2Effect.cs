@@ -1,24 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-
-public partial class AppMain
+﻿public partial class AppMain
 {
-    private static void gmBoss2EffDamageInit(AppMain.GMS_BOSS2_BODY_WORK body_work)
+    private static void gmBoss2EffDamageInit(GMS_BOSS2_BODY_WORK body_work)
     {
-        AppMain.GMM_BS_OBJ((object)AppMain.GmEfctBossCmnEsCreate(AppMain.GMM_BS_OBJ((object)body_work), 0U)).pos.z += 131072;
+        GMM_BS_OBJ(GmEfctBossCmnEsCreate(GMM_BS_OBJ(body_work), 0U)).pos.z += 131072;
     }
 
     private static void gmBoss2EffBombsInit(
-      AppMain.GMS_BOSS2_EFF_BOMB_WORK bomb_work,
-      AppMain.OBS_OBJECT_WORK parent_obj,
+      GMS_BOSS2_EFF_BOMB_WORK bomb_work,
+      OBS_OBJECT_WORK parent_obj,
       int pos_x,
       int pos_y,
       int width,
@@ -36,7 +25,7 @@ public partial class AppMain
         bomb_work.area[1] = height;
     }
 
-    private static void gmBoss2EffBombsUpdate(AppMain.GMS_BOSS2_EFF_BOMB_WORK bomb_work)
+    private static void gmBoss2EffBombsUpdate(GMS_BOSS2_EFF_BOMB_WORK bomb_work)
     {
         if (bomb_work.interval_timer > 0U)
         {
@@ -44,100 +33,100 @@ public partial class AppMain
         }
         else
         {
-            AppMain.GmSoundPlaySE("Boss0_02");
-            AppMain.OBS_OBJECT_WORK obsObjectWork1 = AppMain.GMM_BS_OBJ((object)AppMain.GmEfctCmnEsCreate((AppMain.OBS_OBJECT_WORK)null, 7));
-            AppMain.OBS_OBJECT_WORK obsObjectWork2 = AppMain.GMM_BS_OBJ((object)bomb_work.parent_obj);
+            GmSoundPlaySE("Boss0_02");
+            OBS_OBJECT_WORK obsObjectWork1 = GMM_BS_OBJ(GmEfctCmnEsCreate(null, 7));
+            OBS_OBJECT_WORK obsObjectWork2 = GMM_BS_OBJ(bomb_work.parent_obj);
             int v2_1 = bomb_work.area[0];
             int v2_2 = bomb_work.area[1];
-            int num1 = AppMain.FX_Mul(AppMain.AkMathRandFx(), v2_1);
-            int num2 = AppMain.FX_Mul(AppMain.AkMathRandFx(), v2_2);
+            int num1 = FX_Mul(AkMathRandFx(), v2_1);
+            int num2 = FX_Mul(AkMathRandFx(), v2_2);
             obsObjectWork1.pos.x = bomb_work.pos[0] - (v2_1 >> 1) + num1;
             obsObjectWork1.pos.y = bomb_work.pos[1] - (v2_2 >> 1) + num2;
             obsObjectWork1.pos.z = obsObjectWork2.pos.z + 131072;
-            uint num3 = (uint)(AppMain.AkMathRandFx() * ((int)bomb_work.interval_max - (int)bomb_work.interval_min) >> 12);
+            uint num3 = (uint)(AkMathRandFx() * ((int)bomb_work.interval_max - (int)bomb_work.interval_min) >> 12);
             bomb_work.interval_timer = bomb_work.interval_min + num3;
         }
     }
 
-    private static void gmBoss2EffAfterburnerRequestCreate(AppMain.GMS_BOSS2_BODY_WORK body_work)
+    private static void gmBoss2EffAfterburnerRequestCreate(GMS_BOSS2_BODY_WORK body_work)
     {
         body_work.flag |= 33554432U;
     }
 
-    private static void gmBoss2EffAfterburnerRequestDelete(AppMain.GMS_BOSS2_BODY_WORK body_work)
+    private static void gmBoss2EffAfterburnerRequestDelete(GMS_BOSS2_BODY_WORK body_work)
     {
         body_work.flag &= 4294967293U;
         body_work.flag &= 4261412863U;
     }
 
-    private static void gmBoss2EffAfterburnerInit(AppMain.GMS_BOSS2_BODY_WORK body_work)
+    private static void gmBoss2EffAfterburnerInit(GMS_BOSS2_BODY_WORK body_work)
     {
         if (((int)body_work.flag & 2) != 0)
             return;
         body_work.flag &= 4261412863U;
         body_work.flag |= 2U;
-        AppMain.GMS_EFFECT_3DES_WORK efct_3des = AppMain.GmEfctBossCmnEsCreate(AppMain.GMM_BS_OBJ((object)body_work), 4U);
-        AppMain.GmEffect3DESAddDispOffset(efct_3des, 0.0f, 0.0f, -30f);
-        AppMain.GMM_BS_OBJ((object)efct_3des).ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmBoss2EffAfterburnerMainFunc);
+        GMS_EFFECT_3DES_WORK efct_3des = GmEfctBossCmnEsCreate(GMM_BS_OBJ(body_work), 4U);
+        GmEffect3DESAddDispOffset(efct_3des, 0.0f, 0.0f, -30f);
+        GMM_BS_OBJ(efct_3des).ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmBoss2EffAfterburnerMainFunc);
     }
 
-    private static void gmBoss2EffAfterburnerMainFunc(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffAfterburnerMainFunc(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_BOSS2_BODY_WORK parentObj = (AppMain.GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
+        GMS_BOSS2_BODY_WORK parentObj = (GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
         if (((int)obj_work.disp_flag & 8) != 0)
             obj_work.flag |= 4U;
         if (((int)parentObj.flag & 2) == 0)
-            AppMain.ObjDrawKillAction3DES(obj_work);
-        AppMain.GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[0], 1);
+            ObjDrawKillAction3DES(obj_work);
+        GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[0], 1);
     }
 
-    private static void gmBoss2EffAfterburnerSmokeInit(AppMain.GMS_BOSS2_BODY_WORK body_work)
+    private static void gmBoss2EffAfterburnerSmokeInit(GMS_BOSS2_BODY_WORK body_work)
     {
-        AppMain.GMS_EFFECT_3DES_WORK efct_3des = AppMain.GmEfctBossCmnEsCreate(AppMain.GMM_BS_OBJ((object)body_work), 5U);
-        AppMain.GmEffect3DESAddDispOffset(efct_3des, 0.0f, 0.0f, -32f);
-        AppMain.GMM_BS_OBJ((object)efct_3des).ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmBoss2EffAfterburnerSmokeMainFunc);
+        GMS_EFFECT_3DES_WORK efct_3des = GmEfctBossCmnEsCreate(GMM_BS_OBJ(body_work), 5U);
+        GmEffect3DESAddDispOffset(efct_3des, 0.0f, 0.0f, -32f);
+        GMM_BS_OBJ(efct_3des).ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmBoss2EffAfterburnerSmokeMainFunc);
     }
 
-    private static void gmBoss2EffAfterburnerSmokeMainFunc(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffAfterburnerSmokeMainFunc(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_BOSS2_BODY_WORK parentObj = (AppMain.GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
-        AppMain.GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[0], 1);
+        GMS_BOSS2_BODY_WORK parentObj = (GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
+        GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[0], 1);
     }
 
-    private static void gmBoss2EffBodySmokeInit(AppMain.GMS_BOSS2_BODY_WORK body_work)
+    private static void gmBoss2EffBodySmokeInit(GMS_BOSS2_BODY_WORK body_work)
     {
-        AppMain.GMS_EFFECT_3DES_WORK efct_3des = AppMain.GmEfctBossCmnEsCreate(AppMain.GMM_BS_OBJ((object)body_work), 3U);
-        AppMain.GmEffect3DESAddDispOffset(efct_3des, 0.0f, 0.0f, -32f);
-        AppMain.GMM_BS_OBJ((object)efct_3des).ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmBoss2EffBodySmokeMainFunc);
+        GMS_EFFECT_3DES_WORK efct_3des = GmEfctBossCmnEsCreate(GMM_BS_OBJ(body_work), 3U);
+        GmEffect3DESAddDispOffset(efct_3des, 0.0f, 0.0f, -32f);
+        GMM_BS_OBJ(efct_3des).ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmBoss2EffBodySmokeMainFunc);
     }
 
-    private static void gmBoss2EffBodySmokeMainFunc(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffBodySmokeMainFunc(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_BOSS2_BODY_WORK parentObj = (AppMain.GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
-        AppMain.GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[0], 1);
+        GMS_BOSS2_BODY_WORK parentObj = (GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
+        GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[0], 1);
     }
 
-    private static void gmBoss2EffSweatInit(AppMain.GMS_BOSS2_EGG_WORK egg_work)
+    private static void gmBoss2EffSweatInit(GMS_BOSS2_EGG_WORK egg_work)
     {
-        AppMain.GMS_EFFECT_3DES_WORK efct_3des = AppMain.GmEfctCmnEsCreate(AppMain.GMM_BS_OBJ((object)egg_work), 93);
-        AppMain.GmEffect3DESAddDispOffset(efct_3des, 0.0f, 32f, 0.0f);
-        AppMain.GMM_BS_OBJ((object)efct_3des).ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmBoss2EffSweatMainFunc);
+        GMS_EFFECT_3DES_WORK efct_3des = GmEfctCmnEsCreate(GMM_BS_OBJ(egg_work), 93);
+        GmEffect3DESAddDispOffset(efct_3des, 0.0f, 32f, 0.0f);
+        GMM_BS_OBJ(efct_3des).ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmBoss2EffSweatMainFunc);
         egg_work.flag |= 2U;
     }
 
-    private static void gmBoss2EffSweatMainFunc(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffSweatMainFunc(OBS_OBJECT_WORK obj_work)
     {
-        if (((int)((AppMain.GMS_BOSS2_EGG_WORK)obj_work.parent_obj).flag & 2) == 0)
-            AppMain.ObjDrawKillAction3DES(obj_work);
+        if (((int)((GMS_BOSS2_EGG_WORK)obj_work.parent_obj).flag & 2) == 0)
+            ObjDrawKillAction3DES(obj_work);
         if (((int)obj_work.disp_flag & 8) == 0)
             return;
         obj_work.flag |= 4U;
     }
 
-    private static AppMain.OBS_OBJECT_WORK gmBoss2EffInit(
-      AppMain.OBS_DATA_WORK data_work,
+    private static OBS_OBJECT_WORK gmBoss2EffInit(
+      OBS_DATA_WORK data_work,
       int effect_type,
-      AppMain.OBS_OBJECT_WORK parent_obj_work,
+      OBS_OBJECT_WORK parent_obj_work,
       short rot_x,
       short rot_y,
       short rot_z,
@@ -147,11 +136,11 @@ public partial class AppMain
       int flag_flip,
       int flag_data_rotate)
     {
-        AppMain.OBS_OBJECT_WORK work = AppMain.GMM_EFFECT_CREATE_WORK((AppMain.TaskWorkFactoryDelegate)(() => (object)new AppMain.GMS_EFFECT_3DES_WORK()), (AppMain.OBS_OBJECT_WORK)null, (ushort)0, "B02_effect");
-        AppMain.GMS_EFFECT_3DES_WORK efct_3des = (AppMain.GMS_EFFECT_3DES_WORK)work;
-        AppMain.ObjObjectAction3dESEffectLoad(work, efct_3des.obj_3des, data_work, (string)null, 0, (AppMain.AMS_AMB_HEADER)null);
-        AppMain.ObjObjectAction3dESTextureLoad(work, efct_3des.obj_3des, AppMain.ObjDataGet(722), (string)null, 0, (AppMain.AMS_AMB_HEADER)null, false);
-        AppMain.ObjObjectAction3dESTextureSetByDwork(work, AppMain.ObjDataGet(723));
+        OBS_OBJECT_WORK work = GMM_EFFECT_CREATE_WORK(() => new GMS_EFFECT_3DES_WORK(), null, 0, "B02_effect");
+        GMS_EFFECT_3DES_WORK efct_3des = (GMS_EFFECT_3DES_WORK)work;
+        ObjObjectAction3dESEffectLoad(work, efct_3des.obj_3des, data_work, null, 0, null);
+        ObjObjectAction3dESTextureLoad(work, efct_3des.obj_3des, ObjDataGet(722), null, 0, null, false);
+        ObjObjectAction3dESTextureSetByDwork(work, ObjDataGet(723));
         uint init_flag = 0;
         if (parent_obj_work != null)
         {
@@ -161,39 +150,39 @@ public partial class AppMain
             work.pos.z = parent_obj_work.pos.z;
             init_flag |= 18U;
         }
-        AppMain.GmEffect3DESSetDispRotation(efct_3des, rot_x, rot_y, rot_z);
-        AppMain.GmEffect3DESAddDispOffset(efct_3des, offset_x, offset_y, offset_z);
+        GmEffect3DESSetDispRotation(efct_3des, rot_x, rot_y, rot_z);
+        GmEffect3DESAddDispOffset(efct_3des, offset_x, offset_y, offset_z);
         if (flag_flip == 0)
             init_flag |= 1U;
         if (flag_data_rotate != 0)
             init_flag |= 64U;
-        AppMain.GmEffect3DESSetupBase(efct_3des, (uint)effect_type, init_flag);
+        GmEffect3DESSetupBase(efct_3des, (uint)effect_type, init_flag);
         return work;
     }
 
     private static void gmBoss2EffBallBombInit(
-      AppMain.VecFx32 create_pos,
-      AppMain.OBS_OBJECT_WORK body_obj_work)
+      VecFx32 create_pos,
+      OBS_OBJECT_WORK body_obj_work)
     {
-        AppMain.OBS_OBJECT_WORK obj_work_parts = AppMain.gmBoss2EffInit(AppMain.ObjDataGet(717), 1, (AppMain.OBS_OBJECT_WORK)null, (short)0, (short)0, (short)0, 0.0f, 0.0f, 0.0f, 0, 0);
+        OBS_OBJECT_WORK obj_work_parts = gmBoss2EffInit(ObjDataGet(717), 1, null, 0, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0);
         obj_work_parts.pos.x = create_pos.x;
         obj_work_parts.pos.y = create_pos.y;
         obj_work_parts.pos.z = create_pos.z + 131072;
-        AppMain.gmBoss2MgrAddObject(AppMain.gmBoss2MgrGetMgrWork(body_obj_work), obj_work_parts);
-        AppMain.mtTaskChangeTcbDestructor(obj_work_parts.tcb, new AppMain.GSF_TASK_PROCEDURE(AppMain.gmBoss2EffectExitFunc));
+        gmBoss2MgrAddObject(gmBoss2MgrGetMgrWork(body_obj_work), obj_work_parts);
+        mtTaskChangeTcbDestructor(obj_work_parts.tcb, new GSF_TASK_PROCEDURE(gmBoss2EffectExitFunc));
     }
 
-    private static AppMain.OBS_OBJECT_WORK gmBoss2EffBallBombPartInit(
-      AppMain.VecFx32 create_pos,
-      AppMain.OBS_OBJECT_WORK body_obj_work,
+    private static OBS_OBJECT_WORK gmBoss2EffBallBombPartInit(
+      VecFx32 create_pos,
+      OBS_OBJECT_WORK body_obj_work,
       int spd_x)
     {
-        AppMain.GMS_EFFECT_3DES_WORK gmsEffect3DesWork = (AppMain.GMS_EFFECT_3DES_WORK)AppMain.gmBoss2EffInit(AppMain.ObjDataGet(718), 2, (AppMain.OBS_OBJECT_WORK)null, (short)0, (short)0, (short)0, 0.0f, 0.0f, 0.0f, 0, 0);
-        AppMain.OBS_OBJECT_WORK objWork = gmsEffect3DesWork.efct_com.obj_work;
-        AppMain.OBS_RECT_WORK[] rectWork = gmsEffect3DesWork.efct_com.rect_work;
-        AppMain.GmBsCmnSetEfctAtkVsPly(gmsEffect3DesWork.efct_com, (short)64);
-        AppMain.ObjRectWorkSet(rectWork[1], (short)-8, (short)-8, (short)8, (short)8);
-        rectWork[1].ppHit = new AppMain.OBS_RECT_WORK_Delegate1(AppMain.gmBoss2BallHitFunc);
+        GMS_EFFECT_3DES_WORK gmsEffect3DesWork = (GMS_EFFECT_3DES_WORK)gmBoss2EffInit(ObjDataGet(718), 2, null, 0, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0);
+        OBS_OBJECT_WORK objWork = gmsEffect3DesWork.efct_com.obj_work;
+        OBS_RECT_WORK[] rectWork = gmsEffect3DesWork.efct_com.rect_work;
+        GmBsCmnSetEfctAtkVsPly(gmsEffect3DesWork.efct_com, 64);
+        ObjRectWorkSet(rectWork[1], -8, -8, 8, 8);
+        rectWork[1].ppHit = new OBS_RECT_WORK_Delegate1(gmBoss2BallHitFunc);
         rectWork[1].flag |= 1028U;
         rectWork[0].flag |= 3072U;
         objWork.pos.x = create_pos.x;
@@ -204,132 +193,132 @@ public partial class AppMain
         objWork.move_flag |= 32912U;
         objWork.flag |= 16U;
         objWork.parent_obj = body_obj_work;
-        objWork.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmBoss2EffBallBombPartMainFunc);
-        AppMain.gmBoss2MgrAddObject(AppMain.gmBoss2MgrGetMgrWork(body_obj_work), objWork);
-        AppMain.mtTaskChangeTcbDestructor(objWork.tcb, new AppMain.GSF_TASK_PROCEDURE(AppMain.gmBoss2EffectExitFunc));
+        objWork.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmBoss2EffBallBombPartMainFunc);
+        gmBoss2MgrAddObject(gmBoss2MgrGetMgrWork(body_obj_work), objWork);
+        mtTaskChangeTcbDestructor(objWork.tcb, new GSF_TASK_PROCEDURE(gmBoss2EffectExitFunc));
         return objWork;
     }
 
-    private static void gmBoss2EffBallBombPartMainFunc(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffBallBombPartMainFunc(OBS_OBJECT_WORK obj_work)
     {
         if (((int)obj_work.disp_flag & 8) != 0)
             obj_work.flag |= 4U;
-        if (AppMain.ObjViewOutCheck(obj_work.pos.x, obj_work.pos.y, (short)64, (short)0, (short)0, (short)0, (short)0) == 0)
+        if (ObjViewOutCheck(obj_work.pos.x, obj_work.pos.y, 64, 0, 0, 0, 0) == 0)
             return;
         obj_work.flag |= 4U;
     }
 
-    private static void gmBoss2EffBlitzInit(AppMain.GMS_BOSS2_BODY_WORK body_work)
+    private static void gmBoss2EffBlitzInit(GMS_BOSS2_BODY_WORK body_work)
     {
-        AppMain.OBS_OBJECT_WORK obsObjectWork = AppMain.GMM_BS_OBJ((object)body_work);
-        AppMain.OBS_OBJECT_WORK obj_work_parts1 = AppMain.gmBoss2EffInit(AppMain.ObjDataGet(714), 2, obsObjectWork, (short)0, (short)0, (short)0, 24f, 0.0f, 0.0f, 0, 0);
-        obj_work_parts1.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmBoss2EffBlitzMainFuncBlitzCoreL);
-        AppMain.OBS_OBJECT_WORK obj_work_parts2 = AppMain.gmBoss2EffInit(AppMain.ObjDataGet(714), 2, obsObjectWork, (short)0, (short)0, (short)0, -24f, 0.0f, 0.0f, 0, 0);
-        obj_work_parts2.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmBoss2EffBlitzMainFuncBlitzCoreR);
-        AppMain.OBS_OBJECT_WORK obj_work_parts3 = AppMain.gmBoss2EffInit(AppMain.ObjDataGet(715), 2, obsObjectWork, (short)0, (short)0, AppMain.GMD_BOSS2_EFFECT_BLITZ_LINE_DISP_ROT_Z, 0.0f, -30f, 0.0f, 0, 0);
-        obj_work_parts3.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmBoss2EffBlitzMainFuncBlitzLineCreate);
+        OBS_OBJECT_WORK obsObjectWork = GMM_BS_OBJ(body_work);
+        OBS_OBJECT_WORK obj_work_parts1 = gmBoss2EffInit(ObjDataGet(714), 2, obsObjectWork, 0, 0, 0, 24f, 0.0f, 0.0f, 0, 0);
+        obj_work_parts1.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmBoss2EffBlitzMainFuncBlitzCoreL);
+        OBS_OBJECT_WORK obj_work_parts2 = gmBoss2EffInit(ObjDataGet(714), 2, obsObjectWork, 0, 0, 0, -24f, 0.0f, 0.0f, 0, 0);
+        obj_work_parts2.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmBoss2EffBlitzMainFuncBlitzCoreR);
+        OBS_OBJECT_WORK obj_work_parts3 = gmBoss2EffInit(ObjDataGet(715), 2, obsObjectWork, 0, 0, GMD_BOSS2_EFFECT_BLITZ_LINE_DISP_ROT_Z, 0.0f, -30f, 0.0f, 0, 0);
+        obj_work_parts3.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmBoss2EffBlitzMainFuncBlitzLineCreate);
         body_work.flag |= 4U;
-        AppMain.GMS_BOSS2_MGR_WORK mgrWork = AppMain.gmBoss2MgrGetMgrWork(obsObjectWork);
-        AppMain.gmBoss2MgrAddObject(mgrWork, obj_work_parts1);
-        AppMain.gmBoss2MgrAddObject(mgrWork, obj_work_parts2);
-        AppMain.gmBoss2MgrAddObject(mgrWork, obj_work_parts3);
-        AppMain.mtTaskChangeTcbDestructor(obj_work_parts1.tcb, new AppMain.GSF_TASK_PROCEDURE(AppMain.gmBoss2EffectExitFunc));
-        AppMain.mtTaskChangeTcbDestructor(obj_work_parts2.tcb, new AppMain.GSF_TASK_PROCEDURE(AppMain.gmBoss2EffectExitFunc));
-        AppMain.mtTaskChangeTcbDestructor(obj_work_parts3.tcb, new AppMain.GSF_TASK_PROCEDURE(AppMain.gmBoss2EffectExitFunc));
+        GMS_BOSS2_MGR_WORK mgrWork = gmBoss2MgrGetMgrWork(obsObjectWork);
+        gmBoss2MgrAddObject(mgrWork, obj_work_parts1);
+        gmBoss2MgrAddObject(mgrWork, obj_work_parts2);
+        gmBoss2MgrAddObject(mgrWork, obj_work_parts3);
+        mtTaskChangeTcbDestructor(obj_work_parts1.tcb, new GSF_TASK_PROCEDURE(gmBoss2EffectExitFunc));
+        mtTaskChangeTcbDestructor(obj_work_parts2.tcb, new GSF_TASK_PROCEDURE(gmBoss2EffectExitFunc));
+        mtTaskChangeTcbDestructor(obj_work_parts3.tcb, new GSF_TASK_PROCEDURE(gmBoss2EffectExitFunc));
     }
 
-    private static void gmBoss2EffBlitzMainFuncBlitzLineCreate(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffBlitzMainFuncBlitzLineCreate(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_BOSS2_BODY_WORK parentObj = (AppMain.GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
+        GMS_BOSS2_BODY_WORK parentObj = (GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
         if (((int)obj_work.disp_flag & 8) != 0)
             obj_work.flag |= 4U;
         if (((int)parentObj.flag & 4) == 0)
-            AppMain.ObjDrawKillAction3DES(obj_work);
+            ObjDrawKillAction3DES(obj_work);
         if (obj_work.parent_obj != null)
             obj_work.dir.z = obj_work.parent_obj.dir.z;
-        AppMain.GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[2], 1);
+        GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[2], 1);
         ++obj_work.user_timer;
-        if ((double)obj_work.user_timer < 64.0)
+        if (obj_work.user_timer < 64.0)
             return;
         obj_work.user_timer = 0;
-        AppMain.GmEffect3DESAddDispOffset((AppMain.GMS_EFFECT_3DES_WORK)obj_work, 0.0f, -4f, 0.0f);
-        obj_work.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmBoss2EffBlitzMainFuncBlitzLineNormal);
+        GmEffect3DESAddDispOffset((GMS_EFFECT_3DES_WORK)obj_work, 0.0f, -4f, 0.0f);
+        obj_work.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmBoss2EffBlitzMainFuncBlitzLineNormal);
     }
 
-    private static void gmBoss2EffBlitzMainFuncBlitzLineNormal(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffBlitzMainFuncBlitzLineNormal(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_BOSS2_BODY_WORK parentObj = (AppMain.GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
+        GMS_BOSS2_BODY_WORK parentObj = (GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
         if (((int)obj_work.disp_flag & 8) != 0)
             obj_work.flag |= 4U;
         if (((int)parentObj.flag & 4) == 0)
-            AppMain.ObjDrawKillAction3DES(obj_work);
+            ObjDrawKillAction3DES(obj_work);
         if (obj_work.parent_obj != null)
             obj_work.dir.z = obj_work.parent_obj.dir.z;
-        AppMain.GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[2], 1);
+        GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[2], 1);
     }
 
-    private static void gmBoss2EffBlitzMainFuncBlitzCoreL(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffBlitzMainFuncBlitzCoreL(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_BOSS2_BODY_WORK parentObj = (AppMain.GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
+        GMS_BOSS2_BODY_WORK parentObj = (GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
         if (((int)obj_work.disp_flag & 8) != 0)
             obj_work.flag |= 4U;
         if (((int)parentObj.flag & 4) == 0)
-            AppMain.ObjDrawKillAction3DES(obj_work);
+            ObjDrawKillAction3DES(obj_work);
         if (obj_work.parent_obj != null)
             obj_work.dir.z = obj_work.parent_obj.dir.z;
-        AppMain.GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[7], 1);
+        GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[7], 1);
     }
 
-    private static void gmBoss2EffBlitzMainFuncBlitzCoreR(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffBlitzMainFuncBlitzCoreR(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_BOSS2_BODY_WORK parentObj = (AppMain.GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
+        GMS_BOSS2_BODY_WORK parentObj = (GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
         if (((int)parentObj.flag & 4) == 0)
-            AppMain.ObjDrawKillAction3DES(obj_work);
+            ObjDrawKillAction3DES(obj_work);
         if (obj_work.parent_obj != null)
             obj_work.dir.z = obj_work.parent_obj.dir.z;
-        AppMain.GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[10], 1);
+        GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[10], 1);
     }
 
-    private static void gmBoss2EffBlitzMainFuncBlitzL(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffBlitzMainFuncBlitzL(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_BOSS2_BODY_WORK parentObj = (AppMain.GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
+        GMS_BOSS2_BODY_WORK parentObj = (GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
         if (((int)parentObj.flag & 4) == 0)
-            AppMain.ObjDrawKillAction3DES(obj_work);
+            ObjDrawKillAction3DES(obj_work);
         if (obj_work.parent_obj != null)
             obj_work.dir.z = obj_work.parent_obj.dir.z;
-        AppMain.GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[6], 1);
+        GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[6], 1);
     }
 
-    private static void gmBoss2EffBlitzMainFuncBlitzR(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffBlitzMainFuncBlitzR(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_BOSS2_BODY_WORK parentObj = (AppMain.GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
+        GMS_BOSS2_BODY_WORK parentObj = (GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
         if (((int)obj_work.disp_flag & 8) != 0)
             obj_work.flag |= 4U;
         if (((int)parentObj.flag & 4) == 0)
-            AppMain.ObjDrawKillAction3DES(obj_work);
+            ObjDrawKillAction3DES(obj_work);
         if (obj_work.parent_obj != null)
             obj_work.dir.z = obj_work.parent_obj.dir.z;
-        AppMain.GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[9], 1);
+        GmBsCmnUpdateObject3DESStuckWithNode(obj_work, parentObj.snm_work, parentObj.snm_reg_id[9], 1);
     }
 
-    private static void gmBoss2EffScatterInit(AppMain.GMS_BOSS2_BODY_WORK body_work)
+    private static void gmBoss2EffScatterInit(GMS_BOSS2_BODY_WORK body_work)
     {
-        AppMain.OBS_OBJECT_WORK parent_obj = AppMain.GMM_BS_OBJ((object)body_work);
-        AppMain.GMS_BOSS2_EFFECT_SCATTER_WORK effectScatterWork = (AppMain.GMS_BOSS2_EFFECT_SCATTER_WORK)null;
+        OBS_OBJECT_WORK parent_obj = GMM_BS_OBJ(body_work);
+        GMS_BOSS2_EFFECT_SCATTER_WORK effectScatterWork = null;
         for (int index = 3; 13 > index; ++index)
         {
-            AppMain.GMS_BOSS2_EFFECT_SCATTER_WORK controlObjectBySize = (AppMain.GMS_BOSS2_EFFECT_SCATTER_WORK)AppMain.GmBsCmnCreateNodeControlObjectBySize(parent_obj, body_work.cnm_mgr_work, body_work.cnm_reg_id[index], body_work.snm_work, body_work.snm_reg_id[2 + index], (AppMain.TaskWorkFactoryDelegate)(() => (object)new AppMain.GMS_BOSS2_EFFECT_SCATTER_WORK()));
-            AppMain.GMS_BS_CMN_NODE_CTRL_OBJECT ndc_obj = (AppMain.GMS_BS_CMN_NODE_CTRL_OBJECT)controlObjectBySize;
-            AppMain.GmBsCmnChangeCNMModeNode(body_work.cnm_mgr_work, body_work.cnm_reg_id[index], 0U);
-            AppMain.GmBsCmnEnableCNMLocalCoordinate(body_work.cnm_mgr_work, body_work.cnm_reg_id[index], 0);
-            AppMain.GmBsCmnAttachNCObjectToSNMNode(ndc_obj);
+            GMS_BOSS2_EFFECT_SCATTER_WORK controlObjectBySize = (GMS_BOSS2_EFFECT_SCATTER_WORK)GmBsCmnCreateNodeControlObjectBySize(parent_obj, body_work.cnm_mgr_work, body_work.cnm_reg_id[index], body_work.snm_work, body_work.snm_reg_id[2 + index], () => new GMS_BOSS2_EFFECT_SCATTER_WORK());
+            GMS_BS_CMN_NODE_CTRL_OBJECT ndc_obj = (GMS_BS_CMN_NODE_CTRL_OBJECT)controlObjectBySize;
+            GmBsCmnChangeCNMModeNode(body_work.cnm_mgr_work, body_work.cnm_reg_id[index], 0U);
+            GmBsCmnEnableCNMLocalCoordinate(body_work.cnm_mgr_work, body_work.cnm_reg_id[index], 0);
+            GmBsCmnAttachNCObjectToSNMNode(ndc_obj);
             ndc_obj.is_enable = 1;
-            ndc_obj.proc_update = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmBoss2EffScatterMainFunc);
-            AppMain.OBS_OBJECT_WORK objWork1 = ndc_obj.efct_com.obj_work;
+            ndc_obj.proc_update = new MPP_VOID_OBS_OBJECT_WORK(gmBoss2EffScatterMainFunc);
+            OBS_OBJECT_WORK objWork1 = ndc_obj.efct_com.obj_work;
             objWork1.move_flag |= 128U;
             if (index == 4 || index == 5 || (index == 7 || index == 8))
             {
-                AppMain.OBS_OBJECT_WORK objWork2 = effectScatterWork.control_node_work.efct_com.obj_work;
+                OBS_OBJECT_WORK objWork2 = effectScatterWork.control_node_work.efct_com.obj_work;
                 objWork1.spd.x = objWork2.spd.x;
                 objWork1.spd.y = objWork2.spd.y;
             }
@@ -338,15 +327,15 @@ public partial class AppMain
                 int right_flag = 0;
                 if (index % 2 != 0)
                     right_flag = 1;
-                AppMain.gmBoss2EffScatterSetParamMove(objWork1, right_flag);
+                gmBoss2EffScatterSetParamMove(objWork1, right_flag);
             }
             effectScatterWork = controlObjectBySize;
         }
     }
 
-    private static void gmBoss2EffScatterMainFunc(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffScatterMainFunc(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GmBsCmnSetWorldMtxFromNCObjectPosture((AppMain.GMS_BS_CMN_NODE_CTRL_OBJECT)obj_work);
+        GmBsCmnSetWorldMtxFromNCObjectPosture((GMS_BS_CMN_NODE_CTRL_OBJECT)obj_work);
         ++obj_work.user_timer;
         if (obj_work.user_timer < 100)
             return;
@@ -355,50 +344,50 @@ public partial class AppMain
     }
 
     private static void gmBoss2EffScatterSetParamMove(
-      AppMain.OBS_OBJECT_WORK obj_work,
+      OBS_OBJECT_WORK obj_work,
       int right_flag)
     {
-        int num = (int)AppMain.mtMathRand() % 30 + 45;
+        int num = mtMathRand() % 30 + 45;
         if (right_flag != 0)
             num = -num;
-        int ang = AppMain.AKM_DEGtoA32(num + 90);
-        obj_work.spd.y = -(int)(4096.0 * (double)AppMain.nnSin(ang));
-        obj_work.spd.x = (int)(4096.0 * (double)AppMain.nnCos(ang));
+        int ang = AKM_DEGtoA32(num + 90);
+        obj_work.spd.y = -(int)(4096.0 * nnSin(ang));
+        obj_work.spd.x = (int)(4096.0 * nnCos(ang));
     }
 
-    private static void gmBoss2EffCreateRollModel(AppMain.GMS_BOSS2_BODY_WORK body_work)
+    private static void gmBoss2EffCreateRollModel(GMS_BOSS2_BODY_WORK body_work)
     {
-        AppMain.OBS_OBJECT_WORK obsObjectWork = AppMain.GMM_BS_OBJ((object)body_work);
+        OBS_OBJECT_WORK obsObjectWork = GMM_BS_OBJ(body_work);
         if (((int)body_work.flag & 32) != 0)
             return;
         body_work.flag |= 32U;
-        AppMain.OBS_OBJECT_WORK byParam = (AppMain.OBS_OBJECT_WORK)AppMain.GmEffect3dESCreateByParam(new AppMain.GMS_EFFECT_CREATE_PARAM(11, 0U, 19U, new AppMain.NNS_VECTOR(0.0f, 0.0f, 64f), new AppMain.NNS_ROTATE_A16((short)0, ((int)obsObjectWork.disp_flag & 1) == 0 ? (short)AppMain.AKM_DEGtoA32(90f) : (short)AppMain.AKM_DEGtoA32(-90f), (short)0), 3.2f, new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.GmEffectDefaultMainFuncDeleteAtEnd), 5), obsObjectWork, (object)AppMain.GmBoss2GetGameDatEnemyArc(), AppMain.ObjDataGet(719), AppMain.ObjDataGet(726), AppMain.ObjDataGet(727), AppMain.ObjDataGet(725), AppMain.ObjDataGet(724), (AppMain.TaskWorkFactoryDelegate)(() => (object)new AppMain.GMS_EFFECT_3DES_WORK()));
-        byParam.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmBoss2EffRollModelMainFunc);
+        OBS_OBJECT_WORK byParam = (OBS_OBJECT_WORK)GmEffect3dESCreateByParam(new GMS_EFFECT_CREATE_PARAM(11, 0U, 19U, new NNS_VECTOR(0.0f, 0.0f, 64f), new NNS_ROTATE_A16(0, ((int)obsObjectWork.disp_flag & 1) == 0 ? (short)AKM_DEGtoA32(90f) : (short)AKM_DEGtoA32(-90f), 0), 3.2f, new MPP_VOID_OBS_OBJECT_WORK(GmEffectDefaultMainFuncDeleteAtEnd), 5), obsObjectWork, GmBoss2GetGameDatEnemyArc(), ObjDataGet(719), ObjDataGet(726), ObjDataGet(727), ObjDataGet(725), ObjDataGet(724), () => new GMS_EFFECT_3DES_WORK());
+        byParam.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmBoss2EffRollModelMainFunc);
         byParam.obj_3des.command_state = 16U;
-        AppMain.gmBoss2MgrAddObject(AppMain.gmBoss2MgrGetMgrWork(obsObjectWork), byParam);
-        AppMain.mtTaskChangeTcbDestructor(byParam.tcb, new AppMain.GSF_TASK_PROCEDURE(AppMain.gmBoss2EffectExitFunc));
+        gmBoss2MgrAddObject(gmBoss2MgrGetMgrWork(obsObjectWork), byParam);
+        mtTaskChangeTcbDestructor(byParam.tcb, new GSF_TASK_PROCEDURE(gmBoss2EffectExitFunc));
     }
 
-    private static void gmBoss2EffCreateRollModelLost(AppMain.GMS_BOSS2_BODY_WORK body_work)
+    private static void gmBoss2EffCreateRollModelLost(GMS_BOSS2_BODY_WORK body_work)
     {
-        if (((int)AppMain.GMM_BS_OBJ((object)body_work).disp_flag & 1) != 0)
-            AppMain.AKM_DEGtoA32(-90f);
+        if (((int)GMM_BS_OBJ(body_work).disp_flag & 1) != 0)
+            AKM_DEGtoA32(-90f);
         else
-            AppMain.AKM_DEGtoA32(90f);
+            AKM_DEGtoA32(90f);
     }
 
-    public static void gmBoss2EffRollModelMainFunc(AppMain.OBS_OBJECT_WORK obj_work)
+    public static void gmBoss2EffRollModelMainFunc(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_BOSS2_BODY_WORK parentObj = (AppMain.GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
+        GMS_BOSS2_BODY_WORK parentObj = (GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
         int num = (int)obj_work.disp_flag & 8;
         if (((int)parentObj.flag & 32) != 0)
             return;
         obj_work.flag |= 4U;
     }
 
-    private static void gmBoss2EffRollMainFunc(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmBoss2EffRollMainFunc(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_BOSS2_BODY_WORK parentObj = (AppMain.GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
+        GMS_BOSS2_BODY_WORK parentObj = (GMS_BOSS2_BODY_WORK)obj_work.parent_obj;
         int num = (int)obj_work.disp_flag & 8;
         if (((int)parentObj.flag & 32) != 0)
             return;

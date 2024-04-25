@@ -6,20 +6,14 @@
 
 public class UIntBuffer : ByteBuffer
 {
-  public UIntBuffer(ByteBuffer buffer)
-    : base(buffer.data, buffer.offset)
-  {
-  }
+    public UIntBuffer(ByteBuffer buffer)
+      : base(buffer.data, buffer.offset)
+    {
+    }
 
-  public uint this[int index]
-  {
-    get
+    public uint this[int index]
     {
-      return this.GetUInt(index * 4);
+        get => this.GetUInt(index * 4);
+        set => this.PutUInt(value, index * 4);
     }
-    set
-    {
-      this.PutUInt(value, index * 4);
-    }
-  }
 }

@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-
-public partial class AppMain
+﻿public partial class AppMain
 {
-    private static AppMain.OBS_OBJECT_WORK GmGmkWaterAreaInit(
-      AppMain.GMS_EVE_RECORD_EVENT eve_rec,
+    private static OBS_OBJECT_WORK GmGmkWaterAreaInit(
+      GMS_EVE_RECORD_EVENT eve_rec,
       int pos_x,
       int pos_y,
       byte type)
@@ -20,61 +9,61 @@ public partial class AppMain
         ushort water_level = (ushort)((uint)eve_rec.left * 100U + (uint)eve_rec.top);
         ushort time = 0;
         ushort flag = eve_rec.flag;
-        for (ushort index = 0; (ushort)10 > index; ++index)
+        for (ushort index = 0; 10 > index; ++index)
         {
-            if (((int)flag & 1) != 0)
-                time += (ushort)((uint)index + 1U);
+            if ((flag & 1) != 0)
+                time += (ushort)(index + 1U);
             flag >>= 1;
         }
-        if (AppMain.gmGmkWaterAreaGetType(eve_rec) == 0U)
+        if (gmGmkWaterAreaGetType(eve_rec) == 0U)
         {
-            if (AppMain.gmGmkWaterAreaCheckRestart(pos_x, pos_y))
-                AppMain.GmWaterSurfaceRequestChangeWaterLevel(water_level, (ushort)((uint)time * 60U), false);
+            if (gmGmkWaterAreaCheckRestart(pos_x, pos_y))
+                GmWaterSurfaceRequestChangeWaterLevel(water_level, (ushort)(time * 60U), false);
             eve_rec.pos_x = byte.MaxValue;
-            return (AppMain.OBS_OBJECT_WORK)null;
+            return null;
         }
-        AppMain.GMS_ENEMY_3D_WORK gimmick_work = AppMain.gmGmkWaterAreaLoadObj(eve_rec, pos_x, pos_y, type);
-        AppMain.gmGmkWaterAreaInit(gimmick_work, water_level, time);
-        return (AppMain.OBS_OBJECT_WORK)gimmick_work;
+        GMS_ENEMY_3D_WORK gimmick_work = gmGmkWaterAreaLoadObj(eve_rec, pos_x, pos_y, type);
+        gmGmkWaterAreaInit(gimmick_work, water_level, time);
+        return (OBS_OBJECT_WORK)gimmick_work;
     }
 
-    private static AppMain.GMS_ENEMY_3D_WORK gmGmkWaterAreaLoadObj(
-      AppMain.GMS_EVE_RECORD_EVENT eve_rec,
+    private static GMS_ENEMY_3D_WORK gmGmkWaterAreaLoadObj(
+      GMS_EVE_RECORD_EVENT eve_rec,
       int pos_x,
       int pos_y,
       byte type)
     {
-        AppMain.GMS_ENEMY_3D_WORK work = (AppMain.GMS_ENEMY_3D_WORK)AppMain.GMM_ENEMY_CREATE_WORK(eve_rec, pos_x, pos_y, (AppMain.TaskWorkFactoryDelegate)(() => (object)new AppMain.GMS_ENEMY_3D_WORK()), "GMK_WATER_AREA");
+        GMS_ENEMY_3D_WORK work = (GMS_ENEMY_3D_WORK)GMM_ENEMY_CREATE_WORK(eve_rec, pos_x, pos_y, () => new GMS_ENEMY_3D_WORK(), "GMK_WATER_AREA");
         work.ene_com.rect_work[0].flag &= 4294967291U;
         work.ene_com.rect_work[1].flag &= 4294967291U;
         return work;
     }
 
     private static void gmGmkWaterAreaInit(
-      AppMain.GMS_ENEMY_3D_WORK gimmick_work,
+      GMS_ENEMY_3D_WORK gimmick_work,
       ushort water_level,
       ushort time)
     {
-        AppMain.OBS_OBJECT_WORK obj_work = (AppMain.OBS_OBJECT_WORK)gimmick_work;
-        AppMain.GMS_EVE_RECORD_EVENT eveRec = gimmick_work.ene_com.eve_rec;
-        uint type = AppMain.gmGmkWaterAreaGetType(eveRec);
+        OBS_OBJECT_WORK obj_work = (OBS_OBJECT_WORK)gimmick_work;
+        GMS_EVE_RECORD_EVENT eveRec = gimmick_work.ene_com.eve_rec;
+        uint type = gmGmkWaterAreaGetType(eveRec);
         byte width = eveRec.width;
         byte height = eveRec.height;
-        AppMain.gmGmkWaterAreaSetRect(gimmick_work, width, height, type);
-        gimmick_work.ene_com.target_obj = AppMain.g_gm_main_system.ply_work[0].obj_work;
+        gmGmkWaterAreaSetRect(gimmick_work, width, height, type);
+        gimmick_work.ene_com.target_obj = g_gm_main_system.ply_work[0].obj_work;
         obj_work.move_flag |= 8448U;
         obj_work.disp_flag |= 32U;
-        AppMain.gmGmkWaterAreaUserWorkSetLevel(obj_work, water_level);
-        AppMain.gmGmkWaterAreaUserWorkSetTime(obj_work, time);
+        gmGmkWaterAreaUserWorkSetLevel(obj_work, water_level);
+        gmGmkWaterAreaUserWorkSetTime(obj_work, time);
     }
 
     private static bool gmGmkWaterAreaCheckRestart(int pos_x, int pos_y)
     {
-        int num = AppMain.MTM_MATH_ABS(AppMain.g_gm_main_system.resume_pos_x - pos_x);
-        return AppMain.MTM_MATH_ABS(AppMain.g_gm_main_system.resume_pos_y - pos_y) <= 524288 && num <= 524288;
+        int num = MTM_MATH_ABS(g_gm_main_system.resume_pos_x - pos_x);
+        return MTM_MATH_ABS(g_gm_main_system.resume_pos_y - pos_y) <= 524288 && num <= 524288;
     }
 
-    private static uint gmGmkWaterAreaGetType(AppMain.GMS_EVE_RECORD_EVENT eve_rec)
+    private static uint gmGmkWaterAreaGetType(GMS_EVE_RECORD_EVENT eve_rec)
     {
         uint num = uint.MaxValue;
         switch (eve_rec.id)
@@ -98,26 +87,26 @@ public partial class AppMain
         return num;
     }
 
-    private static void gmGmkWaterAreaRequestChangeWatarLevel(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmGmkWaterAreaRequestChangeWatarLevel(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GmWaterSurfaceRequestChangeWaterLevel(AppMain.gmGmkWaterAreaUserWorkGetLevel(obj_work), (ushort)((uint)AppMain.gmGmkWaterAreaUserWorkGetTime(obj_work) * 60U), false);
+        GmWaterSurfaceRequestChangeWaterLevel(gmGmkWaterAreaUserWorkGetLevel(obj_work), (ushort)(gmGmkWaterAreaUserWorkGetTime(obj_work) * 60U), false);
     }
 
     private static void gmGmkWaterAreaSetRect(
-      AppMain.GMS_ENEMY_3D_WORK gimmick_work,
+      GMS_ENEMY_3D_WORK gimmick_work,
       byte width,
       byte height,
       uint type)
     {
-        AppMain.OBS_RECT_WORK pRec = gimmick_work.ene_com.rect_work[2];
-        if (width < (byte)34)
-            width = (byte)34;
-        if (height < (byte)34)
-            height = (byte)34;
-        AppMain.ObjRectWorkZSet(pRec, (short)((int)-width / 2), (short)((int)-height / 2), (short)-500, (short)((int)width / 2), (short)((int)height / 2), (short)500);
-        AppMain.ObjRectAtkSet(pRec, (ushort)0, (short)0);
-        pRec.ppHit = (AppMain.OBS_RECT_WORK_Delegate1)null;
-        AppMain.ObjRectDefSet(pRec, (ushort)0, (short)0);
+        OBS_RECT_WORK pRec = gimmick_work.ene_com.rect_work[2];
+        if (width < 34)
+            width = 34;
+        if (height < 34)
+            height = 34;
+        ObjRectWorkZSet(pRec, (short)(-width / 2), (short)(-height / 2), -500, (short)(width / 2), (short)(height / 2), 500);
+        ObjRectAtkSet(pRec, 0, 0);
+        pRec.ppHit = null;
+        ObjRectDefSet(pRec, 0, 0);
         switch (type)
         {
             case 1:
@@ -125,14 +114,14 @@ public partial class AppMain
             case 3:
             case 4:
                 pRec.flag |= 1024U;
-                pRec.ppDef = new AppMain.OBS_RECT_WORK_Delegate1(AppMain.gmGmkWaterAreaDefFuncDelay);
+                pRec.ppDef = new OBS_RECT_WORK_Delegate1(gmGmkWaterAreaDefFuncDelay);
                 break;
         }
     }
 
     private static bool gmGmkWaterAreaCheckDir(
-      AppMain.OBS_OBJECT_WORK gimmick_obj_work,
-      AppMain.OBS_OBJECT_WORK player_obj_work,
+      OBS_OBJECT_WORK gimmick_obj_work,
+      OBS_OBJECT_WORK player_obj_work,
       uint type)
     {
         bool flag = false;
@@ -174,102 +163,102 @@ public partial class AppMain
     }
 
     private static void gmGmkWaterAreaDefFuncDelay(
-      AppMain.OBS_RECT_WORK own_rect,
-      AppMain.OBS_RECT_WORK target_rect)
+      OBS_RECT_WORK own_rect,
+      OBS_RECT_WORK target_rect)
     {
-        AppMain.OBS_OBJECT_WORK parentObj1 = own_rect.parent_obj;
-        AppMain.GMS_ENEMY_3D_WORK gmsEnemy3DWork = (AppMain.GMS_ENEMY_3D_WORK)parentObj1;
-        AppMain.OBS_OBJECT_WORK parentObj2 = target_rect.parent_obj;
-        if (!AppMain.gmGmkWaterAreaModeCheckWait(parentObj1))
+        OBS_OBJECT_WORK parentObj1 = own_rect.parent_obj;
+        GMS_ENEMY_3D_WORK gmsEnemy3DWork = (GMS_ENEMY_3D_WORK)parentObj1;
+        OBS_OBJECT_WORK parentObj2 = target_rect.parent_obj;
+        if (!gmGmkWaterAreaModeCheckWait(parentObj1))
             return;
-        uint type = AppMain.gmGmkWaterAreaGetType(gmsEnemy3DWork.ene_com.eve_rec);
-        if (!AppMain.gmGmkWaterAreaCheckDir(parentObj1, parentObj2, type))
+        uint type = gmGmkWaterAreaGetType(gmsEnemy3DWork.ene_com.eve_rec);
+        if (!gmGmkWaterAreaCheckDir(parentObj1, parentObj2, type))
             return;
-        AppMain.gmGmkWaterAreaModeChangeLady(parentObj1);
+        gmGmkWaterAreaModeChangeLady(parentObj1);
     }
 
-    private static bool gmGmkWaterAreaModeCheckWait(AppMain.OBS_OBJECT_WORK obj_work)
+    private static bool gmGmkWaterAreaModeCheckWait(OBS_OBJECT_WORK obj_work)
     {
         return obj_work.ppFunc == null;
     }
 
-    private static void gmGmkWaterAreaModeChangeWait(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmGmkWaterAreaModeChangeWait(OBS_OBJECT_WORK obj_work)
     {
         obj_work.flag &= 4294967279U;
-        obj_work.ppFunc = (AppMain.MPP_VOID_OBS_OBJECT_WORK)null;
+        obj_work.ppFunc = null;
     }
 
-    private static void gmGmkWaterAreaModeChangeLady(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmGmkWaterAreaModeChangeLady(OBS_OBJECT_WORK obj_work)
     {
         obj_work.flag &= 4294967279U;
-        obj_work.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmGmkWaterAreaMainLady);
+        obj_work.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmGmkWaterAreaMainLady);
     }
 
-    private static void gmGmkWaterAreaModeChangeActive(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmGmkWaterAreaModeChangeActive(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.gmGmkWaterAreaRequestChangeWatarLevel(obj_work);
+        gmGmkWaterAreaRequestChangeWatarLevel(obj_work);
         obj_work.flag |= 16U;
-        obj_work.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmGmkWaterAreaMainActive);
-        AppMain.gmGmkWaterAreaUserTimerSetCounter(obj_work, 0);
-        AppMain.gmGmkWaterAreaRequestChangeWatarLevel(obj_work);
-        AppMain.GmWaterSurfaceSetFlagDraw(true);
+        obj_work.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmGmkWaterAreaMainActive);
+        gmGmkWaterAreaUserTimerSetCounter(obj_work, 0);
+        gmGmkWaterAreaRequestChangeWatarLevel(obj_work);
+        GmWaterSurfaceSetFlagDraw(true);
     }
 
-    private static void gmGmkWaterAreaMainLady(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmGmkWaterAreaMainLady(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_ENEMY_3D_WORK gmsEnemy3DWork = (AppMain.GMS_ENEMY_3D_WORK)obj_work;
+        GMS_ENEMY_3D_WORK gmsEnemy3DWork = (GMS_ENEMY_3D_WORK)obj_work;
         if (((int)gmsEnemy3DWork.ene_com.rect_work[2].flag & 131072) != 0)
             return;
-        uint type = AppMain.gmGmkWaterAreaGetType(gmsEnemy3DWork.ene_com.eve_rec);
-        AppMain.OBS_OBJECT_WORK targetObj = gmsEnemy3DWork.ene_com.target_obj;
-        if (AppMain.gmGmkWaterAreaCheckDir(obj_work, targetObj, type))
-            AppMain.gmGmkWaterAreaModeChangeWait(obj_work);
+        uint type = gmGmkWaterAreaGetType(gmsEnemy3DWork.ene_com.eve_rec);
+        OBS_OBJECT_WORK targetObj = gmsEnemy3DWork.ene_com.target_obj;
+        if (gmGmkWaterAreaCheckDir(obj_work, targetObj, type))
+            gmGmkWaterAreaModeChangeWait(obj_work);
         else
-            AppMain.gmGmkWaterAreaModeChangeActive(obj_work);
+            gmGmkWaterAreaModeChangeActive(obj_work);
     }
 
-    private static void gmGmkWaterAreaMainActive(AppMain.OBS_OBJECT_WORK obj_work)
+    private static void gmGmkWaterAreaMainActive(OBS_OBJECT_WORK obj_work)
     {
-        int time = (int)AppMain.gmGmkWaterAreaUserWorkGetTime(obj_work);
-        int counter = AppMain.gmGmkWaterAreaUserTimerGetCounter(obj_work);
-        AppMain.gmGmkWaterAreaUserTimerAddCounter(obj_work, 1);
+        int time = gmGmkWaterAreaUserWorkGetTime(obj_work);
+        int counter = gmGmkWaterAreaUserTimerGetCounter(obj_work);
+        gmGmkWaterAreaUserTimerAddCounter(obj_work, 1);
         if (counter < time * 60)
             return;
-        AppMain.gmGmkWaterAreaModeChangeWait(obj_work);
+        gmGmkWaterAreaModeChangeWait(obj_work);
     }
 
-    private static void gmGmkWaterAreaUserWorkSetLevel(AppMain.OBS_OBJECT_WORK obj_work, ushort level)
+    private static void gmGmkWaterAreaUserWorkSetLevel(OBS_OBJECT_WORK obj_work, ushort level)
     {
         obj_work.user_work |= (uint)level << 16;
     }
 
-    private static ushort gmGmkWaterAreaUserWorkGetLevel(AppMain.OBS_OBJECT_WORK obj_work)
+    private static ushort gmGmkWaterAreaUserWorkGetLevel(OBS_OBJECT_WORK obj_work)
     {
         return (ushort)(obj_work.user_work >> 16);
     }
 
-    private static void gmGmkWaterAreaUserWorkSetTime(AppMain.OBS_OBJECT_WORK obj_work, ushort time)
+    private static void gmGmkWaterAreaUserWorkSetTime(OBS_OBJECT_WORK obj_work, ushort time)
     {
         obj_work.user_work &= 4294901760U;
-        obj_work.user_work |= (uint)time;
+        obj_work.user_work |= time;
     }
 
-    private static ushort gmGmkWaterAreaUserWorkGetTime(AppMain.OBS_OBJECT_WORK obj_work)
+    private static ushort gmGmkWaterAreaUserWorkGetTime(OBS_OBJECT_WORK obj_work)
     {
         return (ushort)obj_work.user_work;
     }
 
-    private static void gmGmkWaterAreaUserTimerSetCounter(AppMain.OBS_OBJECT_WORK obj_work, int time)
+    private static void gmGmkWaterAreaUserTimerSetCounter(OBS_OBJECT_WORK obj_work, int time)
     {
         obj_work.user_timer = time;
     }
 
-    private static void gmGmkWaterAreaUserTimerAddCounter(AppMain.OBS_OBJECT_WORK obj_work, int time)
+    private static void gmGmkWaterAreaUserTimerAddCounter(OBS_OBJECT_WORK obj_work, int time)
     {
         obj_work.user_timer += time;
     }
 
-    private static int gmGmkWaterAreaUserTimerGetCounter(AppMain.OBS_OBJECT_WORK obj_work)
+    private static int gmGmkWaterAreaUserTimerGetCounter(OBS_OBJECT_WORK obj_work)
     {
         return obj_work.user_timer;
     }

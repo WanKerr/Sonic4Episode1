@@ -8,30 +8,24 @@ using mpp;
 
 public class GLPositionData : GLVector3Data, OpenGL.GLVertexData
 {
-  protected OpenGL.GLVertexElementType[] compType_ = new OpenGL.GLVertexElementType[1];
+    protected OpenGL.GLVertexElementType[] compType_ = new OpenGL.GLVertexElementType[1];
 
-  public GLPositionData(ByteBuffer buffer, int size, uint type, int stride, int elCount)
-    : base(buffer, size, type, stride, elCount)
-  {
-  }
-
-  public OpenGL.GLVertexElementType[] DataComponents
-  {
-    get
+    public GLPositionData(ByteBuffer buffer, int size, uint type, int stride, int elCount)
+      : base(buffer, size, type, stride, elCount)
     {
-      return this.compType_;
     }
-  }
 
-  public virtual void ExtractTo(OpenGL.Vertex[] dst, int count)
-  {
-    for (int index = 0; index < count; ++index)
-      dst[index].Position = this.data_[index];
-  }
+    public OpenGL.GLVertexElementType[] DataComponents => this.compType_;
 
-  public void ExtractTo(OpenGL.VertexPosTexColNorm[] dst, int dstOffset, int count)
-  {
-    for (int index = 0; index < count; ++index)
-      dst[index + dstOffset].Position = this.data_[index];
-  }
+    public virtual void ExtractTo(OpenGL.Vertex[] dst, int count)
+    {
+        for (int index = 0; index < count; ++index)
+            dst[index].Position = this.data_[index];
+    }
+
+    public void ExtractTo(OpenGL.VertexPosTexColNorm[] dst, int dstOffset, int count)
+    {
+        for (int index = 0; index < count; ++index)
+            dst[index + dstOffset].Position = this.data_[index];
+    }
 }

@@ -1,32 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
 
 public partial class AppMain
 {
     private static int ObjCameraInit(
      int cam_id,
-     AppMain.NNS_VECTOR pos,
+     NNS_VECTOR pos,
      int group,
      ushort pause_level,
      int prio)
     {
-        AppMain.OBS_CAMERA_SYS obsCameraSys1 = new AppMain.OBS_CAMERA_SYS();
-        AppMain.OBS_CAMERA_SYS obsCameraSys2;
-        if (AppMain.obj_camera_tcb == null)
+        OBS_CAMERA_SYS obsCameraSys1 = new OBS_CAMERA_SYS();
+        OBS_CAMERA_SYS obsCameraSys2;
+        if (obj_camera_tcb == null)
         {
-            AppMain.obj_camera_tcb = AppMain.MTM_TASK_MAKE_TCB(new AppMain.GSF_TASK_PROCEDURE(AppMain.objCameraMain), new AppMain.GSF_TASK_PROCEDURE(AppMain.objCameraDest), 0U, pause_level, (uint)prio, group, (AppMain.TaskWorkFactoryDelegate)(() => (object)new AppMain.OBS_CAMERA_SYS()), "objCamera");
-            obsCameraSys2 = (AppMain.OBS_CAMERA_SYS)AppMain.obj_camera_tcb.work;
+            obj_camera_tcb = MTM_TASK_MAKE_TCB(new GSF_TASK_PROCEDURE(objCameraMain), new GSF_TASK_PROCEDURE(objCameraDest), 0U, pause_level, (uint)prio, group, () => new OBS_CAMERA_SYS(), "objCamera");
+            obsCameraSys2 = (OBS_CAMERA_SYS)obj_camera_tcb.work;
             obsCameraSys2.Clear();
-            AppMain.obj_camera_sys = obsCameraSys2;
+            obj_camera_sys = obsCameraSys2;
         }
         else
-            obsCameraSys2 = AppMain.obj_camera_sys;
+            obsCameraSys2 = obj_camera_sys;
         if (obsCameraSys2.camera_num >= 8)
             return -1;
         int index;
@@ -44,9 +37,9 @@ public partial class AppMain
         }
         if (index >= 8 || obsCameraSys2.obj_camera[index] != null)
             return -1;
-        obsCameraSys2.obj_camera[index] = new AppMain.OBS_CAMERA();
+        obsCameraSys2.obj_camera[index] = new OBS_CAMERA();
         ++obsCameraSys2.camera_num;
-        AppMain.OBS_CAMERA obsCamera = obsCameraSys2.obj_camera[index];
+        OBS_CAMERA obsCamera = obsCameraSys2.obj_camera[index];
         obsCamera.camera_id = index;
         obsCamera.command_state = 0U;
         obsCamera.spd_max.x = 16f;
@@ -55,11 +48,11 @@ public partial class AppMain
         obsCamera.spd_add.x = 3f;
         obsCamera.spd_add.y = 3f;
         obsCamera.spd_add.z = 0.5f;
-        obsCamera.shift = (ushort)1;
+        obsCamera.shift = 1;
         obsCamera.limit[0] = 8;
         obsCamera.limit[1] = 8;
-        obsCamera.limit[2] = obsCamera.limit[0] + (int)AppMain.OBD_LCD_X;
-        obsCamera.limit[3] = obsCamera.limit[1] + (int)AppMain.OBD_LCD_Y;
+        obsCamera.limit[2] = obsCamera.limit[0] + OBD_LCD_X;
+        obsCamera.limit[3] = obsCamera.limit[1] + OBD_LCD_Y;
         obsCamera.limit[4] = -4096;
         obsCamera.limit[5] = 4096;
         obsCamera.pos.Assign(pos);
@@ -71,60 +64,60 @@ public partial class AppMain
 
     private static void ObjCamera3dInit(int cam_id)
     {
-        if (AppMain.obj_camera_sys == null)
+        if (obj_camera_sys == null)
             return;
-        if (AppMain.obj_camera_sys.obj_camera[cam_id] == null)
+        if (obj_camera_sys.obj_camera[cam_id] == null)
         {
-            AppMain.NNS_VECTOR pos = AppMain.GlobalPool<AppMain.NNS_VECTOR>.Alloc();
-            if (AppMain.ObjCameraInit(cam_id, pos, 0, (ushort)0, 61438) == -1)
+            NNS_VECTOR pos = GlobalPool<NNS_VECTOR>.Alloc();
+            if (ObjCameraInit(cam_id, pos, 0, 0, 61438) == -1)
                 return;
-            AppMain.GlobalPool<AppMain.NNS_VECTOR>.Release(pos);
+            GlobalPool<NNS_VECTOR>.Release(pos);
         }
-        AppMain.OBS_CAMERA obj_camera = AppMain.obj_camera_sys.obj_camera[cam_id];
+        OBS_CAMERA obj_camera = obj_camera_sys.obj_camera[cam_id];
         obj_camera.flag |= 16U;
         obj_camera.znear = 1f;
         obj_camera.zfar = 60000f;
-        obj_camera.aspect = AppMain.AMD_SCREEN_ASPECT;
-        obj_camera.fovy = AppMain.NNM_DEGtoA32(45f);
-        AppMain.nnMakePerspectiveMatrix(obj_camera.prj_pers_mtx, obj_camera.fovy, obj_camera.aspect, obj_camera.znear, obj_camera.zfar);
+        obj_camera.aspect = AMD_SCREEN_ASPECT;
+        obj_camera.fovy = NNM_DEGtoA32(45f);
+        nnMakePerspectiveMatrix(obj_camera.prj_pers_mtx, obj_camera.fovy, obj_camera.aspect, obj_camera.znear, obj_camera.zfar);
         obj_camera.scale = 5f / 64f;
-        float num1 = (float)((double)AppMain.g_obj.disp_height * (double)obj_camera.scale * 0.5 * 1.0);
+        float num1 = (float)(g_obj.disp_height * (double)obj_camera.scale * 0.5 * 1.0);
         float num2 = num1 * obj_camera.aspect;
         obj_camera.left = -num2;
         obj_camera.right = num2;
         obj_camera.bottom = -num1;
         obj_camera.top = num1;
-        AppMain.nnMakeOrthoMatrix(obj_camera.prj_ortho_mtx, obj_camera.left, obj_camera.right, obj_camera.bottom, obj_camera.top, obj_camera.znear, obj_camera.zfar);
+        nnMakeOrthoMatrix(obj_camera.prj_ortho_mtx, obj_camera.left, obj_camera.right, obj_camera.bottom, obj_camera.top, obj_camera.znear, obj_camera.zfar);
         switch (obj_camera.camera_type)
         {
-            case AppMain.OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_ROLL:
-                AppMain.NNS_CAMERA_TARGET_ROLL cameraTargetRoll = new AppMain.NNS_CAMERA_TARGET_ROLL();
-                AppMain.ObjCameraGetTargetRollCamera(obj_camera, cameraTargetRoll);
-                AppMain.nnMakeTargetRollCameraViewMatrix(obj_camera.view_mtx, cameraTargetRoll);
+            case OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_ROLL:
+                NNS_CAMERA_TARGET_ROLL cameraTargetRoll = new NNS_CAMERA_TARGET_ROLL();
+                ObjCameraGetTargetRollCamera(obj_camera, cameraTargetRoll);
+                nnMakeTargetRollCameraViewMatrix(obj_camera.view_mtx, cameraTargetRoll);
                 break;
-            case AppMain.OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_UP_TARGET:
-                AppMain.NNS_CAMERA_TARGET_UPTARGET cameraTargetUptarget = new AppMain.NNS_CAMERA_TARGET_UPTARGET();
-                AppMain.ObjCameraGetTargetUpTargetCamera(obj_camera, cameraTargetUptarget);
-                AppMain.nnMakeTargetUpTargetCameraViewMatrix(obj_camera.view_mtx, cameraTargetUptarget);
+            case OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_UP_TARGET:
+                NNS_CAMERA_TARGET_UPTARGET cameraTargetUptarget = new NNS_CAMERA_TARGET_UPTARGET();
+                ObjCameraGetTargetUpTargetCamera(obj_camera, cameraTargetUptarget);
+                nnMakeTargetUpTargetCameraViewMatrix(obj_camera.view_mtx, cameraTargetUptarget);
                 break;
-            case AppMain.OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_UP_VEC:
-                AppMain.NNS_CAMERA_TARGET_UPVECTOR cameraTargetUpvector = new AppMain.NNS_CAMERA_TARGET_UPVECTOR();
-                AppMain.ObjCameraGetTargetUpVecCamera(obj_camera, cameraTargetUpvector);
-                AppMain.nnMakeTargetUpVectorCameraViewMatrix(obj_camera.view_mtx, cameraTargetUpvector);
+            case OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_UP_VEC:
+                NNS_CAMERA_TARGET_UPVECTOR cameraTargetUpvector = new NNS_CAMERA_TARGET_UPVECTOR();
+                ObjCameraGetTargetUpVecCamera(obj_camera, cameraTargetUpvector);
+                nnMakeTargetUpVectorCameraViewMatrix(obj_camera.view_mtx, cameraTargetUpvector);
                 break;
         }
     }
 
     private static void ObjCameraExit()
     {
-        if (AppMain.obj_camera_tcb == null)
+        if (obj_camera_tcb == null)
             return;
-        AppMain.mtTaskClearTcb(AppMain.obj_camera_tcb);
+        mtTaskClearTcb(obj_camera_tcb);
     }
 
     private static void ObjCameraGetTargetRollCamera(
-      AppMain.OBS_CAMERA obj_camera,
-      AppMain.NNS_CAMERA_TARGET_ROLL troll_camera)
+      OBS_CAMERA obj_camera,
+      NNS_CAMERA_TARGET_ROLL troll_camera)
     {
         troll_camera.User = 0U;
         troll_camera.Fovy = obj_camera.fovy;
@@ -136,9 +129,9 @@ public partial class AppMain
         troll_camera.Position.z = obj_camera.disp_pos.z;
         if (obj_camera.target_obj != null)
         {
-            troll_camera.Target.x = AppMain.FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.x);
-            troll_camera.Target.y = AppMain.FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.y);
-            troll_camera.Target.z = AppMain.FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.z);
+            troll_camera.Target.x = FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.x);
+            troll_camera.Target.y = FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.y);
+            troll_camera.Target.z = FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.z);
         }
         else
         {
@@ -150,8 +143,8 @@ public partial class AppMain
     }
 
     private static void ObjCameraGetTargetUpTargetCamera(
-      AppMain.OBS_CAMERA obj_camera,
-      AppMain.NNS_CAMERA_TARGET_UPTARGET tupt_camera)
+      OBS_CAMERA obj_camera,
+      NNS_CAMERA_TARGET_UPTARGET tupt_camera)
     {
         tupt_camera.User = 0U;
         tupt_camera.Fovy = obj_camera.fovy;
@@ -163,9 +156,9 @@ public partial class AppMain
         tupt_camera.Position.z = obj_camera.disp_pos.z;
         if (obj_camera.camup_obj != null)
         {
-            tupt_camera.Target.x = AppMain.FXM_FX32_TO_FLOAT(obj_camera.camup_obj.pos.x);
-            tupt_camera.Target.y = AppMain.FXM_FX32_TO_FLOAT(obj_camera.camup_obj.pos.y);
-            tupt_camera.Target.z = AppMain.FXM_FX32_TO_FLOAT(obj_camera.camup_obj.pos.z);
+            tupt_camera.Target.x = FXM_FX32_TO_FLOAT(obj_camera.camup_obj.pos.x);
+            tupt_camera.Target.y = FXM_FX32_TO_FLOAT(obj_camera.camup_obj.pos.y);
+            tupt_camera.Target.z = FXM_FX32_TO_FLOAT(obj_camera.camup_obj.pos.z);
         }
         else
         {
@@ -176,8 +169,8 @@ public partial class AppMain
     }
 
     private static void ObjCameraGetTargetUpVecCamera(
-      AppMain.OBS_CAMERA obj_camera,
-      AppMain.NNS_CAMERA_TARGET_UPVECTOR tupvec_camera)
+      OBS_CAMERA obj_camera,
+      NNS_CAMERA_TARGET_UPVECTOR tupvec_camera)
     {
         tupvec_camera.User = 0U;
         tupvec_camera.Fovy = obj_camera.fovy;
@@ -189,9 +182,9 @@ public partial class AppMain
         tupvec_camera.Position.z = obj_camera.disp_pos.z;
         if (obj_camera.target_obj != null)
         {
-            tupvec_camera.Target.x = AppMain.FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.x);
-            tupvec_camera.Target.y = AppMain.FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.y);
-            tupvec_camera.Target.z = AppMain.FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.z);
+            tupvec_camera.Target.x = FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.x);
+            tupvec_camera.Target.y = FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.y);
+            tupvec_camera.Target.z = FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.z);
         }
         else
         {
@@ -202,48 +195,48 @@ public partial class AppMain
         tupvec_camera.UpVector.Assign(obj_camera.up_vec);
     }
 
-    private static void ObjCameraPlaySet(int cam_id, AppMain.NNS_VECTOR ofst)
+    private static void ObjCameraPlaySet(int cam_id, NNS_VECTOR ofst)
     {
-        AppMain.obj_camera_sys.obj_camera[cam_id].play_ofst_max.Assign(ofst);
+        obj_camera_sys.obj_camera[cam_id].play_ofst_max.Assign(ofst);
     }
 
-    private static void ObjCameraAllowSet(int cam_id, AppMain.NNS_VECTOR allow)
+    private static void ObjCameraAllowSet(int cam_id, NNS_VECTOR allow)
     {
-        AppMain.obj_camera_sys.obj_camera[cam_id].allow.x = 0.0f;
-        AppMain.obj_camera_sys.obj_camera[cam_id].allow.y = 0.0f;
-        AppMain.obj_camera_sys.obj_camera[cam_id].allow.z = 0.0f;
-        AppMain.obj_camera_sys.obj_camera[cam_id].allow_limit.Assign(allow);
+        obj_camera_sys.obj_camera[cam_id].allow.x = 0.0f;
+        obj_camera_sys.obj_camera[cam_id].allow.y = 0.0f;
+        obj_camera_sys.obj_camera[cam_id].allow.z = 0.0f;
+        obj_camera_sys.obj_camera[cam_id].allow_limit.Assign(allow);
     }
 
-    public static void ObjCameraDispPosGet(int cam_id, out AppMain.SNNS_VECTOR disp_pos)
+    public static void ObjCameraDispPosGet(int cam_id, out SNNS_VECTOR disp_pos)
     {
-        disp_pos = new AppMain.SNNS_VECTOR(AppMain.obj_camera_sys.obj_camera[cam_id].disp_pos);
+        disp_pos = new SNNS_VECTOR(obj_camera_sys.obj_camera[cam_id].disp_pos);
     }
 
     private static float ObjCameraDispScaleGet(int cam_id)
     {
-        AppMain.mppAssertNotImpl();
-        AppMain.OBS_CAMERA obsCamera = AppMain.obj_camera_sys.obj_camera[cam_id];
-        return (double)obsCamera.disp_pos.z >= 0.0 ? (float)(1.0 - (double)obsCamera.disp_pos.z / 2.0) : 1f - obsCamera.disp_pos.z;
+        mppAssertNotImpl();
+        OBS_CAMERA obsCamera = obj_camera_sys.obj_camera[cam_id];
+        return obsCamera.disp_pos.z >= 0.0 ? (float)(1.0 - obsCamera.disp_pos.z / 2.0) : 1f - obsCamera.disp_pos.z;
     }
 
-    public static AppMain.OBS_CAMERA ObjCameraGet(int cam_id)
+    public static OBS_CAMERA ObjCameraGet(int cam_id)
     {
-        return AppMain.obj_camera_sys != null ? AppMain.obj_camera_sys.obj_camera[cam_id] : (AppMain.OBS_CAMERA)null;
+        return obj_camera_sys != null ? obj_camera_sys.obj_camera[cam_id] : null;
     }
 
-    public static void ObjCameraSetUserFunc(int cam_id, AppMain.OBJF_CAMERA_USER_FUNC user_func)
+    public static void ObjCameraSetUserFunc(int cam_id, OBJF_CAMERA_USER_FUNC user_func)
     {
-        if (AppMain.obj_camera_sys == null || AppMain.obj_camera_sys.obj_camera[cam_id] == null)
+        if (obj_camera_sys == null || obj_camera_sys.obj_camera[cam_id] == null)
             return;
-        AppMain.obj_camera_sys.obj_camera[cam_id].user_func = user_func;
+        obj_camera_sys.obj_camera[cam_id].user_func = user_func;
     }
 
-    private static void objCameraDest(AppMain.MTS_TASK_TCB pTcb)
+    private static void objCameraDest(MTS_TASK_TCB pTcb)
     {
-        AppMain.obj_camera_tcb = (AppMain.MTS_TASK_TCB)null;
-        AppMain.obj_camera_sys = (AppMain.OBS_CAMERA_SYS)null;
-        AppMain.OBS_CAMERA_SYS work = (AppMain.OBS_CAMERA_SYS)pTcb.work;
+        obj_camera_tcb = null;
+        obj_camera_sys = null;
+        OBS_CAMERA_SYS work = (OBS_CAMERA_SYS)pTcb.work;
         for (int index = 0; index < 8; ++index)
         {
             if (work.obj_camera[index] != null)
@@ -253,14 +246,14 @@ public partial class AppMain
         }
     }
 
-    private static void objCameraMain(AppMain.MTS_TASK_TCB tcb)
+    private static void objCameraMain(MTS_TASK_TCB tcb)
     {
-        if (AppMain.ObjObjectPauseCheck(0U) != 0U)
+        if (ObjObjectPauseCheck(0U) != 0U)
             return;
-        AppMain.NNS_VECTOR nnsVector = AppMain.GlobalPool<AppMain.NNS_VECTOR>.Alloc();
+        NNS_VECTOR nnsVector = GlobalPool<NNS_VECTOR>.Alloc();
         for (int index = 0; index < 8; ++index)
         {
-            AppMain.OBS_CAMERA obsCamera = AppMain.obj_camera_sys.obj_camera[index];
+            OBS_CAMERA obsCamera = obj_camera_sys.obj_camera[index];
             if (obsCamera != null)
             {
                 obsCamera.prev_disp_pos.x = obsCamera.disp_pos.x;
@@ -273,22 +266,22 @@ public partial class AppMain
                 else
                 {
                     if (((int)obsCamera.flag & 4) != 0)
-                        AppMain.objCameraMove(obsCamera);
+                        objCameraMove(obsCamera);
                     nnsVector.x = obsCamera.pos.x;
                     nnsVector.y = obsCamera.pos.y;
                     nnsVector.z = obsCamera.pos.z;
                     if (((int)obsCamera.flag & 8) != 0)
                     {
-                        nnsVector.x -= (float)(((double)nnsVector.x - (double)obsCamera.work.x) * 2.0);
-                        nnsVector.y -= (float)(((double)nnsVector.y - (double)obsCamera.work.y) * 2.0);
-                        nnsVector.z -= (float)(((double)nnsVector.z - (double)obsCamera.work.z) * 2.0);
+                        nnsVector.x -= (float)((nnsVector.x - (double)obsCamera.work.x) * 2.0);
+                        nnsVector.y -= (float)((nnsVector.y - (double)obsCamera.work.y) * 2.0);
+                        nnsVector.z -= (float)((nnsVector.z - (double)obsCamera.work.z) * 2.0);
                     }
                     obsCamera.disp_pos.x = nnsVector.x + obsCamera.ofst.x;
                     obsCamera.disp_pos.y = nnsVector.y + obsCamera.ofst.y;
                     obsCamera.disp_pos.z = nnsVector.z + obsCamera.ofst.z;
                 }
                 if (((int)obsCamera.flag & 32) != 0)
-                    AppMain.objCameraLimitCheck(obsCamera);
+                    objCameraLimitCheck(obsCamera);
                 obsCamera.disp_pos.x += obsCamera.disp_ofst.x;
                 obsCamera.disp_pos.y += obsCamera.disp_ofst.y;
                 obsCamera.disp_pos.z += obsCamera.disp_ofst.z;
@@ -297,35 +290,35 @@ public partial class AppMain
                 obsCamera.disp_ofst.z = 0.0f;
                 if (((int)obsCamera.flag & 16) != 0)
                 {
-                    AppMain.nnMakePerspectiveMatrix(obsCamera.prj_pers_mtx, obsCamera.fovy, obsCamera.aspect, obsCamera.znear, obsCamera.zfar);
-                    float num1 = (float)((double)AppMain.AMD_SCREEN_2D_WIDTH * (double)obsCamera.scale * 0.5 * 1.0);
+                    nnMakePerspectiveMatrix(obsCamera.prj_pers_mtx, obsCamera.fovy, obsCamera.aspect, obsCamera.znear, obsCamera.zfar);
+                    float num1 = (float)(AMD_SCREEN_2D_WIDTH * (double)obsCamera.scale * 0.5 * 1.0);
                     float num2 = num1 * obsCamera.aspect;
                     obsCamera.left = -num2;
                     obsCamera.right = num2;
                     obsCamera.bottom = -num1;
                     obsCamera.top = num1;
-                    AppMain.nnMakeOrthoMatrix(obsCamera.prj_ortho_mtx, obsCamera.left, obsCamera.right, obsCamera.bottom, obsCamera.top, obsCamera.znear, obsCamera.zfar);
+                    nnMakeOrthoMatrix(obsCamera.prj_ortho_mtx, obsCamera.left, obsCamera.right, obsCamera.bottom, obsCamera.top, obsCamera.znear, obsCamera.zfar);
                     switch (obsCamera.camera_type)
                     {
-                        case AppMain.OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_ROLL:
-                            AppMain.NNS_CAMERA_TARGET_ROLL cameraTargetRoll = AppMain.GlobalPool<AppMain.NNS_CAMERA_TARGET_ROLL>.Alloc();
+                        case OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_ROLL:
+                            NNS_CAMERA_TARGET_ROLL cameraTargetRoll = GlobalPool<NNS_CAMERA_TARGET_ROLL>.Alloc();
                             int roll = obsCamera.roll;
                             if (((int)obsCamera.flag & 1073741824) != 0)
                                 obsCamera.roll = 0;
-                            AppMain.ObjCameraGetTargetRollCamera(obsCamera, cameraTargetRoll);
-                            AppMain.nnMakeTargetRollCameraViewMatrix(obsCamera.view_mtx, cameraTargetRoll);
+                            ObjCameraGetTargetRollCamera(obsCamera, cameraTargetRoll);
+                            nnMakeTargetRollCameraViewMatrix(obsCamera.view_mtx, cameraTargetRoll);
                             obsCamera.roll = roll;
-                            AppMain.GlobalPool<AppMain.NNS_CAMERA_TARGET_ROLL>.Release(cameraTargetRoll);
+                            GlobalPool<NNS_CAMERA_TARGET_ROLL>.Release(cameraTargetRoll);
                             continue;
-                        case AppMain.OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_UP_TARGET:
-                            AppMain.NNS_CAMERA_TARGET_UPTARGET cameraTargetUptarget = new AppMain.NNS_CAMERA_TARGET_UPTARGET();
-                            AppMain.ObjCameraGetTargetUpTargetCamera(obsCamera, cameraTargetUptarget);
-                            AppMain.nnMakeTargetUpTargetCameraViewMatrix(obsCamera.view_mtx, cameraTargetUptarget);
+                        case OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_UP_TARGET:
+                            NNS_CAMERA_TARGET_UPTARGET cameraTargetUptarget = new NNS_CAMERA_TARGET_UPTARGET();
+                            ObjCameraGetTargetUpTargetCamera(obsCamera, cameraTargetUptarget);
+                            nnMakeTargetUpTargetCameraViewMatrix(obsCamera.view_mtx, cameraTargetUptarget);
                             continue;
-                        case AppMain.OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_UP_VEC:
-                            AppMain.NNS_CAMERA_TARGET_UPVECTOR cameraTargetUpvector = new AppMain.NNS_CAMERA_TARGET_UPVECTOR();
-                            AppMain.ObjCameraGetTargetUpVecCamera(obsCamera, cameraTargetUpvector);
-                            AppMain.nnMakeTargetUpVectorCameraViewMatrix(obsCamera.view_mtx, cameraTargetUpvector);
+                        case OBE_CAMERA_TYPE.OBE_CAMERA_TYPE_TARGET_UP_VEC:
+                            NNS_CAMERA_TARGET_UPVECTOR cameraTargetUpvector = new NNS_CAMERA_TARGET_UPVECTOR();
+                            ObjCameraGetTargetUpVecCamera(obsCamera, cameraTargetUpvector);
+                            nnMakeTargetUpVectorCameraViewMatrix(obsCamera.view_mtx, cameraTargetUpvector);
                             continue;
                         default:
                             continue;
@@ -333,22 +326,22 @@ public partial class AppMain
                 }
             }
         }
-        AppMain.GlobalPool<AppMain.NNS_VECTOR>.Release(nnsVector);
+        GlobalPool<NNS_VECTOR>.Release(nnsVector);
     }
 
-    private static void objCameraMove(AppMain.OBS_CAMERA obj_camera)
+    private static void objCameraMove(OBS_CAMERA obj_camera)
     {
-        AppMain.NNS_VECTOR nnsVector = AppMain.GlobalPool<AppMain.NNS_VECTOR>.Alloc();
+        NNS_VECTOR nnsVector = GlobalPool<NNS_VECTOR>.Alloc();
         if (obj_camera.target_obj != null)
         {
-            nnsVector.x = AppMain.FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.x) + obj_camera.target_ofst.x;
-            nnsVector.y = AppMain.FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.y - (((int)AppMain.OBD_LCD_Y << 1) + 200 << 12)) + obj_camera.target_ofst.y;
-            nnsVector.z = AppMain.FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.z) + obj_camera.target_ofst.z;
+            nnsVector.x = FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.x) + obj_camera.target_ofst.x;
+            nnsVector.y = FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.y - ((OBD_LCD_Y << 1) + 200 << 12)) + obj_camera.target_ofst.y;
+            nnsVector.z = FXM_FX32_TO_FLOAT(obj_camera.target_obj.pos.z) + obj_camera.target_ofst.z;
         }
         else
         {
-            nnsVector.x = obj_camera.target_pos.x - AppMain.FXM_FX32_TO_FLOAT((int)AppMain.OBD_LCD_X >> 1 << 12) + obj_camera.target_ofst.x;
-            nnsVector.y = obj_camera.target_pos.y - AppMain.FXM_FX32_TO_FLOAT((int)AppMain.OBD_LCD_Y >> 1 << 12) + obj_camera.target_ofst.y;
+            nnsVector.x = obj_camera.target_pos.x - FXM_FX32_TO_FLOAT(OBD_LCD_X >> 1 << 12) + obj_camera.target_ofst.x;
+            nnsVector.y = obj_camera.target_pos.y - FXM_FX32_TO_FLOAT(OBD_LCD_Y >> 1 << 12) + obj_camera.target_ofst.y;
             nnsVector.z = obj_camera.target_pos.z + obj_camera.target_ofst.z;
         }
         obj_camera.work.x = nnsVector.x;
@@ -369,100 +362,100 @@ public partial class AppMain
         {
             if (((int)obj_camera.flag & 2) != 0)
             {
-                obj_camera.pos.x = AppMain.ObjShiftSetF(obj_camera.pos.x, nnsVector.x, (int)obj_camera.shift, obj_camera.spd_max.x, obj_camera.spd_add.x);
-                obj_camera.pos.y = AppMain.ObjShiftSetF(obj_camera.pos.y, nnsVector.x, (int)obj_camera.shift, obj_camera.spd_max.y, obj_camera.spd_add.y);
-                obj_camera.pos.z = AppMain.ObjShiftSetF(obj_camera.pos.z, nnsVector.x, (int)obj_camera.shift, obj_camera.spd_max.z, obj_camera.spd_add.z);
+                obj_camera.pos.x = ObjShiftSetF(obj_camera.pos.x, nnsVector.x, obj_camera.shift, obj_camera.spd_max.x, obj_camera.spd_add.x);
+                obj_camera.pos.y = ObjShiftSetF(obj_camera.pos.y, nnsVector.x, obj_camera.shift, obj_camera.spd_max.y, obj_camera.spd_add.y);
+                obj_camera.pos.z = ObjShiftSetF(obj_camera.pos.z, nnsVector.x, obj_camera.shift, obj_camera.spd_max.z, obj_camera.spd_add.z);
             }
             else
             {
-                obj_camera.spd.x = (double)nnsVector.x == (double)obj_camera.pos.x ? AppMain.ObjSpdDownSetF(obj_camera.spd.x, obj_camera.spd_add.x) : AppMain.ObjSpdUpSetF(obj_camera.spd.x, obj_camera.spd_add.x, obj_camera.spd_max.x);
-                obj_camera.spd.y = (double)nnsVector.y == (double)obj_camera.pos.y ? AppMain.ObjSpdDownSetF(obj_camera.spd.y, obj_camera.spd_add.y) : AppMain.ObjSpdUpSetF(obj_camera.spd.y, obj_camera.spd_add.y, obj_camera.spd_max.y);
-                obj_camera.spd.z = (double)nnsVector.z == (double)obj_camera.pos.z ? AppMain.ObjSpdDownSetF(obj_camera.spd.z, obj_camera.spd_add.z) : AppMain.ObjSpdUpSetF(obj_camera.spd.z, obj_camera.spd_add.z, obj_camera.spd_max.z);
-                if ((double)nnsVector.x > (double)obj_camera.pos.x)
+                obj_camera.spd.x = nnsVector.x == (double)obj_camera.pos.x ? ObjSpdDownSetF(obj_camera.spd.x, obj_camera.spd_add.x) : ObjSpdUpSetF(obj_camera.spd.x, obj_camera.spd_add.x, obj_camera.spd_max.x);
+                obj_camera.spd.y = nnsVector.y == (double)obj_camera.pos.y ? ObjSpdDownSetF(obj_camera.spd.y, obj_camera.spd_add.y) : ObjSpdUpSetF(obj_camera.spd.y, obj_camera.spd_add.y, obj_camera.spd_max.y);
+                obj_camera.spd.z = nnsVector.z == (double)obj_camera.pos.z ? ObjSpdDownSetF(obj_camera.spd.z, obj_camera.spd_add.z) : ObjSpdUpSetF(obj_camera.spd.z, obj_camera.spd_add.z, obj_camera.spd_max.z);
+                if (nnsVector.x > (double)obj_camera.pos.x)
                 {
                     obj_camera.pos.x += obj_camera.spd.x;
-                    if ((double)obj_camera.pos.x > (double)nnsVector.x)
+                    if (obj_camera.pos.x > (double)nnsVector.x)
                         obj_camera.pos.x = nnsVector.x;
                 }
                 else
                 {
                     obj_camera.pos.x -= obj_camera.spd.x;
-                    if ((double)obj_camera.pos.x < (double)nnsVector.x)
+                    if (obj_camera.pos.x < (double)nnsVector.x)
                         obj_camera.pos.x = nnsVector.x;
                 }
-                if ((double)nnsVector.y > (double)obj_camera.pos.y)
+                if (nnsVector.y > (double)obj_camera.pos.y)
                 {
                     obj_camera.pos.y += obj_camera.spd.y;
-                    if ((double)obj_camera.pos.y > (double)nnsVector.y)
+                    if (obj_camera.pos.y > (double)nnsVector.y)
                         obj_camera.pos.y = nnsVector.y;
                 }
                 else
                 {
                     obj_camera.pos.y -= obj_camera.spd.y;
-                    if ((double)obj_camera.pos.y < (double)nnsVector.y)
+                    if (obj_camera.pos.y < (double)nnsVector.y)
                         obj_camera.pos.y = nnsVector.y;
                 }
-                if ((double)nnsVector.z > (double)obj_camera.pos.z)
+                if (nnsVector.z > (double)obj_camera.pos.z)
                 {
                     obj_camera.pos.z += obj_camera.spd.z;
-                    if ((double)obj_camera.pos.z > (double)nnsVector.z)
+                    if (obj_camera.pos.z > (double)nnsVector.z)
                         obj_camera.pos.z = nnsVector.z;
                 }
                 else
                 {
                     obj_camera.pos.z -= obj_camera.spd.z;
-                    if ((double)obj_camera.pos.z < (double)nnsVector.z)
+                    if (obj_camera.pos.z < (double)nnsVector.z)
                         obj_camera.pos.z = nnsVector.z;
                 }
             }
-            if ((double)Math.Abs(nnsVector.x - obj_camera.pos.x) > (double)obj_camera.play_ofst_max.x)
-                obj_camera.pos.x = (double)nnsVector.x <= (double)obj_camera.pos.x ? nnsVector.x + obj_camera.play_ofst_max.x : nnsVector.x - obj_camera.play_ofst_max.x;
-            if ((double)Math.Abs(nnsVector.y - obj_camera.pos.y) > (double)obj_camera.play_ofst_max.y)
-                obj_camera.pos.y = (double)nnsVector.y <= (double)obj_camera.pos.y ? nnsVector.y + obj_camera.play_ofst_max.y : nnsVector.y - obj_camera.play_ofst_max.y;
-            if ((double)Math.Abs(nnsVector.z - obj_camera.pos.z) > (double)obj_camera.play_ofst_max.z)
-                obj_camera.pos.z = (double)nnsVector.z <= (double)obj_camera.pos.z ? nnsVector.z + obj_camera.play_ofst_max.z : nnsVector.z - obj_camera.play_ofst_max.z;
+            if (Math.Abs(nnsVector.x - obj_camera.pos.x) > (double)obj_camera.play_ofst_max.x)
+                obj_camera.pos.x = nnsVector.x <= (double)obj_camera.pos.x ? nnsVector.x + obj_camera.play_ofst_max.x : nnsVector.x - obj_camera.play_ofst_max.x;
+            if (Math.Abs(nnsVector.y - obj_camera.pos.y) > (double)obj_camera.play_ofst_max.y)
+                obj_camera.pos.y = nnsVector.y <= (double)obj_camera.pos.y ? nnsVector.y + obj_camera.play_ofst_max.y : nnsVector.y - obj_camera.play_ofst_max.y;
+            if (Math.Abs(nnsVector.z - obj_camera.pos.z) > (double)obj_camera.play_ofst_max.z)
+                obj_camera.pos.z = nnsVector.z <= (double)obj_camera.pos.z ? nnsVector.z + obj_camera.play_ofst_max.z : nnsVector.z - obj_camera.play_ofst_max.z;
             obj_camera.pos.z += obj_camera.ofst.z;
-            AppMain.GlobalPool<AppMain.NNS_VECTOR>.Release(nnsVector);
+            GlobalPool<NNS_VECTOR>.Release(nnsVector);
         }
     }
 
-    private static void objCameraLimitCheck(AppMain.OBS_CAMERA obj_camera)
+    private static void objCameraLimitCheck(OBS_CAMERA obj_camera)
     {
-        AppMain.objCameraPosLimitCheck(obj_camera, obj_camera.disp_pos);
+        objCameraPosLimitCheck(obj_camera, obj_camera.disp_pos);
     }
 
-    private static void objCameraPosLimitCheck(AppMain.OBS_CAMERA obj_camera, AppMain.NNS_VECTOR pPos)
+    private static void objCameraPosLimitCheck(OBS_CAMERA obj_camera, NNS_VECTOR pPos)
     {
         int num1 = 0;
-        if ((double)pPos.z != 0.0)
+        if (pPos.z != 0.0)
         {
-            if ((double)obj_camera.limit[4] > (double)pPos.z)
-                pPos.z = (float)obj_camera.limit[4];
-            if ((double)obj_camera.limit[5] < (double)pPos.z)
-                pPos.z = (float)obj_camera.limit[5];
-            if (1.0 / (double)AppMain.ObjCameraDispScaleGet((int)obj_camera.index) * (double)AppMain.OBD_LCD_X > (double)(obj_camera.limit[2] - obj_camera.limit[0]))
+            if (obj_camera.limit[4] > (double)pPos.z)
+                pPos.z = obj_camera.limit[4];
+            if (obj_camera.limit[5] < (double)pPos.z)
+                pPos.z = obj_camera.limit[5];
+            if (1.0 / ObjCameraDispScaleGet(obj_camera.index) * OBD_LCD_X > obj_camera.limit[2] - obj_camera.limit[0])
             {
-                float num2 = 1f / ((float)(obj_camera.limit[2] - obj_camera.limit[0]) / (float)AppMain.OBD_LCD_X);
-                pPos.z = (double)pPos.z < 0.0 ? (float)(((double)num2 - 1.0) * -1.0) : (float)(((double)num2 - 1.0) * -2.0);
+                float num2 = 1f / ((obj_camera.limit[2] - obj_camera.limit[0]) / (float)OBD_LCD_X);
+                pPos.z = pPos.z < 0.0 ? (float)((num2 - 1.0) * -1.0) : (float)((num2 - 1.0) * -2.0);
             }
-            if (1.0 / (double)AppMain.ObjCameraDispScaleGet((int)obj_camera.index) * (double)AppMain.OBD_LCD_Y > (double)(obj_camera.limit[3] - obj_camera.limit[1]))
+            if (1.0 / ObjCameraDispScaleGet(obj_camera.index) * OBD_LCD_Y > obj_camera.limit[3] - obj_camera.limit[1])
             {
-                float num2 = 1f / ((float)(obj_camera.limit[3] - obj_camera.limit[1]) / (float)AppMain.OBD_LCD_X);
-                pPos.z = (double)pPos.z < 0.0 ? (float)(((double)num2 - 1.0) * -1.0) : (float)(((double)num2 - 1.0) * -2.0);
+                float num2 = 1f / ((obj_camera.limit[3] - obj_camera.limit[1]) / (float)OBD_LCD_X);
+                pPos.z = pPos.z < 0.0 ? (float)((num2 - 1.0) * -1.0) : (float)((num2 - 1.0) * -2.0);
             }
         }
-        if ((double)pPos.z > 0.0)
-            num1 = AppMain.FXM_FLOAT_TO_FX32(1f / AppMain.ObjCameraDispScaleGet((int)obj_camera.index) * (float)AppMain.OBD_LCD_X) - ((int)AppMain.OBD_LCD_X << 12) >> 13;
-        if ((double)(obj_camera.limit[0] + num1) > (double)pPos.x)
-            pPos.x = (float)(obj_camera.limit[0] + num1);
-        if ((double)(obj_camera.limit[2] - (int)AppMain.OBD_LCD_X - num1) < (double)pPos.x)
-            pPos.x = (float)(obj_camera.limit[2] - (int)AppMain.OBD_LCD_X - num1);
-        if ((double)pPos.z > 0.0)
-            num1 = AppMain.FXM_FLOAT_TO_FX32(1f / AppMain.ObjCameraDispScaleGet((int)obj_camera.index) * (float)AppMain.OBD_LCD_Y) - ((int)AppMain.OBD_LCD_Y << 12) >> 13;
-        if ((double)(obj_camera.limit[1] + num1) > (double)pPos.y)
-            pPos.y = (float)(obj_camera.limit[1] + num1);
-        if ((double)(obj_camera.limit[3] - (int)AppMain.OBD_LCD_Y - num1) >= (double)pPos.y)
+        if (pPos.z > 0.0)
+            num1 = FXM_FLOAT_TO_FX32(1f / ObjCameraDispScaleGet(obj_camera.index) * OBD_LCD_X) - (OBD_LCD_X << 12) >> 13;
+        if (obj_camera.limit[0] + num1 > (double)pPos.x)
+            pPos.x = obj_camera.limit[0] + num1;
+        if (obj_camera.limit[2] - OBD_LCD_X - num1 < (double)pPos.x)
+            pPos.x = obj_camera.limit[2] - OBD_LCD_X - num1;
+        if (pPos.z > 0.0)
+            num1 = FXM_FLOAT_TO_FX32(1f / ObjCameraDispScaleGet(obj_camera.index) * OBD_LCD_Y) - (OBD_LCD_Y << 12) >> 13;
+        if (obj_camera.limit[1] + num1 > (double)pPos.y)
+            pPos.y = obj_camera.limit[1] + num1;
+        if (obj_camera.limit[3] - OBD_LCD_Y - num1 >= (double)pPos.y)
             return;
-        pPos.y = (float)(obj_camera.limit[3] - (int)AppMain.OBD_LCD_Y - num1);
+        pPos.y = obj_camera.limit[3] - OBD_LCD_Y - num1;
     }
 }

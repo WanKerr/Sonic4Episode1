@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
+﻿using System.Globalization;
 
 public partial class AppMain
 {
     private static void GsEnvInit()
     {
-        AppMain.g_gs_env_region = AppMain.GsEnvGetRegionIphone();
-        AppMain.g_gs_env_language = AppMain.GsEnvGetLanguageIphone();
-        switch (AppMain.g_gs_env_language)
+        g_gs_env_region = GsEnvGetRegionIphone();
+        g_gs_env_language = GsEnvGetLanguageIphone();
+        switch (g_gs_env_language)
         {
             case 0:
                 Sonic4ep1.Strings.Culture = new CultureInfo("ja-JP");
@@ -56,24 +47,24 @@ public partial class AppMain
         }
     }
 
-    private static AppMain.GSE_REGION GsEnvGetRegion()
+    private static GSE_REGION GsEnvGetRegion()
     {
-        return AppMain.g_gs_env_region;
+        return g_gs_env_region;
     }
 
     private static bool GsEnvIsRegionAsia()
     {
-        return AppMain.g_gs_env_is_asia;
+        return g_gs_env_is_asia;
     }
 
     public static int GsEnvGetLanguage()
     {
-        return AppMain.g_gs_env_language;
+        return g_gs_env_language;
     }
 
-    private static AppMain.GSE_DECIDE_KEY GeEnvGetDecideKey()
+    private static GSE_DECIDE_KEY GeEnvGetDecideKey()
     {
-        return AppMain.g_gs_env_decide_key;
+        return g_gs_env_decide_key;
     }
 
     private static char GsEnvDebugGetDecideKeyChar()
@@ -81,69 +72,69 @@ public partial class AppMain
         return 'A';
     }
 
-    private static AppMain.GSE_REGION GsEnvGetRegionIphone()
+    private static GSE_REGION GsEnvGetRegionIphone()
     {
-        AppMain.CRegionTable[] cregionTableArray = new AppMain.CRegionTable[59]
+        var cregionTableArray = new CRegionTable[59]
         {
-      new AppMain.CRegionTable("JP", AppMain.GSE_REGION.GSD_REGION_JP),
-      new AppMain.CRegionTable("US", AppMain.GSE_REGION.GSD_REGION_US),
-      new AppMain.CRegionTable("CA", AppMain.GSE_REGION.GSD_REGION_US),
-      new AppMain.CRegionTable("PM", AppMain.GSE_REGION.GSD_REGION_US),
-      new AppMain.CRegionTable("FR", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("IT", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("DE", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("ES", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("AL", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("AD", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("AZ", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("AT", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("AM", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("BE", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("BA", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("BG", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("BY", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("HR", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("CZ", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("DK", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("EE", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("FO", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("FI", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("AX", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("GE", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("GI", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("GR", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("GL", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("VA", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("HU", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("IS", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("IE", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("LV", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("LI", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("LT", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("LU", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("MC", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("MD", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("ME", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("NL", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("NO", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("PL", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("PT", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("RO", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("SM", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("RS", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("SK", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("SI", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("SJ", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("SE", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("CH", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("UA", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("MK", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("GB", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("GG", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("JE", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("IM", AppMain.GSE_REGION.GSD_REGION_EU),
-      new AppMain.CRegionTable("BR", AppMain.GSE_REGION.GSD_REGION_US),
-      new AppMain.CRegionTable("RU", AppMain.GSE_REGION.GSD_REGION_EU)
+            new CRegionTable("JP", GSE_REGION.GSD_REGION_JP),
+            new CRegionTable("US", GSE_REGION.GSD_REGION_US),
+            new CRegionTable("CA", GSE_REGION.GSD_REGION_US),
+            new CRegionTable("PM", GSE_REGION.GSD_REGION_US),
+            new CRegionTable("FR", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("IT", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("DE", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("ES", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("AL", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("AD", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("AZ", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("AT", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("AM", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("BE", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("BA", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("BG", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("BY", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("HR", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("CZ", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("DK", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("EE", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("FO", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("FI", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("AX", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("GE", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("GI", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("GR", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("GL", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("VA", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("HU", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("IS", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("IE", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("LV", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("LI", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("LT", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("LU", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("MC", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("MD", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("ME", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("NL", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("NO", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("PL", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("PT", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("RO", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("SM", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("RS", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("SK", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("SI", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("SJ", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("SE", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("CH", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("UA", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("MK", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("GB", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("GG", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("JE", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("IM", GSE_REGION.GSD_REGION_EU),
+            new CRegionTable("BR", GSE_REGION.GSD_REGION_US),
+            new CRegionTable("RU", GSE_REGION.GSD_REGION_EU)
         };
         string name = CultureInfo.CurrentCulture.Name;
         for (int index = 0; index < cregionTableArray.Length; ++index)
@@ -151,29 +142,29 @@ public partial class AppMain
             if (name.IndexOf(cregionTableArray[index].country) != -1)
                 return cregionTableArray[index].region;
         }
-        return AppMain.GSE_REGION.GSD_REGION_US;
+        return GSE_REGION.GSD_REGION_US;
     }
 
     private static int GsEnvGetLanguageIphone()
     {
-        AppMain.CLanguageTable[] clanguageTableArray = new AppMain.CLanguageTable[16]
+        var clanguageTableArray = new CLanguageTable[16]
         {
-      new AppMain.CLanguageTable("ja-JP", 0),
-      new AppMain.CLanguageTable("en-US", 1),
-      new AppMain.CLanguageTable("fr-FR", 2),
-      new AppMain.CLanguageTable("it-IT", 3),
-      new AppMain.CLanguageTable("de-DE", 4),
-      new AppMain.CLanguageTable("es-ES", 5),
-      new AppMain.CLanguageTable("fi-FI", 6),
-      new AppMain.CLanguageTable("pt-BR", 7),
-      new AppMain.CLanguageTable("ru-RU", 8),
-      new AppMain.CLanguageTable("zh-CN", 9),
-      new AppMain.CLanguageTable("zh-Hans", 9),
-      new AppMain.CLanguageTable("zh-HK", 10),
-      new AppMain.CLanguageTable("zh-MO", 10),
-      new AppMain.CLanguageTable("zh-SG", 10),
-      new AppMain.CLanguageTable("zh-TW", 10),
-      new AppMain.CLanguageTable("zh-Hant", 10)
+            new CLanguageTable("ja-JP", 0),
+            new CLanguageTable("en-US", 1),
+            new CLanguageTable("fr-FR", 2),
+            new CLanguageTable("it-IT", 3),
+            new CLanguageTable("de-DE", 4),
+            new CLanguageTable("es-ES", 5),
+            new CLanguageTable("fi-FI", 6),
+            new CLanguageTable("pt-BR", 7),
+            new CLanguageTable("ru-RU", 8),
+            new CLanguageTable("zh-CN", 9),
+            new CLanguageTable("zh-Hans", 9),
+            new CLanguageTable("zh-HK", 10),
+            new CLanguageTable("zh-MO", 10),
+            new CLanguageTable("zh-SG", 10),
+            new CLanguageTable("zh-TW", 10),
+            new CLanguageTable("zh-Hant", 10)
         };
         string name = CultureInfo.CurrentCulture.Name;
         for (int index = 0; index < clanguageTableArray.Length; ++index)

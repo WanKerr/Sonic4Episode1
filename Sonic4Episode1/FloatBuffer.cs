@@ -6,20 +6,14 @@
 
 public class FloatBuffer : ByteBuffer
 {
-  public FloatBuffer(ByteBuffer buffer)
-    : base(buffer.data, buffer.offset)
-  {
-  }
+    public FloatBuffer(ByteBuffer buffer)
+      : base(buffer.data, buffer.offset)
+    {
+    }
 
-  public float this[int index]
-  {
-    get
+    public new float this[int index]
     {
-      return this.GetFloat(index * 4);
+        get => this.GetFloat(index * 4);
+        set => this.PutFloat(value, index * 4);
     }
-    set
-    {
-      this.PutFloat(value, index * 4);
-    }
-  }
 }

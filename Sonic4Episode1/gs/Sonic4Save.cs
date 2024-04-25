@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
-using System.Text;
+#if WASM
+using System.Text.Json.Serialization;
+#endif
 using System.Xml.Serialization;
 
 namespace gs
@@ -13,7 +13,7 @@ namespace gs
         public Sonic4Save()
         {
             System = new System();
-            Options = new Options();
+            Options = new gsOptions();
             Remaster = new Remaster();
             Debug = new Debug();
 
@@ -31,53 +31,34 @@ namespace gs
         }
 
         [XmlElement("System")] public System System { get; set; }
-
-        [XmlElement("Options")] public Options Options { get; set; }
-
+        [XmlElement("Options")] public gsOptions Options { get; set; }
         [XmlElement("Remaster")] public Remaster Remaster { get; set; }
-
         [XmlElement("Debug")] public Debug Debug { get; set; }
-
         [XmlElement("Stage")] public Stage[] Stages { get; set; }
-
         [XmlElement("SpecialStage")] public SpecialStage[] SpecialStages { get; set; }
     }
 
     public class System
     {
         [XmlElement("Lives")] public uint Lives { get; set; } = 3;
-
         [XmlElement("Killed")] public uint Killed { get; set; } = 0;
-
         [XmlElement("ClearCount")] public uint ClearCount { get; set; } = 0;
-
         [XmlElement("Announce")] public Announce Announce { get; set; } = new Announce();
     }
 
     public class Announce
     {
         [XmlElement("ZoneSelect")] public bool ZoneSelect { get; set; }
-
         [XmlElement("Zone1Boss")] public bool Zone1Boss { get; set; }
-
         [XmlElement("Zone2Boss")] public bool Zone2Boss { get; set; }
-
         [XmlElement("Zone3Boss")] public bool Zone3Boss { get; set; }
-
         [XmlElement("Zone4Boss")] public bool Zone4Boss { get; set; }
-
         [XmlElement("FinalZone")] public bool FinalZone { get; set; }
-
         [XmlElement("SpecialStage")] public bool SpecialStage { get; set; }
-
         [XmlElement("SuperSonic")] public bool SuperSonic { get; set; }
-
         [XmlElement("SpecialStageTilt")] public bool SpecialStageTiltControls { get; set; }
-
         [XmlElement("SpecialStageFlick")] public bool SpecialStageFlickControls { get; set; }
-
         [XmlElement("MinecartTiltControls")] public bool MinecartTiltControls { get; set; }
-
         [XmlElement("MinecartFlickControls")] public bool MinecartFlickControls { get; set; }
     }
 
@@ -94,74 +75,68 @@ namespace gs
         }
 
         [XmlAttribute("New")] public bool New { get; set; }
-
         [XmlAttribute("HighScoreSuperSonic")] public bool HighScoreSuperSonic { get; set; }
-
         [XmlAttribute("BestTimeSuperSonic")] public bool BestTimeSuperSonic { get; set; }
-
         [XmlAttribute("UsedSuperSonic")] public bool UsedSuperSonic { get; set; }
-
         [XmlElement("StageRecord")] public StageRecord[] StageRecords { get; set; }
     }
 
     public class StageRecord
     {
         [XmlAttribute("HighScore")] public uint HighScore { get; set; }
-
         [XmlIgnore] public TimeSpan BestTime { get; set; }
 
-        [Browsable(false)]
+        //[Browsable(false)]
+#if WASM
+        [JsonIgnore]
+#endif
         [XmlAttribute("BestTime")]
-        public string BestTimetring
+        public string BestTimeString
         {
-            get { return BestTime.ToString("c"); }
-            set
-            {
-                BestTime = string.IsNullOrEmpty(value)
+            get => BestTime.ToString("c");
+            set => BestTime = string.IsNullOrEmpty(value)
                     ? TimeSpan.Zero
                     : TimeSpan.Parse(value, CultureInfo.InvariantCulture);
-            }
         }
     }
 
     public class SpecialStage
     {
         [XmlAttribute("EmeraldStage")] public uint EmeraldStage { get; set; }
-
         [XmlAttribute("HighScore")] public uint HighScore { get; set; }
-
         [XmlIgnore] public TimeSpan BestTime { get; set; }
 
-        [Browsable(false)]
+        //[Browsable(false)]
+#if WASM
+        [JsonIgnore]
+#endif
         [XmlAttribute("BestTime")]
         public string BestTimeString
         {
-            get { return BestTime.ToString("c"); }
-            set
-            {
-                BestTime = string.IsNullOrEmpty(value)
+            get => BestTime.ToString("c");
+            set => BestTime = string.IsNullOrEmpty(value)
                     ? TimeSpan.Zero
                     : TimeSpan.Parse(value, CultureInfo.InvariantCulture);
-            }
         }
     }
 
-    public class Options
+    public class gsOptions
     {
         [XmlElement("Vibration")] public bool Vibration { get; set; } = true;
-
         [XmlElement("BGMVolume")] public float BGMVolume { get; set; } = 1;
-
         [XmlElement("SEVolume")] public float SEVolume { get; set; } = 1;
-
-        [XmlElement("ControlStyle")] public ControlType ControlType { get; set; } = ControlType.VirtualPadDown;
+        [XmlElement("ControlStyle")] public ControlType ControlType { get; set; } = ControlType.VirtualPadUp;
     }
 
     public class Remaster
     {
         [XmlElement("LoopCamera")] public bool LoopCamera { get; set; } = false;
         [XmlElement("BetterSoundEffects")] public bool BetterSoundEffects { get; set; } = true;
-        [XmlElement("ModernSoundEffects")] public bool ModernSoundEffects { get; set; } = true;
+        [XmlElement("ModernSoundEffects")] public bool ModernSoundEffects { get; set; } = false;
+        [XmlElement("BetterGears")] public bool BetterGears { get; set; } = true;
+        [XmlElement("BetterMusic")] public bool BetterMusic { get; set; } = true;
+        [XmlElement("BugFixes")] public bool BugFixes { get; set; } = true;
+        [XmlElement("Misc")] public bool Misc { get; set; } = true;
     }
 
     public class Debug

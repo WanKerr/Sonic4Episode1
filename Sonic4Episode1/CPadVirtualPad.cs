@@ -12,9 +12,9 @@ public class CPadVirtualPad
 
     public static CPadVirtualPad CreateInstance()
     {
-        if (CPadVirtualPad.p_instance == null)
-            CPadVirtualPad.p_instance = new CPadVirtualPad();
-        return CPadVirtualPad.p_instance;
+        if (p_instance == null)
+            p_instance = new CPadVirtualPad();
+        return p_instance;
     }
 
     public bool Create()
@@ -101,10 +101,10 @@ public class CPadVirtualPad
             if (this.m_focus[index2])
                 num |= this.getOnFlag(AppMain._am_tp_touch[index2].@on);
         }
-        if (12 == (12 & (int)num))
-            num &= (ushort)65531;
-        if (3 == (3 & (int)num))
-            num &= (ushort)65534;
+        if (12 == (12 & num))
+            num &= 65531;
+        if (3 == (3 & num))
+            num &= 65534;
         this.m_on_flag.push_front(num);
     }
 
@@ -133,51 +133,51 @@ public class CPadVirtualPad
 
     public bool isHit(ushort[] point)
     {
-        return this.isHit(CArray2<float>.initializer((float)point[0], (float)point[1]));
+        return this.isHit(CArray2<float>.initializer(point[0], point[1]));
     }
 
     public bool isHit(CArray2<float> pos)
     {
         bool flag = false;
-        if ((double)pos.x >= (double)this.m_area.left && (double)this.m_area.right >= (double)pos.x && ((double)pos.y >= (double)this.m_area.top && (double)this.m_area.bottom >= (double)pos.y))
+        if (pos.x >= (double)this.m_area.left && m_area.right >= (double)pos.x && (pos.y >= (double)this.m_area.top && m_area.bottom >= (double)pos.y))
             flag = true;
         return flag;
     }
 
     public ushort getOnFlag(ushort[] point)
     {
-        return this.getOnFlag(CArray2<float>.initializer((float)point[0], (float)point[1]));
+        return this.getOnFlag(CArray2<float>.initializer(point[0], point[1]));
     }
 
     public ushort getOnFlag(CArray2<float> pos)
     {
-        CArray2<float> p1 = CArray2<float>.initializer((float)(((double)this.m_area.left + (double)this.m_area.right) * 0.5), (float)(((double)this.m_area.top + (double)this.m_area.bottom) * 0.5));
+        CArray2<float> p1 = CArray2<float>.initializer((float)((m_area.left + (double)this.m_area.right) * 0.5), (float)((m_area.top + (double)this.m_area.bottom) * 0.5));
         pos.y -= 16f;
         pos.y /= 1.05f;
         ushort num1 = 0;
-        float num2 = (float)(((double)this.m_area.bottom - (double)this.m_area.top) * 0.400000005960464 * 0.5);
+        float num2 = (float)((m_area.bottom - (double)this.m_area.top) * 0.400000005960464 * 0.5);
         CArray2<float> xy1_1 = CArray2<float>.initializer(this.m_area.left, p1.y - num2);
-        CArray2<float> xy2_1 = CArray2<float>.initializer(p1.x, (float)((double)p1.y + (double)num2 - 17.0));
+        CArray2<float> xy2_1 = CArray2<float>.initializer(p1.x, (float)(p1.y + (double)num2 - 17.0));
         CArray2<float> xy1_2 = CArray2<float>.initializer(p1.x, p1.y - num2);
-        CArray2<float> xy2_2 = CArray2<float>.initializer(this.m_area.right, (float)((double)p1.y + (double)num2 - 17.0));
+        CArray2<float> xy2_2 = CArray2<float>.initializer(this.m_area.right, (float)(p1.y + (double)num2 - 17.0));
         if (this.isHit(pos, xy1_2, xy2_2))
-            num1 = (ushort)8;
+            num1 = 8;
         else if (this.isHit(pos, xy1_1, xy2_1))
-            num1 = (ushort)4;
-        if (num1 == (ushort)0)
+            num1 = 4;
+        if (num1 == 0)
         {
             CArray2<float> carray2_1 = CArray2<float>.initializer(this.m_area.left, this.m_area.top);
             CArray2<float> carray2_2 = CArray2<float>.initializer(this.m_area.right, this.m_area.top);
             CArray2<float> carray2_3 = CArray2<float>.initializer(this.m_area.left, this.m_area.bottom);
             CArray2<float> carray2_4 = CArray2<float>.initializer(this.m_area.right, this.m_area.bottom);
             if (this.isHit(pos, p1, carray2_2, carray2_4))
-                num1 = (ushort)8;
+                num1 = 8;
             else if (this.isHit(pos, p1, carray2_3, carray2_1))
-                num1 = (ushort)4;
+                num1 = 4;
             else if (this.isHit(pos, p1, carray2_1, carray2_2))
-                num1 = (ushort)1;
+                num1 = 1;
             else if (this.isHit(pos, p1, carray2_4, carray2_3))
-                num1 = (ushort)2;
+                num1 = 2;
         }
         return num1;
     }
@@ -185,7 +185,7 @@ public class CPadVirtualPad
     public bool isHit(CArray2<float> target, CArray2<float> xy1, CArray2<float> xy2)
     {
         bool flag = false;
-        if ((double)target.x >= (double)xy1.x && (double)xy2.x >= (double)target.x && ((double)target.y >= (double)xy1.y && (double)xy2.y >= (double)target.y))
+        if (target.x >= (double)xy1.x && xy2.x >= (double)target.x && (target.y >= (double)xy1.y && xy2.y >= (double)target.y))
             flag = true;
         return flag;
     }
@@ -196,17 +196,17 @@ public class CPadVirtualPad
         CArray2<float> p2,
         CArray2<float> p3)
     {
-        float num1 = CPadVirtualPad.CLocalLogic.Cross(AppMain._SubrtactArray2(p1, target), AppMain._SubrtactArray2(p2, target));
-        float num2 = CPadVirtualPad.CLocalLogic.Cross(AppMain._SubrtactArray2(p2, target), AppMain._SubrtactArray2(p3, target));
-        float num3 = CPadVirtualPad.CLocalLogic.Cross(AppMain._SubrtactArray2(p3, target), AppMain._SubrtactArray2(p1, target));
-        return 0.0 < (double)num1 * (double)num2 && 0.0 < (double)num1 * (double)num3;
+        float num1 = CLocalLogic.Cross(AppMain._SubrtactArray2(p1, target), AppMain._SubrtactArray2(p2, target));
+        float num2 = CLocalLogic.Cross(AppMain._SubrtactArray2(p2, target), AppMain._SubrtactArray2(p3, target));
+        float num3 = CLocalLogic.Cross(AppMain._SubrtactArray2(p3, target), AppMain._SubrtactArray2(p1, target));
+        return 0.0 < num1 * (double)num2 && 0.0 < num1 * (double)num3;
     }
 
     private class CLocalLogic
     {
         public static float Cross(CArray2<float> p1, CArray2<float> p2)
         {
-            return (float)((double)p1.x * (double)p2.y - (double)p1.y * (double)p2.x);
+            return (float)(p1.x * (double)p2.y - p1.y * (double)p2.x);
         }
     }
 

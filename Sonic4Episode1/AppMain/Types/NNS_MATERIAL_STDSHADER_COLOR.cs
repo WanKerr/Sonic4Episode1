@@ -1,45 +1,20 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
 
 public partial class AppMain
 {
     public class NNS_MATERIAL_STDSHADER_COLOR
     {
         public uint fFlag;
-        public AppMain.NNS_RGBA Ambient;
-        public AppMain.NNS_RGBA Diffuse;
-        public AppMain.NNS_RGBA Specular;
-        public AppMain.NNS_RGBA Emission;
+        public NNS_RGBA Ambient;
+        public NNS_RGBA Diffuse;
+        public NNS_RGBA Specular;
+        public NNS_RGBA Emission;
         public float Shininess;
         public float SpecularIntensity;
 
-        public static AppMain.NNS_MATERIAL_STDSHADER_COLOR Read(BinaryReader reader)
+        public static NNS_MATERIAL_STDSHADER_COLOR Read(BinaryReader reader)
         {
-            return new AppMain.NNS_MATERIAL_STDSHADER_COLOR()
+            return new NNS_MATERIAL_STDSHADER_COLOR()
             {
                 fFlag = reader.ReadUInt32(),
                 Ambient = {
@@ -75,7 +50,7 @@ public partial class AppMain
         {
         }
 
-        public NNS_MATERIAL_STDSHADER_COLOR(AppMain.NNS_MATERIAL_STDSHADER_COLOR matColor)
+        public NNS_MATERIAL_STDSHADER_COLOR(NNS_MATERIAL_STDSHADER_COLOR matColor)
         {
             this.fFlag = matColor.fFlag;
             this.Ambient.r = matColor.Ambient.r;
@@ -98,8 +73,8 @@ public partial class AppMain
             this.SpecularIntensity = matColor.SpecularIntensity;
         }
 
-        public AppMain.NNS_MATERIAL_STDSHADER_COLOR Assign(
-          AppMain.NNS_MATERIAL_STDSHADER_COLOR matColor)
+        public NNS_MATERIAL_STDSHADER_COLOR Assign(
+          NNS_MATERIAL_STDSHADER_COLOR matColor)
         {
             this.fFlag = matColor.fFlag;
             this.Ambient.r = matColor.Ambient.r;

@@ -1,217 +1,216 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-
-public partial class AppMain
+﻿public partial class AppMain
 {
 
     public static void DmSndBgmPlayerInit()
     {
-        AppMain.dmSndBgmPlayerInit();
+        dmSndBgmPlayerInit();
     }
 
     public static void DmSndBgmPlayerExit()
     {
-        AppMain.dm_snd_bgm_player_flag |= 4U;
+        dm_snd_bgm_player_flag |= 4U;
     }
 
     public static void DmSndBgmPlayerBgmStop()
     {
-        AppMain.dm_snd_bgm_player_flag |= 8U;
+        dm_snd_bgm_player_flag |= 8U;
     }
 
     private static bool DmSndBgmPlayerIsTaskExit()
     {
-        return AppMain.dm_snd_bgm_player_tcb == null;
+        return dm_snd_bgm_player_tcb == null;
     }
 
     private static bool DmSndBgmPlayerIsSndSysBuild()
     {
-        return AppMain.DmSoundBuildCheck();
+        return DmSoundBuildCheck();
     }
 
     public static void DmSndBgmPlayerPlayBgm(int idx)
     {
-        if (AppMain.dm_snd_bgm_player_tcb == null)
-            AppMain.dmSndBgmPlayerInit();
+        if (dm_snd_bgm_player_tcb == null)
+            dmSndBgmPlayerInit();
         switch (idx)
         {
             case 0:
-                if (((int)AppMain.dm_snd_bgm_player_flag & 16) != 0)
+                if (((int)dm_snd_bgm_player_flag & 16) != 0)
                 {
-                    AppMain.dm_snd_bgm_player_flag |= 128U;
+                    dm_snd_bgm_player_flag |= 128U;
                     break;
                 }
-                if (((int)AppMain.dm_snd_bgm_player_flag & 32) != 0)
+                if (((int)dm_snd_bgm_player_flag & 32) != 0)
                     break;
-                AppMain.dm_snd_bgm_player_flag |= 32U;
+                dm_snd_bgm_player_flag |= 32U;
                 break;
             case 1:
-                if (((int)AppMain.dm_snd_bgm_player_flag & 32) != 0)
+                if (((int)dm_snd_bgm_player_flag & 32) != 0)
                 {
-                    AppMain.dm_snd_bgm_player_flag |= 64U;
+                    dm_snd_bgm_player_flag |= 64U;
                     break;
                 }
-                if (((int)AppMain.dm_snd_bgm_player_flag & 16) != 0)
+                if (((int)dm_snd_bgm_player_flag & 16) != 0)
                     break;
-                AppMain.dm_snd_bgm_player_flag |= 16U;
+                dm_snd_bgm_player_flag |= 16U;
+                break;
+            case 2:
+                if (((int)dm_snd_bgm_player_flag & 256) != 0)
+                    break;
+                dm_snd_bgm_player_flag |= 256;
                 break;
         }
     }
 
     private static void dmSndBgmPlayerInit()
     {
-        if (AppMain.dm_snd_bgm_player_tcb != null)
+        if (dm_snd_bgm_player_tcb != null)
             return;
-        AppMain.dm_snd_bgm_player_tcb = AppMain.MTM_TASK_MAKE_TCB(new AppMain.GSF_TASK_PROCEDURE(AppMain.dmSndBgmPlayerProcMain), new AppMain.GSF_TASK_PROCEDURE(AppMain.dmSndBgmPlayerDest), 0U, (ushort)0, 4096U, 0, (AppMain.TaskWorkFactoryDelegate)(() => (object)new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK()), "DM_SND_BGM_PLAYER_MAIN");
-        AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK work = (AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK)AppMain.dm_snd_bgm_player_tcb.work;
-        AppMain.dm_snd_bgm_player_flag = 0U;
-        work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcInit);
+        dm_snd_bgm_player_tcb = MTM_TASK_MAKE_TCB(new GSF_TASK_PROCEDURE(dmSndBgmPlayerProcMain), new GSF_TASK_PROCEDURE(dmSndBgmPlayerDest), 0U, 0, 4096U, 0, () => new DMS_SND_BGM_PLAYER_MAIN_WORK(), "DM_SND_BGM_PLAYER_MAIN");
+        DMS_SND_BGM_PLAYER_MAIN_WORK work = (DMS_SND_BGM_PLAYER_MAIN_WORK)dm_snd_bgm_player_tcb.work;
+        dm_snd_bgm_player_flag = 0U;
+        work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcInit);
     }
 
-    private static void dmSndBgmPlayerProcMain(AppMain.MTS_TASK_TCB tcb)
+    private static void dmSndBgmPlayerProcMain(MTS_TASK_TCB tcb)
     {
-        AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK work = (AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK)tcb.work;
-        if (((int)AppMain.dm_snd_bgm_player_flag & 1) != 0)
+        DMS_SND_BGM_PLAYER_MAIN_WORK work = (DMS_SND_BGM_PLAYER_MAIN_WORK)tcb.work;
+        if (((int)dm_snd_bgm_player_flag & 1) != 0)
         {
-            AppMain.mtTaskClearTcb(tcb);
-            AppMain.dm_snd_bgm_player_flag = 0U;
-            AppMain.dm_snd_bgm_player_tcb = (AppMain.MTS_TASK_TCB)null;
+            mtTaskClearTcb(tcb);
+            dm_snd_bgm_player_flag = 0U;
+            dm_snd_bgm_player_tcb = null;
         }
         if (work.proc_update == null)
             return;
         work.proc_update(work);
     }
 
-    private static void dmSndBgmPlayerDest(AppMain.MTS_TASK_TCB tcb)
+    private static void dmSndBgmPlayerDest(MTS_TASK_TCB tcb)
     {
     }
 
-    private static void dmSndBgmPlayerProcInit(AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
+    private static void dmSndBgmPlayerProcInit(DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
     {
-        AppMain.DmSoundBuild();
-        main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcBuildIdle);
+        DmSoundBuild();
+        main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcBuildIdle);
     }
 
-    private static void dmSndBgmPlayerProcBuildIdle(AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
+    private static void dmSndBgmPlayerProcBuildIdle(DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
     {
-        if (!AppMain.DmSoundBuildCheck())
+        if (!DmSoundBuildCheck())
             return;
-        AppMain.DmSoundInit();
-        main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcWaitSetBgm);
+        DmSoundInit();
+        main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcWaitSetBgm);
         main_work.end_timer = 0;
     }
 
-    private static void dmSndBgmPlayerProcWaitSetBgm(AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
+    private static void dmSndBgmPlayerProcWaitSetBgm(DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
     {
-        AppMain.GsGetMainSysInfo();
-        if (((int)AppMain.dm_snd_bgm_player_flag & 8) != 0 || ((int)AppMain.dm_snd_bgm_player_flag & 4) != 0)
+        GsGetMainSysInfo();
+        if (((int)dm_snd_bgm_player_flag & 8) != 0 || ((int)dm_snd_bgm_player_flag & 4) != 0)
         {
-            AppMain.DmSoundStopJingle(24);
-            AppMain.DmSoundStopBGM(24);
-            main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcStopIdle);
+            DmSoundStopJingle(24);
+            DmSoundStopBGM(24);
+            main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcStopIdle);
         }
-        else if (((int)AppMain.dm_snd_bgm_player_flag & 16) != 0 || ((int)AppMain.dm_snd_bgm_player_flag & 32) != 0)
+        else if (((int)dm_snd_bgm_player_flag & 16) != 0 || ((int)dm_snd_bgm_player_flag & 32) != 0 || ((int)dm_snd_bgm_player_flag & 256) != 0)
         {
-            if (((int)AppMain.dm_snd_bgm_player_flag & 16) != 0)
+            if (((int)dm_snd_bgm_player_flag & 16) != 0)
             {
-                AppMain.DmSoundPlayJingle(0, 0);
-                AppMain.dm_snd_bgm_player_flag &= 4294967263U;
+                DmSoundPlayJingle(0, 0);
+                dm_snd_bgm_player_flag &= 4294967263U;
+            }
+            else if (((int)dm_snd_bgm_player_flag & 256) != 0)
+            {
+                DmSoundPlayMenuBGM(0, 32);
+                dm_snd_bgm_player_flag &= 4294967279U;
             }
             else
             {
-                AppMain.DmSoundPlayMenuBGM(0, 32);
-                AppMain.dm_snd_bgm_player_flag &= 4294967279U;
+                DmSoundPlayMenuBGM(0, 32);
+                dm_snd_bgm_player_flag &= 4294967279U;
             }
-            main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcPlayIdle);
+            main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcPlayIdle);
             main_work.end_timer = 0;
         }
-        else if (((int)AppMain.dm_snd_bgm_player_flag & 64) != 0)
+        else if (((int)dm_snd_bgm_player_flag & 64) != 0)
         {
-            AppMain.DmSoundStopBGM(0);
-            main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcStopIdle);
+            DmSoundStopBGM(0);
+            main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcStopIdle);
         }
         else
         {
-            if (((int)AppMain.dm_snd_bgm_player_flag & 128) == 0)
+            if (((int)dm_snd_bgm_player_flag & 128) == 0)
                 return;
-            AppMain.DmSoundStopJingle(24);
-            main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcStopIdle);
+            DmSoundStopJingle(24);
+            main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcStopIdle);
         }
     }
 
-    private static void dmSndBgmPlayerProcPlayIdle(AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
+    private static void dmSndBgmPlayerProcPlayIdle(DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
     {
-        if (((int)AppMain.dm_snd_bgm_player_flag & 8) != 0 || ((int)AppMain.dm_snd_bgm_player_flag & 4) != 0)
+        if (((int)dm_snd_bgm_player_flag & 8) != 0 || ((int)dm_snd_bgm_player_flag & 4) != 0)
         {
-            AppMain.DmSoundStopJingle(24);
-            AppMain.DmSoundStopBGM(24);
-            main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcStopIdle);
+            DmSoundStopJingle(24);
+            DmSoundStopBGM(24);
+            main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcStopIdle);
         }
-        else if (((int)AppMain.dm_snd_bgm_player_flag & 64) != 0)
+        else if (((int)dm_snd_bgm_player_flag & 64) != 0)
         {
-            AppMain.DmSoundStopBGM(0);
-            main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcStopIdle);
+            DmSoundStopBGM(0);
+            main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcStopIdle);
         }
         else
         {
-            if (((int)AppMain.dm_snd_bgm_player_flag & 128) == 0)
+            if (((int)dm_snd_bgm_player_flag & 128) == 0)
                 return;
-            AppMain.DmSoundStopJingle(24);
-            main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcStopIdle);
+            DmSoundStopJingle(24);
+            main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcStopIdle);
         }
     }
 
-    private static void dmSndBgmPlayerProcStopIdle(AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
+    private static void dmSndBgmPlayerProcStopIdle(DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
     {
-        if (!AppMain.DmSoundIsStopStageBGM() || !AppMain.DmSoundIsStopJingle())
+        if (!DmSoundIsStopStageBGM() || !DmSoundIsStopJingle())
             return;
-        if (((int)AppMain.dm_snd_bgm_player_flag & 4) != 0)
+        if (((int)dm_snd_bgm_player_flag & 4) != 0)
         {
-            AppMain.dm_snd_bgm_player_flag &= 4294967291U;
-            main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcSndRelease);
+            dm_snd_bgm_player_flag &= 4294967291U;
+            main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcSndRelease);
         }
         else
         {
-            if (((int)AppMain.dm_snd_bgm_player_flag & 64) != 0)
+            if (((int)dm_snd_bgm_player_flag & 64) != 0)
             {
-                AppMain.dm_snd_bgm_player_flag |= 16U;
-                AppMain.dm_snd_bgm_player_flag &= 4294967231U;
+                dm_snd_bgm_player_flag |= 16U;
+                dm_snd_bgm_player_flag &= 4294967231U;
             }
-            else if (((int)AppMain.dm_snd_bgm_player_flag & 64) == 0 && ((int)AppMain.dm_snd_bgm_player_flag & 128) == 0 && ((int)AppMain.dm_snd_bgm_player_flag & 8) == 0)
-                AppMain.dm_snd_bgm_player_flag |= 16U;
-            else if (((int)AppMain.dm_snd_bgm_player_flag & 8) != 0)
+            else if (((int)dm_snd_bgm_player_flag & 64) == 0 && ((int)dm_snd_bgm_player_flag & 128) == 0 && ((int)dm_snd_bgm_player_flag & 8) == 0)
+                dm_snd_bgm_player_flag |= 16U;
+            else if (((int)dm_snd_bgm_player_flag & 8) != 0)
             {
-                AppMain.dm_snd_bgm_player_flag &= 4294967279U;
-                AppMain.dm_snd_bgm_player_flag &= 4294967263U;
-                AppMain.dm_snd_bgm_player_flag &= 4294967287U;
+                dm_snd_bgm_player_flag &= 4294967279U;
+                dm_snd_bgm_player_flag &= 4294967263U;
+                dm_snd_bgm_player_flag &= 4294967287U;
             }
             else
             {
-                AppMain.dm_snd_bgm_player_flag |= 32U;
-                AppMain.dm_snd_bgm_player_flag &= 4294967167U;
+                dm_snd_bgm_player_flag |= 32U;
+                dm_snd_bgm_player_flag &= 4294967167U;
             }
-            main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcWaitSetBgm);
+            main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcWaitSetBgm);
         }
     }
 
-    private static void dmSndBgmPlayerProcSndRelease(AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
+    private static void dmSndBgmPlayerProcSndRelease(DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
     {
-        AppMain.DmSoundExit();
-        AppMain.DmSoundFlush();
-        main_work.proc_update = new AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(AppMain.dmSndBgmPlayerProcSndFinish);
+        DmSoundExit();
+        DmSoundFlush();
+        main_work.proc_update = new DMS_SND_BGM_PLAYER_MAIN_WORK._proc_(dmSndBgmPlayerProcSndFinish);
     }
 
-    private static void dmSndBgmPlayerProcSndFinish(AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
+    private static void dmSndBgmPlayerProcSndFinish(DMS_SND_BGM_PLAYER_MAIN_WORK main_work)
     {
-        main_work.proc_update = (AppMain.DMS_SND_BGM_PLAYER_MAIN_WORK._proc_)null;
-        AppMain.dm_snd_bgm_player_flag |= 1U;
+        main_work.proc_update = null;
+        dm_snd_bgm_player_flag |= 1U;
     }
 }

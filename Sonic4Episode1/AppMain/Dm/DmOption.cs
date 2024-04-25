@@ -1,66 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using er;
+﻿using er;
 using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
 
 public partial class AppMain
 {
     private static void DmOptionStart(object arg)
     {
-        AppMain.dm_opt_mgr.Clear();
-        AppMain.dm_opt_mgr_p = AppMain.dm_opt_mgr;
-        AppMain.dm_opt_win_tex.Clear();
-        switch (AppMain.SyGetEvtInfo().cur_evt_id)
+        dm_opt_mgr.Clear();
+        dm_opt_mgr_p = dm_opt_mgr;
+        dm_opt_win_tex.Clear();
+        switch (SyGetEvtInfo().cur_evt_id)
         {
             case 6:
             case 11:
-                AppMain.dm_opt_is_pause_maingame = true;
-                AppMain.mtTaskStartPause((ushort)2);
+                dm_opt_is_pause_maingame = true;
+                mtTaskStartPause(2);
                 break;
             default:
-                AppMain.dm_opt_is_pause_maingame = false;
+                dm_opt_is_pause_maingame = false;
                 break;
         }
-        AppMain.dm_xbox_show_progress = 0;
-        AppMain.dmOptInit();
+        dm_xbox_show_progress = 0;
+        dmOptInit();
     }
 
     private static bool DmOptionIsExit()
     {
-        return AppMain.dm_opt_mgr_p == null || AppMain.dm_opt_mgr_p.tcb == null;
+        return dm_opt_mgr_p == null || dm_opt_mgr_p.tcb == null;
     }
 
     private static void dmOptInit()
     {
-        AppMain.dm_opt_mgr_p.tcb = AppMain.MTM_TASK_MAKE_TCB(new AppMain.GSF_TASK_PROCEDURE(AppMain.dmOptProcMain), new AppMain.GSF_TASK_PROCEDURE(AppMain.dmOptDest), 0U, (ushort)short.MaxValue, 8192U, 10, (AppMain.TaskWorkFactoryDelegate)(() => (object)new AppMain.DMS_OPT_MAIN_WORK()), "OPT_MAIN");
-        AppMain.DMS_OPT_MAIN_WORK work = (AppMain.DMS_OPT_MAIN_WORK)AppMain.dm_opt_mgr_p.tcb.work;
-        if (AppMain.dm_opt_is_pause_maingame)
+        dm_opt_mgr_p.tcb = MTM_TASK_MAKE_TCB(new GSF_TASK_PROCEDURE(dmOptProcMain), new GSF_TASK_PROCEDURE(dmOptDest), 0U, (ushort)short.MaxValue, 8192U, 10, () => new DMS_OPT_MAIN_WORK(), "OPT_MAIN");
+        DMS_OPT_MAIN_WORK work = (DMS_OPT_MAIN_WORK)dm_opt_mgr_p.tcb.work;
+        if (dm_opt_is_pause_maingame)
         {
-            work.draw_state = AppMain.AoActSysGetDrawStateEnable() ? 1U : 0U;
+            work.draw_state = AoActSysGetDrawStateEnable() ? 1U : 0U;
             if (work.draw_state > 0U)
-                AppMain.dm_opt_draw_state = AppMain.AoActSysGetDrawState();
+                dm_opt_draw_state = AoActSysGetDrawState();
         }
         else
         {
             work.draw_state = 1U;
-            AppMain.dm_opt_draw_state = 0U;
+            dm_opt_draw_state = 0U;
         }
-        AppMain.AoActSysSetDrawStateEnable(work.draw_state > 0U);
+        AoActSysSetDrawStateEnable(work.draw_state > 0U);
         if (work.draw_state > 0U)
-            AppMain.dm_opt_draw_state = AppMain.AoActSysGetDrawState();
-        AppMain.dmOptSetInitDispOptionData(work);
-        work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptLoadFontData);
+            dm_opt_draw_state = AoActSysGetDrawState();
+        dmOptSetInitDispOptionData(work);
+        work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptLoadFontData);
     }
 
-    private static void dmOptSetSaveOptionData(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetSaveOptionData(DMS_OPT_MAIN_WORK main_work)
     {
         SOption instance = SOption.CreateInstance();
         int volumeBgm = (int)instance.GetVolumeBgm();
@@ -71,27 +61,27 @@ public partial class AppMain
         instance.SetVolumeSe((uint)(main_work.volume_data[1] * 10));
     }
 
-    private static void dmOptSetInitDispOptionData(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetInitDispOptionData(DMS_OPT_MAIN_WORK main_work)
     {
-        main_work.is_jp_region = AppMain.GeEnvGetDecideKey() == AppMain.GSE_DECIDE_KEY.GSD_DECIDE_KEY_O;
+        main_work.is_jp_region = GeEnvGetDecideKey() == GSE_DECIDE_KEY.GSD_DECIDE_KEY_O;
         main_work.vol_icon_col.r = byte.MaxValue;
         main_work.vol_icon_col.g = byte.MaxValue;
-        main_work.vol_icon_col.b = (byte)0;
+        main_work.vol_icon_col.b = 0;
         main_work.vol_icon_col.a = byte.MaxValue;
-        main_work.win_col.r = (byte)0;
-        main_work.win_col.g = (byte)0;
-        main_work.win_col.b = (byte)0;
+        main_work.win_col.r = 0;
+        main_work.win_col.g = 0;
+        main_work.win_col.b = 0;
         main_work.win_col.a = byte.MaxValue;
         main_work.win_size_rate[0] = 0.0f;
         main_work.win_size_rate[1] = 0.0f;
-        main_work.ctrl_tab_pos_x[0] = AppMain.dm_opt_ctrl_nrml_disp_pos_tbl[main_work.ctrl_mode][0];
-        main_work.ctrl_tab_pos_y[0] = AppMain.dm_opt_ctrl_nrml_disp_pos_tbl[main_work.ctrl_mode][1];
-        main_work.ctrl_tab_pos_x[1] = AppMain.dm_opt_ctrl_clsc_disp_pos_tbl[main_work.ctrl_mode][0];
-        main_work.ctrl_tab_pos_y[1] = AppMain.dm_opt_ctrl_clsc_disp_pos_tbl[main_work.ctrl_mode][1];
+        main_work.ctrl_tab_pos_x[0] = dm_opt_ctrl_nrml_disp_pos_tbl[main_work.ctrl_mode][0];
+        main_work.ctrl_tab_pos_y[0] = dm_opt_ctrl_nrml_disp_pos_tbl[main_work.ctrl_mode][1];
+        main_work.ctrl_tab_pos_x[1] = dm_opt_ctrl_clsc_disp_pos_tbl[main_work.ctrl_mode][0];
+        main_work.ctrl_tab_pos_y[1] = dm_opt_ctrl_clsc_disp_pos_tbl[main_work.ctrl_mode][1];
         main_work.decide_menu_col.r = byte.MaxValue;
         main_work.decide_menu_col.g = byte.MaxValue;
         main_work.decide_menu_col.b = byte.MaxValue;
-        main_work.decide_menu_col.a = (byte)0;
+        main_work.decide_menu_col.a = 0;
         main_work.prev_nrml_disp_type = 2;
         main_work.top_crsr_pos_y = 250f;
         main_work.frm_update_time = 1f;
@@ -99,31 +89,31 @@ public partial class AppMain
         main_work.obi_tex_pos[1] = 1120f;
     }
 
-    private static void dmOptProcMain(AppMain.MTS_TASK_TCB tcb)
+    private static void dmOptProcMain(MTS_TASK_TCB tcb)
     {
-        AppMain.DMS_OPT_MAIN_WORK work = (AppMain.DMS_OPT_MAIN_WORK)tcb.work;
+        DMS_OPT_MAIN_WORK work = (DMS_OPT_MAIN_WORK)tcb.work;
         if (((int)work.flag & 1) != 0)
         {
-            AppMain.mtTaskClearTcb(tcb);
-            AppMain.dm_opt_mgr_p = (AppMain.DMS_OPT_MGR)null;
-            if (AppMain.dm_opt_is_pause_maingame)
-                AppMain.mtTaskEndPause();
-            AppMain.dmOptSetNextEvt(work);
+            mtTaskClearTcb(tcb);
+            dm_opt_mgr_p = null;
+            if (dm_opt_is_pause_maingame)
+                mtTaskEndPause();
+            dmOptSetNextEvt(work);
         }
-        if ((work.flag & 2147483648U) > 0U && !AppMain.AoAccountIsCurrentEnable())
+        if ((work.flag & 2147483648U) > 0U && !AoAccountIsCurrentEnable())
         {
-            work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcFadeOut);
-            work.flag &= (uint)int.MaxValue;
+            work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcFadeOut);
+            work.flag &= int.MaxValue;
             work.next_evt = 1;
-            if (AppMain.dm_opt_is_pause_maingame)
-                AppMain.IzFadeInitEasyColor(0, (ushort)short.MaxValue, (ushort)61439, 18U, 1U, 1U, 32f, true);
+            if (dm_opt_is_pause_maingame)
+                IzFadeInitEasyColor(0, (ushort)short.MaxValue, IZD_FADE_DT_PRIO_DEF, 18U, 1U, 1U, 32f, true);
             else
-                AppMain.IzFadeInitEasy(1U, 1U, 32f);
-            AppMain.DmSndBgmPlayerExit();
+                IzFadeInitEasy(1U, 1U, 32f);
+            DmSndBgmPlayerExit();
             work.flag |= 1048576U;
             work.flag &= 4294967291U;
             work.flag &= 4294967293U;
-            work.proc_input = (AppMain.DMS_OPT_MAIN_WORK._proc_input_)null;
+            work.proc_input = null;
             work.win_timer = 0.0f;
         }
         if (work.proc_update != null)
@@ -133,137 +123,137 @@ public partial class AppMain
         work.proc_draw(work);
     }
 
-    private static void dmOptDest(AppMain.MTS_TASK_TCB tcb)
+    private static void dmOptDest(MTS_TASK_TCB tcb)
     {
     }
 
-    private static void dmOptSetNextEvt(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetNextEvt(DMS_OPT_MAIN_WORK main_work)
     {
         short req_id;
         if (((int)main_work.flag & 524288) != 0)
         {
-            req_id = (short)10;
-            AppMain.dm_opt_prev_evt = AppMain.SyGetEvtInfo().old_evt_id;
+            req_id = 10;
+            dm_opt_prev_evt = SyGetEvtInfo().old_evt_id;
             main_work.flag &= 4294443007U;
         }
         else
         {
-            req_id = AppMain.SyGetEvtInfo().old_evt_id;
-            if (req_id == (short)10)
-                req_id = AppMain.dm_opt_prev_evt;
+            req_id = SyGetEvtInfo().old_evt_id;
+            if (req_id == 10)
+                req_id = dm_opt_prev_evt;
         }
-        if (req_id == (short)3)
-            req_id = (short)4;
+        if (req_id == 3)
+            req_id = 4;
         if (main_work.next_evt == 1)
-            req_id = (short)3;
-        if (AppMain.dm_opt_is_pause_maingame)
+            req_id = 3;
+        if (dm_opt_is_pause_maingame)
             return;
-        AppMain.SyDecideEvt(req_id);
-        AppMain.SyChangeNextEvt();
+        SyDecideEvt(req_id);
+        SyChangeNextEvt();
     }
 
-    private static void dmOptLoadFontData(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptLoadFontData(DMS_OPT_MAIN_WORK main_work)
     {
-        AppMain.GsFontBuild();
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptIsLoadFontData);
+        GsFontBuild();
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptIsLoadFontData);
     }
 
-    private static void dmOptIsLoadFontData(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptIsLoadFontData(DMS_OPT_MAIN_WORK main_work)
     {
-        if (!AppMain.GsFontIsBuilded())
+        if (!GsFontIsBuilded())
             return;
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptLoadRequest);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptLoadRequest);
     }
 
-    private static void dmOptLoadRequest(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptLoadRequest(DMS_OPT_MAIN_WORK main_work)
     {
-        main_work.arc_amb_fs[0] = AppMain.amFsReadBackground("DEMO/OPTION/D_OPTION.AMB");
-        main_work.arc_amb_fs[1] = AppMain.amFsReadBackground(AppMain.dm_opt_main_lng_amb_name_tbl[AppMain.GsEnvGetLanguage()]);
+        main_work.arc_amb_fs[0] = amFsReadBackground("DEMO/OPTION/D_OPTION.AMB");
+        main_work.arc_amb_fs[1] = amFsReadBackground(dm_opt_main_lng_amb_name_tbl[GsEnvGetLanguage()]);
         for (int index = 0; index < 4; ++index)
-            main_work.arc_cmn_amb_fs[index] = AppMain.amFsReadBackground(AppMain.dm_opt_menu_cmn_amb_name_tbl[index]);
-        main_work.arc_cmn_amb_fs[4] = AppMain.amFsReadBackground(AppMain.dm_opt_menu_cmn_lng_amb_name_tbl[AppMain.GsEnvGetLanguage()]);
-        main_work.manual_arc_amb_fs[0] = AppMain.amFsReadBackground("DEMO/MANUAL/D_MANUAL.AMB");
-        main_work.manual_arc_amb_fs[1] = AppMain.amFsReadBackground(AppMain.dm_opt_manual_file_lng_amb_name_tbl[AppMain.GsEnvGetLanguage()]);
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcLoadWait);
+            main_work.arc_cmn_amb_fs[index] = amFsReadBackground(dm_opt_menu_cmn_amb_name_tbl[index]);
+        main_work.arc_cmn_amb_fs[4] = amFsReadBackground(dm_opt_menu_cmn_lng_amb_name_tbl[GsEnvGetLanguage()]);
+        main_work.manual_arc_amb_fs[0] = amFsReadBackground("DEMO/MANUAL/D_MANUAL.AMB");
+        main_work.manual_arc_amb_fs[1] = amFsReadBackground(dm_opt_manual_file_lng_amb_name_tbl[GsEnvGetLanguage()]);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcLoadWait);
     }
 
-    private static void dmOptProcLoadWait(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcLoadWait(DMS_OPT_MAIN_WORK main_work)
     {
-        if (AppMain.dmOptIsDataLoad(main_work) <= 0)
+        if (dmOptIsDataLoad(main_work) <= 0)
             return;
         for (int index = 0; index < 2; ++index)
         {
-            main_work.arc_amb[index] = AppMain.readAMBFile(main_work.arc_amb_fs[index]);
-            main_work.ama[index] = AppMain.readAMAFile(AppMain.amBindGet(main_work.arc_amb[index], 0));
+            main_work.arc_amb[index] = readAMBFile(main_work.arc_amb_fs[index]);
+            main_work.ama[index] = readAMAFile(amBindGet(main_work.arc_amb[index], 0));
             string sPath;
-            main_work.amb[index] = AppMain.readAMBFile(AppMain.amBindGet(main_work.arc_amb[index], 1, out sPath));
+            main_work.amb[index] = readAMBFile(amBindGet(main_work.arc_amb[index], 1, out sPath));
             main_work.amb[index].dir = sPath;
-            AppMain.amFsClearRequest(main_work.arc_amb_fs[index]);
-            main_work.arc_amb_fs[index] = (AppMain.AMS_FS)null;
-            AppMain.AoTexBuild(main_work.tex[index], main_work.amb[index]);
-            AppMain.AoTexLoad(main_work.tex[index]);
+            amFsClearRequest(main_work.arc_amb_fs[index]);
+            main_work.arc_amb_fs[index] = null;
+            AoTexBuild(main_work.tex[index], main_work.amb[index]);
+            AoTexLoad(main_work.tex[index]);
         }
         for (int index = 0; index < 5; ++index)
         {
-            main_work.arc_cmn_amb[index] = AppMain.readAMBFile(main_work.arc_cmn_amb_fs[index]);
-            main_work.cmn_ama[index] = AppMain.readAMAFile(AppMain.amBindGet(main_work.arc_cmn_amb[index], 0));
+            main_work.arc_cmn_amb[index] = readAMBFile(main_work.arc_cmn_amb_fs[index]);
+            main_work.cmn_ama[index] = readAMAFile(amBindGet(main_work.arc_cmn_amb[index], 0));
             string sPath;
-            main_work.cmn_amb[index] = AppMain.readAMBFile(AppMain.amBindGet(main_work.arc_cmn_amb[index], 1, out sPath));
+            main_work.cmn_amb[index] = readAMBFile(amBindGet(main_work.arc_cmn_amb[index], 1, out sPath));
             main_work.cmn_amb[index].dir = sPath;
-            AppMain.amFsClearRequest(main_work.arc_cmn_amb_fs[index]);
-            main_work.arc_cmn_amb_fs[index] = (AppMain.AMS_FS)null;
-            AppMain.AoTexBuild(main_work.cmn_tex[index], main_work.cmn_amb[index]);
-            AppMain.AoTexLoad(main_work.cmn_tex[index]);
+            amFsClearRequest(main_work.arc_cmn_amb_fs[index]);
+            main_work.arc_cmn_amb_fs[index] = null;
+            AoTexBuild(main_work.cmn_tex[index], main_work.cmn_amb[index]);
+            AoTexLoad(main_work.cmn_tex[index]);
         }
-        if (!AppMain.dm_opt_is_pause_maingame)
+        if (!dm_opt_is_pause_maingame)
         {
-            AppMain.GsFontBuild();
-            AppMain.DmSndBgmPlayerInit();
+            GsFontBuild();
+            DmSndBgmPlayerInit();
         }
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcLoadWait2);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcLoadWait2);
     }
 
-    private static void dmOptProcLoadWait2(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcLoadWait2(DMS_OPT_MAIN_WORK main_work)
     {
-        if (AppMain.dmOptIsTexLoad(main_work) != 1)
+        if (dmOptIsTexLoad(main_work) != 1)
             return;
         for (int index = 0; index < 2; ++index)
         {
-            main_work.manual_arc_amb[index] = AppMain.readAMBFile(main_work.manual_arc_amb_fs[index]);
-            AppMain.amFsClearRequest(main_work.manual_arc_amb_fs[index]);
-            main_work.manual_arc_amb_fs[index] = (AppMain.AMS_FS)null;
+            main_work.manual_arc_amb[index] = readAMBFile(main_work.manual_arc_amb_fs[index]);
+            amFsClearRequest(main_work.manual_arc_amb_fs[index]);
+            main_work.manual_arc_amb_fs[index] = null;
         }
-        AppMain.DmManualBuild(main_work.manual_arc_amb);
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcTexBuildWait);
+        DmManualBuild(main_work.manual_arc_amb);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcTexBuildWait);
     }
 
-    private static void dmOptProcTexBuildWait(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcTexBuildWait(DMS_OPT_MAIN_WORK main_work)
     {
-        if (AppMain.dmOptIsTexLoad2(main_work) != 1)
+        if (dmOptIsTexLoad2(main_work) != 1)
             return;
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcCheckLoadingEnd);
-        if (!AppMain.dm_opt_is_pause_maingame)
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcCheckLoadingEnd);
+        if (!dm_opt_is_pause_maingame)
             return;
-        main_work.bgm_scb = AppMain.GsSoundAssignScb(0);
+        main_work.bgm_scb = GsSoundAssignScb(0);
         main_work.bgm_scb.flag |= 2147483648U;
-        main_work.se_handle = AppMain.GsSoundAllocSeHandle();
+        main_work.se_handle = GsSoundAllocSeHandle();
     }
 
-    private static void dmOptProcCheckLoadingEnd(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcCheckLoadingEnd(DMS_OPT_MAIN_WORK main_work)
     {
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcCreateAct);
-        if (AppMain.dm_opt_is_pause_maingame)
-            AppMain.IzFadeInitEasyColor(0, (ushort)short.MaxValue, (ushort)61439, 18U, 0U, 0U, 32f, true);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcCreateAct);
+        if (dm_opt_is_pause_maingame)
+            IzFadeInitEasyColor(0, (ushort)short.MaxValue, IZD_FADE_DT_PRIO_DEF, 18U, 0U, 0U, 32f, true);
         else
-            AppMain.IzFadeInitEasy(0U, 0U, 32f);
+            IzFadeInitEasy(0U, 0U, 32f);
     }
 
-    private static void dmOptProcCreateAct(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcCreateAct(DMS_OPT_MAIN_WORK main_work)
     {
         for (uint index = 0; index < 102U; ++index)
         {
-            AppMain.A2S_AMA_HEADER ama;
-            AppMain.AOS_TEXTURE tex;
+            A2S_AMA_HEADER ama;
+            AOS_TEXTURE tex;
             if (index >= 101U)
             {
                 ama = main_work.cmn_ama[4];
@@ -294,8 +284,8 @@ public partial class AppMain
                 ama = main_work.ama[0];
                 tex = main_work.tex[0];
             }
-            AppMain.AoActSetTexture(AppMain.AoTexGetTexList(tex));
-            main_work.act[(int)index] = AppMain.AoActCreate(ama, AppMain.g_dm_act_id_tbl_opt[(int)index]);
+            AoActSetTexture(AoTexGetTexList(tex));
+            main_work.act[(int)index] = AoActCreate(ama, g_dm_act_id_tbl_opt[(int)index]);
         }
         for (int index = 0; index < main_work.trg_slct.Length; ++index)
             main_work.trg_slct[index].Create(main_work.act[3]);
@@ -325,29 +315,29 @@ public partial class AppMain
             int[] numArray = new int[2] { 37, 40 };
             main_work.ctrl_win_trg_btn[index3].Create(main_work.act[numArray[index3]]);
         }
-        AppMain.A2S_AMA_HEADER a2SAmaHeader = main_work.ama[0];
-        AppMain.AOS_TEXTURE aosTexture = main_work.tex[0];
+        A2S_AMA_HEADER a2SAmaHeader = main_work.ama[0];
+        AOS_TEXTURE aosTexture = main_work.tex[0];
         main_work.obi_pos_y = 192f;
-        main_work.proc_draw = new AppMain.DMS_OPT_MAIN_WORK._proc_draw_(AppMain.dmOptProcActDraw);
-        main_work.proc_menu_draw = new AppMain.DMS_OPT_MAIN_WORK._proc_menu_draw_(AppMain.dmOptTopMenuDraw);
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcFadeIn);
+        main_work.proc_draw = new DMS_OPT_MAIN_WORK._proc_draw_(dmOptProcActDraw);
+        main_work.proc_menu_draw = new DMS_OPT_MAIN_WORK._proc_menu_draw_(dmOptTopMenuDraw);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcFadeIn);
         main_work.flag |= 2147483648U;
-        if (!AppMain.dm_opt_is_pause_maingame)
-            AppMain.DmSndBgmPlayerPlayBgm(0);
+        if (!dm_opt_is_pause_maingame)
+            DmSndBgmPlayerPlayBgm(0);
         else
-            AppMain.GsSoundPlayBgm(main_work.bgm_scb, "snd_sng_menu", 32);
+            GsSoundPlayBgm(main_work.bgm_scb, "snd_sng_menu", 32);
     }
 
-    private static void dmOptProcFadeIn(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcFadeIn(DMS_OPT_MAIN_WORK main_work)
     {
-        if (!AppMain.IzFadeIsEnd())
+        if (!IzFadeIsEnd())
             return;
-        AppMain.IzFadeExit();
-        main_work.proc_input = new AppMain.DMS_OPT_MAIN_WORK._proc_input_(AppMain.dmOptInputProcTopMenu);
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcTopMenuIdle);
+        IzFadeExit();
+        main_work.proc_input = new DMS_OPT_MAIN_WORK._proc_input_(dmOptInputProcTopMenu);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcTopMenuIdle);
     }
 
-    private static void dmOptProcTopMenuIdle(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcTopMenuIdle(DMS_OPT_MAIN_WORK main_work)
     {
         if (main_work.proc_input != null)
             main_work.proc_input(main_work);
@@ -357,41 +347,41 @@ public partial class AppMain
             frame = 2f;
         else if (trgReturn.GetState(0U)[0])
             frame = 1f;
-        else if (2.0 > (double)main_work.act[1].frame)
+        else if (2.0 > main_work.act[1].frame)
             frame = 0.0f;
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.cmn_tex[3]));
+        AoActSetTexture(AoTexGetTexList(main_work.cmn_tex[3]));
         for (int index = 1; index <= 2; ++index)
         {
-            AppMain.AoActSetFrame(main_work.act[index], frame);
-            AppMain.AoActUpdate(main_work.act[index], 0.0f);
+            AoActSetFrame(main_work.act[index], frame);
+            AoActUpdate(main_work.act[index], 0.0f);
         }
         if (((int)main_work.flag & 2) != 0)
         {
-            main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcFadeOut);
-            if (AppMain.dm_opt_is_pause_maingame)
-                AppMain.IzFadeInitEasyColor(0, (ushort)short.MaxValue, (ushort)61439, 18U, 0U, 1U, 32f, true);
+            main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcFadeOut);
+            if (dm_opt_is_pause_maingame)
+                IzFadeInitEasyColor(0, (ushort)short.MaxValue, 61439, 18U, 0U, 1U, 32f, true);
             else
-                AppMain.IzFadeInitEasy(0U, 1U, 32f);
+                IzFadeInitEasy(0U, 1U, 32f);
             main_work.flag &= 4294967291U;
             main_work.flag &= 4294967293U;
-            if (!AppMain.dm_opt_is_pause_maingame)
+            if (!dm_opt_is_pause_maingame)
             {
-                AppMain.DmSoundPlaySE("Cancel");
+                DmSoundPlaySE("Cancel");
             }
             else
             {
-                AppMain.GsSoundPlaySe("Cancel", main_work.se_handle);
-                AppMain.GsSoundStopBgm(main_work.bgm_scb, 32);
+                GsSoundPlaySe("Cancel", main_work.se_handle);
+                GsSoundStopBgm(main_work.bgm_scb, 32);
             }
         }
         else if (((int)main_work.flag & 4) != 0)
         {
-            main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcTopMenuDecideEfct);
-            AppMain.dmOptSetTopMenuDecideEfctData(main_work);
-            if (!AppMain.dm_opt_is_pause_maingame)
-                AppMain.DmSoundPlaySE("Ok");
+            main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcTopMenuDecideEfct);
+            dmOptSetTopMenuDecideEfctData(main_work);
+            if (!dm_opt_is_pause_maingame)
+                DmSoundPlaySE("Ok");
             else
-                AppMain.GsSoundPlaySe("Ok", main_work.se_handle);
+                GsSoundPlaySe("Ok", main_work.se_handle);
             main_work.flag &= 4294967291U;
             main_work.flag &= 4294967293U;
         }
@@ -399,101 +389,101 @@ public partial class AppMain
         {
             if (((int)main_work.flag & 64) != 0)
             {
-                main_work.cur_slct_top = AppMain.dmOptGetRevisedTopMenuNo(main_work.cur_slct_top, -1);
-                if (!AppMain.dm_opt_is_pause_maingame)
-                    AppMain.DmSoundPlaySE("Cursol");
+                main_work.cur_slct_top = dmOptGetRevisedTopMenuNo(main_work.cur_slct_top, -1);
+                if (!dm_opt_is_pause_maingame)
+                    DmSoundPlaySE("Cursol");
                 else
-                    AppMain.GsSoundPlaySe("Cursol", main_work.se_handle);
+                    GsSoundPlaySe("Cursol", main_work.se_handle);
                 main_work.flag |= 262144U;
-                AppMain.dmOptSetChngFocusCrsrData(main_work);
+                dmOptSetChngFocusCrsrData(main_work);
                 main_work.flag &= 4294967231U;
                 main_work.flag &= 4294967167U;
             }
             if (((int)main_work.flag & 128) != 0)
             {
-                main_work.cur_slct_top = AppMain.dmOptGetRevisedTopMenuNo(main_work.cur_slct_top, 1);
-                if (!AppMain.dm_opt_is_pause_maingame)
-                    AppMain.DmSoundPlaySE("Cursol");
+                main_work.cur_slct_top = dmOptGetRevisedTopMenuNo(main_work.cur_slct_top, 1);
+                if (!dm_opt_is_pause_maingame)
+                    DmSoundPlaySE("Cursol");
                 else
-                    AppMain.GsSoundPlaySe("Cursol", main_work.se_handle);
+                    GsSoundPlaySe("Cursol", main_work.se_handle);
                 main_work.flag |= 262144U;
-                AppMain.dmOptSetChngFocusCrsrData(main_work);
+                dmOptSetChngFocusCrsrData(main_work);
                 main_work.flag &= 4294967231U;
                 main_work.flag &= 4294967167U;
             }
             if (((int)main_work.flag & 262144) == 0)
                 return;
-            AppMain.dmOptSetCtrlFocusChangeEfct(main_work);
-            if (!AppMain.dmOptIsCtrlFocusChangeEfctEnd(main_work))
+            dmOptSetCtrlFocusChangeEfct(main_work);
+            if (!dmOptIsCtrlFocusChangeEfctEnd(main_work))
                 return;
             main_work.flag &= 4294705151U;
         }
     }
 
-    private static void dmOptProcTopMenuDecideEfct(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcTopMenuDecideEfct(DMS_OPT_MAIN_WORK main_work)
     {
-        if (AppMain.dmOptIsTopMenuTabDecideEfctEnd(main_work))
+        if (dmOptIsTopMenuTabDecideEfctEnd(main_work))
         {
-            AppMain.dmOptSetNextProcFunc(main_work);
+            dmOptSetNextProcFunc(main_work);
             main_work.timer = 0.0f;
         }
         else
         {
             if ((main_work.flag & 262144U) > 0U)
             {
-                AppMain.dmOptSetCtrlFocusChangeEfct(main_work);
-                if (AppMain.dmOptIsCtrlFocusChangeEfctEnd(main_work))
+                dmOptSetCtrlFocusChangeEfct(main_work);
+                if (dmOptIsCtrlFocusChangeEfctEnd(main_work))
                     main_work.flag &= 4294705151U;
             }
             ++main_work.timer;
         }
     }
 
-    private static void dmOptProcManualStartFadeOut(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcManualStartFadeOut(DMS_OPT_MAIN_WORK main_work)
     {
-        if (!AppMain.IzFadeIsEnd())
+        if (!IzFadeIsEnd())
             return;
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcManualIdle);
-        main_work.flag &= (uint)int.MaxValue;
-        AppMain.DmManualStart();
-        main_work.proc_menu_draw = (AppMain.DMS_OPT_MAIN_WORK._proc_menu_draw_)null;
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcManualIdle);
+        main_work.flag &= int.MaxValue;
+        DmManualStart();
+        main_work.proc_menu_draw = null;
     }
 
-    private static void dmOptProcManualIdle(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcManualIdle(DMS_OPT_MAIN_WORK main_work)
     {
-        if (!AppMain.DmManualIsExit())
+        if (!DmManualIsExit())
             return;
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcManualEndFadeIn);
-        main_work.proc_menu_draw = new AppMain.DMS_OPT_MAIN_WORK._proc_menu_draw_(AppMain.dmOptTopMenuDraw);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcManualEndFadeIn);
+        main_work.proc_menu_draw = new DMS_OPT_MAIN_WORK._proc_menu_draw_(dmOptTopMenuDraw);
         main_work.flag |= 2147483648U;
-        if (AppMain.dm_opt_is_pause_maingame)
-            AppMain.IzFadeInitEasyColor(0, (ushort)short.MaxValue, (ushort)61439, 18U, 0U, 0U, 32f, true);
+        if (dm_opt_is_pause_maingame)
+            IzFadeInitEasyColor(0, (ushort)short.MaxValue, 61439, 18U, 0U, 0U, 32f, true);
         else
-            AppMain.IzFadeInitEasy(0U, 0U, 32f);
+            IzFadeInitEasy(0U, 0U, 32f);
     }
 
-    private static void dmOptProcManualEndFadeIn(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcManualEndFadeIn(DMS_OPT_MAIN_WORK main_work)
     {
-        if (!AppMain.IzFadeIsEnd())
+        if (!IzFadeIsEnd())
             return;
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcTopMenuIdle);
-        main_work.proc_input = new AppMain.DMS_OPT_MAIN_WORK._proc_input_(AppMain.dmOptInputProcTopMenu);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcTopMenuIdle);
+        main_work.proc_input = new DMS_OPT_MAIN_WORK._proc_input_(dmOptInputProcTopMenu);
     }
 
-    private static void dmOptProcSetMenuInEfct(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcSetMenuInEfct(DMS_OPT_MAIN_WORK main_work)
     {
         if ((main_work.flag & 2048U) > 0U)
         {
-            main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcSetMenuIdle);
-            main_work.proc_input = new AppMain.DMS_OPT_MAIN_WORK._proc_input_(AppMain.dmOptInputProcSettingMenu);
+            main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcSetMenuIdle);
+            main_work.proc_input = new DMS_OPT_MAIN_WORK._proc_input_(dmOptInputProcSettingMenu);
             main_work.disp_flag |= 1U;
             main_work.flag &= 4294965247U;
         }
         else
-            AppMain.dmOptSetWinOpenEfct(main_work);
+            dmOptSetWinOpenEfct(main_work);
     }
 
-    private static void dmOptProcSetMenuIdle(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcSetMenuIdle(DMS_OPT_MAIN_WORK main_work)
     {
         if (main_work.proc_input != null)
             main_work.proc_input(main_work);
@@ -503,28 +493,28 @@ public partial class AppMain
             frame = 2f;
         else if (trgReturn.GetState(0U)[0])
             frame = 1f;
-        else if (2.0 > (double)main_work.act[1].frame)
+        else if (2.0 > main_work.act[1].frame)
             frame = 0.0f;
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.cmn_tex[3]));
+        AoActSetTexture(AoTexGetTexList(main_work.cmn_tex[3]));
         for (int index = 1; index <= 2; ++index)
         {
-            AppMain.AoActSetFrame(main_work.act[index], frame);
-            AppMain.AoActUpdate(main_work.act[index], 0.0f);
+            AoActSetFrame(main_work.act[index], frame);
+            AoActUpdate(main_work.act[index], 0.0f);
         }
         if ((main_work.flag & 2U) > 0U && (16777216U & main_work.flag) > 0U)
         {
             main_work.flag &= 4278190077U;
-            if (!AppMain.dm_opt_is_pause_maingame)
-                AppMain.DmSoundPlaySE("Cancel");
+            if (!dm_opt_is_pause_maingame)
+                DmSoundPlaySE("Cancel");
             else
-                AppMain.GsSoundPlaySe("Cancel", main_work.se_handle);
+                GsSoundPlaySe("Cancel", main_work.se_handle);
         }
         else if (((int)main_work.flag & 2) != 0)
         {
             SOption instance = SOption.CreateInstance();
             instance.SetVolumeBgm((uint)(main_work.volume_data[0] * 10));
             instance.SetVolumeSe((uint)(main_work.volume_data[1] * 10));
-            AppMain.GSS_MAIN_SYS_INFO mainSysInfo = AppMain.GsGetMainSysInfo();
+            GSS_MAIN_SYS_INFO mainSysInfo = GsGetMainSysInfo();
             switch (instance.GetControl())
             {
                 case SOption.EControl.Type.VirtualPadDown:
@@ -540,88 +530,88 @@ public partial class AppMain
                     mainSysInfo.game_flag &= 4294967294U;
                     break;
             }
-            main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcSetMenuOutEfct);
+            main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcSetMenuOutEfct);
             main_work.win_timer = 8f;
             main_work.disp_flag &= 4294967294U;
-            if (!AppMain.dm_opt_is_pause_maingame)
-                AppMain.DmSoundPlaySE("Cancel");
+            if (!dm_opt_is_pause_maingame)
+                DmSoundPlaySE("Cancel");
             else
-                AppMain.GsSoundPlaySe("Cancel", main_work.se_handle);
+                GsSoundPlaySe("Cancel", main_work.se_handle);
             main_work.flag &= 4294967291U;
             main_work.flag &= 4294967293U;
         }
         else if (((int)main_work.flag & 4) != 0)
         {
             if (main_work.cur_slct_set == 2)
-                AppMain.dmOptSetDefaultDataSetMenu(main_work);
-            if (!AppMain.dm_opt_is_pause_maingame)
-                AppMain.DmSoundPlaySE("Ok");
+                dmOptSetDefaultDataSetMenu(main_work);
+            if (!dm_opt_is_pause_maingame)
+                DmSoundPlaySE("Ok");
             else
-                AppMain.GsSoundPlaySe("Ok", main_work.se_handle);
+                GsSoundPlaySe("Ok", main_work.se_handle);
             main_work.flag &= 4294967291U;
             main_work.flag &= 4294967293U;
         }
         else if ((main_work.flag & 64U) > 0U)
         {
-            main_work.cur_slct_set = AppMain.dmOptGetRevisedSettingMenuNo(main_work.cur_slct_set, -1);
-            if (!AppMain.dm_opt_is_pause_maingame)
-                AppMain.DmSoundPlaySE("Cursol");
+            main_work.cur_slct_set = dmOptGetRevisedSettingMenuNo(main_work.cur_slct_set, -1);
+            if (!dm_opt_is_pause_maingame)
+                DmSoundPlaySE("Cursol");
             else
-                AppMain.GsSoundPlaySe("Cursol", main_work.se_handle);
+                GsSoundPlaySe("Cursol", main_work.se_handle);
             main_work.flag &= 4294967231U;
             main_work.flag &= 4294967167U;
         }
         else if ((main_work.flag & 128U) > 0U)
         {
-            main_work.cur_slct_set = AppMain.dmOptGetRevisedSettingMenuNo(main_work.cur_slct_set, 1);
-            if (!AppMain.dm_opt_is_pause_maingame)
-                AppMain.DmSoundPlaySE("Cursol");
+            main_work.cur_slct_set = dmOptGetRevisedSettingMenuNo(main_work.cur_slct_set, 1);
+            if (!dm_opt_is_pause_maingame)
+                DmSoundPlaySE("Cursol");
             else
-                AppMain.GsSoundPlaySe("Cursol", main_work.se_handle);
+                GsSoundPlaySe("Cursol", main_work.se_handle);
             main_work.flag &= 4294967231U;
             main_work.flag &= 4294967167U;
         }
         else
         {
-            AppMain.dmOptSetVolPushEfct(main_work);
+            dmOptSetVolPushEfct(main_work);
             if ((main_work.flag & 1024U) > 0U)
-                AppMain.dmOptSetDfltPushEfct(main_work);
+                dmOptSetDfltPushEfct(main_work);
             if ((16777216U & main_work.flag) > 0U)
             {
-                if ((double)main_work.ctrl_win_window_prgrs >= 1.0)
+                if (main_work.ctrl_win_window_prgrs >= 1.0)
                     return;
                 main_work.ctrl_win_window_prgrs += 0.125f;
-                if (1.0 >= (double)main_work.ctrl_win_window_prgrs)
+                if (1.0 >= main_work.ctrl_win_window_prgrs)
                     return;
                 main_work.ctrl_win_window_prgrs = 1f;
             }
             else
             {
-                if (0.0 >= (double)main_work.ctrl_win_window_prgrs)
+                if (0.0 >= main_work.ctrl_win_window_prgrs)
                     return;
                 main_work.ctrl_win_window_prgrs -= 0.125f;
-                if ((double)main_work.ctrl_win_window_prgrs >= 0.0)
+                if (main_work.ctrl_win_window_prgrs >= 0.0)
                     return;
                 main_work.ctrl_win_window_prgrs = 0.0f;
             }
         }
     }
 
-    private static void dmOptProcSetMenuOutEfct(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcSetMenuOutEfct(DMS_OPT_MAIN_WORK main_work)
     {
         if ((main_work.flag & 2048U) > 0U)
         {
-            main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcTopMenuIdle);
-            main_work.proc_input = new AppMain.DMS_OPT_MAIN_WORK._proc_input_(AppMain.dmOptInputProcTopMenu);
-            main_work.proc_menu_draw = new AppMain.DMS_OPT_MAIN_WORK._proc_menu_draw_(AppMain.dmOptTopMenuDraw);
+            main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcTopMenuIdle);
+            main_work.proc_input = new DMS_OPT_MAIN_WORK._proc_input_(dmOptInputProcTopMenu);
+            main_work.proc_menu_draw = new DMS_OPT_MAIN_WORK._proc_menu_draw_(dmOptTopMenuDraw);
             main_work.state = 0;
             main_work.flag &= 4294965247U;
         }
         else
-            AppMain.dmOptSetWinCloseEfct(main_work);
+            dmOptSetWinCloseEfct(main_work);
     }
 
-    private static void dmOptProcCtrlMenuIdle(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcCtrlMenuIdle(DMS_OPT_MAIN_WORK main_work)
     {
         if (main_work.proc_input != null)
             main_work.proc_input(main_work);
@@ -631,112 +621,112 @@ public partial class AppMain
             frame = 2f;
         else if (trgReturn.GetState(0U)[0])
             frame = 1f;
-        else if (2.0 > (double)main_work.act[1].frame)
+        else if (2.0 > main_work.act[1].frame)
             frame = 0.0f;
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.cmn_tex[3]));
+        AoActSetTexture(AoTexGetTexList(main_work.cmn_tex[3]));
         for (int index = 1; index <= 2; ++index)
         {
-            AppMain.AoActSetFrame(main_work.act[index], frame);
-            AppMain.AoActUpdate(main_work.act[index], 0.0f);
+            AoActSetFrame(main_work.act[index], frame);
+            AoActUpdate(main_work.act[index], 0.0f);
         }
         if ((main_work.flag & 2U) <= 0U)
             return;
-        main_work.proc_input = new AppMain.DMS_OPT_MAIN_WORK._proc_input_(AppMain.dmOptInputProcTopMenu);
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcTopMenuIdle);
-        main_work.proc_menu_draw = new AppMain.DMS_OPT_MAIN_WORK._proc_menu_draw_(AppMain.dmOptTopMenuDraw);
+        main_work.proc_input = new DMS_OPT_MAIN_WORK._proc_input_(dmOptInputProcTopMenu);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcTopMenuIdle);
+        main_work.proc_menu_draw = new DMS_OPT_MAIN_WORK._proc_menu_draw_(dmOptTopMenuDraw);
         main_work.state = 0;
-        main_work.top_crsr_pos_y = (float)(250.0 + (double)main_work.cur_slct_top * 220.0);
-        if (!AppMain.dm_opt_is_pause_maingame)
-            AppMain.DmSoundPlaySE("Cancel");
+        main_work.top_crsr_pos_y = (float)(250.0 + main_work.cur_slct_top * 220.0);
+        if (!dm_opt_is_pause_maingame)
+            DmSoundPlaySE("Cancel");
         else
-            AppMain.GsSoundPlaySe("Cancel", main_work.se_handle);
+            GsSoundPlaySe("Cancel", main_work.se_handle);
         main_work.flag &= 4294967291U;
         main_work.flag &= 4294967293U;
     }
 
-    private static void dmOptProcStfrlStartFadeOut(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcStfrlStartFadeOut(DMS_OPT_MAIN_WORK main_work)
     {
-        if (!AppMain.IzFadeIsEnd())
+        if (!IzFadeIsEnd())
             return;
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcStfrlIdle);
-        main_work.proc_draw = (AppMain.DMS_OPT_MAIN_WORK._proc_draw_)null;
-        main_work.flag &= (uint)int.MaxValue;
-        AppMain.DmStaffRollStart((object)null);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcStfrlIdle);
+        main_work.proc_draw = null;
+        main_work.flag &= int.MaxValue;
+        DmStaffRollStart(null);
     }
 
-    private static void dmOptProcStfrlIdle(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcStfrlIdle(DMS_OPT_MAIN_WORK main_work)
     {
-        if (!AppMain.DmStaffRollIsExit())
+        if (!DmStaffRollIsExit())
             return;
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcStfrlEndFadeIn);
-        main_work.proc_draw = new AppMain.DMS_OPT_MAIN_WORK._proc_draw_(AppMain.dmOptProcActDraw);
-        AppMain.AoActSysSetDrawStateEnable(true);
-        AppMain.AoActSysSetDrawState(AppMain.dm_opt_draw_state);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcStfrlEndFadeIn);
+        main_work.proc_draw = new DMS_OPT_MAIN_WORK._proc_draw_(dmOptProcActDraw);
+        AoActSysSetDrawStateEnable(true);
+        AoActSysSetDrawState(dm_opt_draw_state);
         main_work.flag |= 2147483648U;
-        if (AppMain.dm_opt_is_pause_maingame)
+        if (dm_opt_is_pause_maingame)
         {
-            AppMain.GsSoundPlayBgm(main_work.bgm_scb, "snd_sng_menu", 32);
-            AppMain.IzFadeInitEasyColor(0, (ushort)short.MaxValue, (ushort)61439, 18U, 0U, 0U, 32f, true);
+            GsSoundPlayBgm(main_work.bgm_scb, "snd_sng_menu", 32);
+            IzFadeInitEasyColor(0, (ushort)short.MaxValue, 61439, 18U, 0U, 0U, 32f, true);
         }
         else
         {
-            AppMain.DmSndBgmPlayerPlayBgm(0);
-            AppMain.IzFadeInitEasy(0U, 0U, 32f);
+            DmSndBgmPlayerPlayBgm(0);
+            IzFadeInitEasy(0U, 0U, 32f);
         }
     }
 
-    private static void dmOptProcStfrlEndFadeIn(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcStfrlEndFadeIn(DMS_OPT_MAIN_WORK main_work)
     {
-        if (!AppMain.IzFadeIsEnd())
+        if (!IzFadeIsEnd())
             return;
-        AppMain.IzFadeExit();
+        IzFadeExit();
         main_work.flag |= 2147483648U;
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcTopMenuIdle);
-        main_work.proc_input = new AppMain.DMS_OPT_MAIN_WORK._proc_input_(AppMain.dmOptInputProcTopMenu);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcTopMenuIdle);
+        main_work.proc_input = new DMS_OPT_MAIN_WORK._proc_input_(dmOptInputProcTopMenu);
     }
 
-    private static void dmOptProcFadeOut(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcFadeOut(DMS_OPT_MAIN_WORK main_work)
     {
-        if (AppMain.dm_opt_show_xboxlive && AppMain.dm_xbox_show_progress > 0)
-            AppMain.dm_xbox_show_progress -= 20;
-        if (!AppMain.IzFadeIsEnd())
+        if (dm_opt_show_xboxlive && dm_xbox_show_progress > 0)
+            dm_xbox_show_progress -= 20;
+        if (!IzFadeIsEnd())
             return;
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcStopDraw);
-        main_work.proc_draw = (AppMain.DMS_OPT_MAIN_WORK._proc_draw_)null;
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcStopDraw);
+        main_work.proc_draw = null;
         main_work.timer = 0.0f;
-        if (!AppMain.dm_opt_is_pause_maingame)
+        if (!dm_opt_is_pause_maingame)
             return;
-        AppMain.GsSoundStopBgm(main_work.bgm_scb, 0);
-        AppMain.GsSoundResignScb(main_work.bgm_scb);
-        main_work.bgm_scb = (AppMain.GSS_SND_SCB)null;
-        AppMain.GsSoundFreeSeHandle(main_work.se_handle);
-        main_work.se_handle = (AppMain.GSS_SND_SE_HANDLE)null;
+        GsSoundStopBgm(main_work.bgm_scb, 0);
+        GsSoundResignScb(main_work.bgm_scb);
+        main_work.bgm_scb = null;
+        GsSoundFreeSeHandle(main_work.se_handle);
+        main_work.se_handle = null;
     }
 
-    private static void dmOptProcStopDraw(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcStopDraw(DMS_OPT_MAIN_WORK main_work)
     {
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcDataRelease);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcDataRelease);
     }
 
-    private static void dmOptProcDataRelease(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcDataRelease(DMS_OPT_MAIN_WORK main_work)
     {
         for (int index = 0; index < 2; ++index)
-            AppMain.AoTexRelease(main_work.tex[index]);
+            AoTexRelease(main_work.tex[index]);
         for (int index = 0; index < 5; ++index)
-            AppMain.AoTexRelease(main_work.cmn_tex[index]);
-        AppMain.DmManualFlush();
-        int num = AppMain.dm_opt_is_pause_maingame ? 1 : 0;
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcFinish);
+            AoTexRelease(main_work.cmn_tex[index]);
+        DmManualFlush();
+        int num = dm_opt_is_pause_maingame ? 1 : 0;
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcFinish);
     }
 
-    private static void dmOptProcFinish(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcFinish(DMS_OPT_MAIN_WORK main_work)
     {
-        if (AppMain.dmOptIsTexRelease(main_work) != 1)
+        if (dmOptIsTexRelease(main_work) != 1)
             return;
-        if (AppMain.dm_opt_show_xboxlive)
+        if (dm_opt_show_xboxlive)
         {
             LiveFeature.endInterrupt();
-            AppMain.dm_opt_show_xboxlive = false;
+            dm_opt_show_xboxlive = false;
         }
         for (int index = 0; index < main_work.trg_slct.Length; ++index)
             main_work.trg_slct[index].Release();
@@ -755,58 +745,58 @@ public partial class AppMain
         {
             if (main_work.act[index] != null)
             {
-                AppMain.AoActDelete(main_work.act[index]);
-                main_work.act[index] = (AppMain.AOS_ACTION)null;
+                AoActDelete(main_work.act[index]);
+                main_work.act[index] = null;
             }
         }
         for (int index = 0; index < 2; ++index)
         {
             if (main_work.arc_amb[index] != null)
-                main_work.arc_amb[index] = (AppMain.AMS_AMB_HEADER)null;
+                main_work.arc_amb[index] = null;
         }
         for (int index = 0; index < 5; ++index)
         {
             if (main_work.arc_cmn_amb[index] != null)
-                main_work.arc_cmn_amb[index] = (AppMain.AMS_AMB_HEADER)null;
+                main_work.arc_cmn_amb[index] = null;
         }
         for (int index = 0; index < 2; ++index)
         {
             if (main_work.manual_arc_amb[index] != null)
-                main_work.manual_arc_amb[index] = (AppMain.AMS_AMB_HEADER)null;
+                main_work.manual_arc_amb[index] = null;
         }
-        AppMain.DmSaveMenuStart(true, false);
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcFinishWaitSave);
+        DmSaveMenuStart(true, false);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcFinishWaitSave);
     }
 
-    private static void dmOptProcFinishWaitSave(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcFinishWaitSave(DMS_OPT_MAIN_WORK main_work)
     {
-        if (!AppMain.DmSaveIsExit())
+        if (!DmSaveIsExit())
             return;
-        main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcWaitFinished);
+        main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcWaitFinished);
     }
 
-    private static void dmOptProcWaitFinished(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcWaitFinished(DMS_OPT_MAIN_WORK main_work)
     {
         if (((int)main_work.flag & 1048576) != 0)
         {
-            if (!AppMain.DmSndBgmPlayerIsTaskExit())
+            if (!DmSndBgmPlayerIsTaskExit())
                 return;
             main_work.flag |= 1U;
-            main_work.proc_update = (AppMain.DMS_OPT_MAIN_WORK._proc_update_)null;
+            main_work.proc_update = null;
             main_work.flag &= 4293918719U;
         }
         else
         {
             main_work.flag |= 1U;
-            main_work.proc_update = (AppMain.DMS_OPT_MAIN_WORK._proc_update_)null;
+            main_work.proc_update = null;
         }
     }
 
-    private static void dmOptInputProcTopMenu(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptInputProcTopMenu(DMS_OPT_MAIN_WORK main_work)
     {
-        if (main_work.trg_return.GetState(0U)[10] && main_work.trg_return.GetState(0U)[1] || AppMain.isBackKeyPressed())
+        if (main_work.trg_return.GetState(0U)[10] && main_work.trg_return.GetState(0U)[1] || isBackKeyPressed())
         {
-            AppMain.setBackKeyRequest(false);
+            setBackKeyRequest(false);
             main_work.flag |= 2U;
         }
         else
@@ -825,11 +815,11 @@ public partial class AppMain
         }
     }
 
-    private static void dmOptInputProcSettingMenu(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptInputProcSettingMenu(DMS_OPT_MAIN_WORK main_work)
     {
-        if (main_work.trg_return.GetState(0U)[10] && main_work.trg_return.GetState(0U)[1] || AppMain.isBackKeyPressed())
+        if (main_work.trg_return.GetState(0U)[10] && main_work.trg_return.GetState(0U)[1] || isBackKeyPressed())
         {
-            AppMain.setBackKeyRequest(false);
+            setBackKeyRequest(false);
             main_work.flag |= 2U;
         }
         else
@@ -839,10 +829,10 @@ public partial class AppMain
                 if (main_work.trg_ctrl_btn[0].GetState(0U)[2])
                 {
                     SOption.CreateInstance().SetControl(SOption.EControl.Type.Tilt);
-                    if (!AppMain.dm_opt_is_pause_maingame)
-                        AppMain.DmSoundPlaySE("Cursol");
+                    if (!dm_opt_is_pause_maingame)
+                        DmSoundPlaySE("Cursol");
                     else
-                        AppMain.GsSoundPlaySe("Cursol", main_work.se_handle);
+                        GsSoundPlaySe("Cursol", main_work.se_handle);
                 }
                 CTrgAoAction ctrgAoAction = main_work.trg_ctrl_btn[1];
                 if (ctrgAoAction.GetState(0U)[2])
@@ -850,26 +840,26 @@ public partial class AppMain
                     SOption instance = SOption.CreateInstance();
                     if (instance.GetControl() == SOption.EControl.Type.Tilt)
                         instance.SetControl(SOption.EControl.Type.VirtualPadDown);
-                    if (!AppMain.dm_opt_is_pause_maingame)
-                        AppMain.DmSoundPlaySE("Cursol");
+                    if (!dm_opt_is_pause_maingame)
+                        DmSoundPlaySE("Cursol");
                     else
-                        AppMain.GsSoundPlaySe("Cursol", main_work.se_handle);
+                        GsSoundPlaySe("Cursol", main_work.se_handle);
                 }
                 else if (ctrgAoAction.GetState(0U)[10] && ctrgAoAction.GetState(0U)[1])
                 {
                     main_work.flag |= 16777216U;
-                    if (!AppMain.dm_opt_is_pause_maingame)
+                    if (!dm_opt_is_pause_maingame)
                     {
-                        AppMain.DmSoundPlaySE("Window");
+                        DmSoundPlaySE("Window");
                         return;
                     }
-                    AppMain.GsSoundPlaySe("Window", main_work.se_handle);
+                    GsSoundPlaySe("Window", main_work.se_handle);
                     return;
                 }
             }
-            if (0.0 < (double)main_work.ctrl_win_window_prgrs)
+            if (0.0 < main_work.ctrl_win_window_prgrs)
             {
-                if (1.0 != (double)main_work.ctrl_win_window_prgrs)
+                if (1.0 != main_work.ctrl_win_window_prgrs)
                     return;
                 SOption instance = SOption.CreateInstance();
                 bool flag = true;
@@ -881,10 +871,10 @@ public partial class AppMain
                     flag = false;
                 if (!flag)
                     return;
-                if (!AppMain.dm_opt_is_pause_maingame)
-                    AppMain.DmSoundPlaySE("Cursol");
+                if (!dm_opt_is_pause_maingame)
+                    DmSoundPlaySE("Cursol");
                 else
-                    AppMain.GsSoundPlaySe("Cursol", main_work.se_handle);
+                    GsSoundPlaySe("Cursol", main_work.se_handle);
             }
             else
             {
@@ -941,20 +931,20 @@ public partial class AppMain
                     switch (main_work.cur_slct_set)
                     {
                         case 0:
-                            main_work.volume_data[0] = AppMain.dmOptGetRevisedVolume(main_work.volume_data[0], -1);
+                            main_work.volume_data[0] = dmOptGetRevisedVolume(main_work.volume_data[0], -1);
                             main_work.push_efct_timer[1] = 12f;
-                            AppMain.DmSoundSetVolumeBGM((float)main_work.volume_data[0]);
+                            DmSoundSetVolumeBGM(main_work.volume_data[0]);
                             break;
                         case 1:
-                            main_work.volume_data[1] = AppMain.dmOptGetRevisedVolume(main_work.volume_data[1], -1);
+                            main_work.volume_data[1] = dmOptGetRevisedVolume(main_work.volume_data[1], -1);
                             main_work.push_efct_timer[3] = 12f;
-                            AppMain.DmSoundSetVolumeSE((float)main_work.volume_data[1]);
-                            if (!AppMain.dm_opt_is_pause_maingame)
+                            DmSoundSetVolumeSE(main_work.volume_data[1]);
+                            if (!dm_opt_is_pause_maingame)
                             {
-                                AppMain.DmSoundPlaySE("Cursol");
+                                DmSoundPlaySE("Cursol");
                                 break;
                             }
-                            AppMain.GsSoundPlaySe("Cursol", main_work.se_handle);
+                            GsSoundPlaySe("Cursol", main_work.se_handle);
                             break;
                     }
                 }
@@ -965,20 +955,20 @@ public partial class AppMain
                     switch (main_work.cur_slct_set)
                     {
                         case 0:
-                            main_work.volume_data[0] = AppMain.dmOptGetRevisedVolume(main_work.volume_data[0], 1);
+                            main_work.volume_data[0] = dmOptGetRevisedVolume(main_work.volume_data[0], 1);
                             main_work.push_efct_timer[0] = 12f;
-                            AppMain.DmSoundSetVolumeBGM((float)main_work.volume_data[0]);
+                            DmSoundSetVolumeBGM(main_work.volume_data[0]);
                             break;
                         case 1:
-                            main_work.volume_data[1] = AppMain.dmOptGetRevisedVolume(main_work.volume_data[1], 1);
+                            main_work.volume_data[1] = dmOptGetRevisedVolume(main_work.volume_data[1], 1);
                             main_work.push_efct_timer[2] = 12f;
-                            AppMain.DmSoundSetVolumeSE((float)main_work.volume_data[1]);
-                            if (!AppMain.dm_opt_is_pause_maingame)
+                            DmSoundSetVolumeSE(main_work.volume_data[1]);
+                            if (!dm_opt_is_pause_maingame)
                             {
-                                AppMain.DmSoundPlaySE("Cursol");
+                                DmSoundPlaySE("Cursol");
                                 break;
                             }
-                            AppMain.GsSoundPlaySe("Cursol", main_work.se_handle);
+                            GsSoundPlaySe("Cursol", main_work.se_handle);
                             break;
                     }
                 }
@@ -986,11 +976,11 @@ public partial class AppMain
         }
     }
 
-    private static void dmOptInputProcControlMenu(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptInputProcControlMenu(DMS_OPT_MAIN_WORK main_work)
     {
-        if (main_work.trg_return.GetState(0U)[10] && main_work.trg_return.GetState(0U)[1] || AppMain.isBackKeyPressed())
+        if (main_work.trg_return.GetState(0U)[10] && main_work.trg_return.GetState(0U)[1] || isBackKeyPressed())
         {
-            AppMain.setBackKeyRequest(false);
+            setBackKeyRequest(false);
             main_work.flag |= 2U;
         }
         else
@@ -1001,243 +991,243 @@ public partial class AppMain
         }
     }
 
-    private static void dmOptProcActDraw(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptProcActDraw(DMS_OPT_MAIN_WORK main_work)
     {
-        AppMain.dmOptSetObiEfctPos(main_work);
-        AppMain.dmOptCommonDraw(main_work);
-        AppMain.dmOptCommonFixDraw(main_work);
+        dmOptSetObiEfctPos(main_work);
+        dmOptCommonDraw(main_work);
+        dmOptCommonFixDraw(main_work);
         if (main_work.proc_menu_draw != null)
         {
-            if (!AppMain.dm_opt_show_xboxlive)
+            if (!dm_opt_show_xboxlive)
                 main_work.proc_menu_draw(main_work);
-            else if (AppMain.dm_xbox_show_progress < 100 && main_work.proc_update != new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcFadeOut))
-                AppMain.dm_xbox_show_progress += 5;
+            else if (dm_xbox_show_progress < 100 && main_work.proc_update != new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcFadeOut))
+                dm_xbox_show_progress += 5;
         }
-        if (AppMain.dm_opt_is_pause_maingame)
+        if (dm_opt_is_pause_maingame)
         {
             if (main_work.draw_state == 0U)
                 return;
-            AppMain.amDrawMakeTask(new AppMain.TaskProc(AppMain.dmOptTaskDraw), (ushort)32768, 0U);
+            amDrawMakeTask(new TaskProc(dmOptTaskDraw), 32768, 0U);
         }
         else
-            AppMain.amDrawMakeTask(new AppMain.TaskProc(AppMain.dmOptTaskDraw), (ushort)32768, 0U);
+            amDrawMakeTask(new TaskProc(dmOptTaskDraw), 32768, 0U);
     }
 
-    private static void dmOptTaskDraw(AppMain.AMS_TCB tcb)
+    private static void dmOptTaskDraw(AMS_TCB tcb)
     {
-        AppMain.AoActDrawPre();
-        AppMain.amDrawExecCommand(AppMain.dm_opt_draw_state);
-        AppMain.amDrawEndScene();
+        AoActDrawPre();
+        amDrawExecCommand(dm_opt_draw_state);
+        amDrawEndScene();
     }
 
-    private static void dmOptCommonDraw(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptCommonDraw(DMS_OPT_MAIN_WORK main_work)
     {
-        AppMain.AoActSysSetDrawTaskPrio(4096U);
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.cmn_tex[0]));
-        AppMain.AoActSortRegAction(main_work.act[97]);
-        if (!AppMain.dm_opt_show_xboxlive || LiveFeature.interruptMainLoop == 1)
-            AppMain.AoActSortRegAction(main_work.act[99]);
-        AppMain.AoActSortRegAction(main_work.act[98]);
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.cmn_tex[0]));
-        AppMain.AoActUpdate(main_work.act[97], 1f);
-        if (!AppMain.dm_opt_show_xboxlive || LiveFeature.interruptMainLoop == 1)
-            AppMain.AoActUpdate(main_work.act[99], 0.0f);
-        AppMain.AoActUpdate(main_work.act[98], 0.0f);
-        AppMain.AoActSortExecute();
-        AppMain.AoActSortDraw();
-        AppMain.AoActSortUnregAll();
+        AoActSysSetDrawTaskPrio(4096U);
+        AoActSetTexture(AoTexGetTexList(main_work.cmn_tex[0]));
+        AoActSortRegAction(main_work.act[97]);
+        if (!dm_opt_show_xboxlive || LiveFeature.interruptMainLoop == 1)
+            AoActSortRegAction(main_work.act[99]);
+        AoActSortRegAction(main_work.act[98]);
+        AoActSetTexture(AoTexGetTexList(main_work.cmn_tex[0]));
+        AoActUpdate(main_work.act[97], 1f);
+        if (!dm_opt_show_xboxlive || LiveFeature.interruptMainLoop == 1)
+            AoActUpdate(main_work.act[99], 0.0f);
+        AoActUpdate(main_work.act[98], 0.0f);
+        AoActSortExecute();
+        AoActSortDraw();
+        AoActSortUnregAll();
     }
 
-    private static void dmOptCommonFixDraw(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptCommonFixDraw(DMS_OPT_MAIN_WORK main_work)
     {
-        AppMain.AoActSysSetDrawTaskPrio(12288U);
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
-        if (!AppMain.dm_opt_show_xboxlive || LiveFeature.interruptMainLoop == 1)
+        AoActSysSetDrawTaskPrio(12288U);
+        AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
+        if (!dm_opt_show_xboxlive || LiveFeature.interruptMainLoop == 1)
         {
             for (int index = 0; index <= 0; ++index)
-                AppMain.AoActSortRegAction(main_work.act[index]);
+                AoActSortRegAction(main_work.act[index]);
         }
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
-        if (!AppMain.dm_opt_show_xboxlive)
+        AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
+        if (!dm_opt_show_xboxlive)
         {
             for (int index = 69; index <= 69; ++index)
-                AppMain.AoActSortRegAction(main_work.act[index]);
+                AoActSortRegAction(main_work.act[index]);
         }
         for (int index = 1; index <= 2; ++index)
-            AppMain.AoActSortRegAction(main_work.act[index]);
-        AppMain.AoActSortRegAction(main_work.act[101]);
-        AppMain.AoActSetFrame(main_work.act[69], (float)main_work.state);
+            AoActSortRegAction(main_work.act[index]);
+        AoActSortRegAction(main_work.act[101]);
+        AoActSetFrame(main_work.act[69], main_work.state);
         if (main_work.is_jp_region)
-            AppMain.AoActSetFrame(main_work.act[100], 0.0f);
+            AoActSetFrame(main_work.act[100], 0.0f);
         else
-            AppMain.AoActSetFrame(main_work.act[100], 1f);
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
+            AoActSetFrame(main_work.act[100], 1f);
+        AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
         for (int index = 0; index <= 0; ++index)
-            AppMain.AoActUpdate(main_work.act[index], 0.0f);
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
-        AppMain.AoActUpdate(main_work.act[69], 0.0f);
+            AoActUpdate(main_work.act[index], 0.0f);
+        AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
+        AoActUpdate(main_work.act[69], 0.0f);
         main_work.act[69].sprite.center_y += 10f;
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.cmn_tex[4]));
-        AppMain.AoActUpdate(main_work.act[101], 0.0f);
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.cmn_tex[3]));
+        AoActSetTexture(AoTexGetTexList(main_work.cmn_tex[4]));
+        AoActUpdate(main_work.act[101], 0.0f);
+        AoActSetTexture(AoTexGetTexList(main_work.cmn_tex[3]));
         for (int index = 1; index <= 2; ++index)
         {
-            float frame = 2.0 <= (double)main_work.act[index].frame ? 1f : 0.0f;
-            AppMain.AoActUpdate(main_work.act[index], frame);
+            float frame = 2.0 <= main_work.act[index].frame ? 1f : 0.0f;
+            AoActUpdate(main_work.act[index], frame);
         }
         main_work.trg_return.Update();
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
-        AppMain.AoActSortExecute();
-        AppMain.AoActSortDraw();
-        AppMain.AoActSortUnregAll();
+        AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
+        AoActSortExecute();
+        AoActSortDraw();
+        AoActSortUnregAll();
     }
 
-    private static void dmOptTopMenuDraw(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptTopMenuDraw(DMS_OPT_MAIN_WORK main_work)
     {
-        AppMain.AoActSysSetDrawTaskPrio(8192U);
+        AoActSysSetDrawTaskPrio(8192U);
         for (int index = 0; index < 4; ++index)
         {
-            AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
-            AppMain.AoActSortRegAction(main_work.act[3]);
-            AppMain.AoActSortRegAction(main_work.act[4]);
-            AppMain.AoActSortRegAction(main_work.act[5]);
-            AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
-            AppMain.AoActSortRegAction(main_work.act[AppMain.dm_opt_top_menu_tex_tbl[index]]);
+            AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
+            AoActSortRegAction(main_work.act[3]);
+            AoActSortRegAction(main_work.act[4]);
+            AoActSortRegAction(main_work.act[5]);
+            AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
+            AoActSortRegAction(main_work.act[dm_opt_top_menu_tex_tbl[index]]);
             if ((16U & main_work.flag) > 0U)
             {
                 if (index == main_work.cur_slct_top)
                 {
                     float frame = 2f + main_work.timer;
-                    AppMain.AoActSetFrame(main_work.act[3], frame);
-                    AppMain.AoActSetFrame(main_work.act[4], frame);
-                    AppMain.AoActSetFrame(main_work.act[5], frame);
-                    AppMain.AoActSetFrame(main_work.act[AppMain.dm_opt_top_menu_tex_tbl[index]], 1f);
+                    AoActSetFrame(main_work.act[3], frame);
+                    AoActSetFrame(main_work.act[4], frame);
+                    AoActSetFrame(main_work.act[5], frame);
+                    AoActSetFrame(main_work.act[dm_opt_top_menu_tex_tbl[index]], 1f);
                 }
                 else
                 {
-                    AppMain.AoActSetFrame(main_work.act[3], 0.0f);
-                    AppMain.AoActSetFrame(main_work.act[4], 0.0f);
-                    AppMain.AoActSetFrame(main_work.act[5], 0.0f);
-                    AppMain.AoActSetFrame(main_work.act[AppMain.dm_opt_top_menu_tex_tbl[index]], 0.0f);
+                    AoActSetFrame(main_work.act[3], 0.0f);
+                    AoActSetFrame(main_work.act[4], 0.0f);
+                    AoActSetFrame(main_work.act[5], 0.0f);
+                    AoActSetFrame(main_work.act[dm_opt_top_menu_tex_tbl[index]], 0.0f);
                 }
             }
-            else if (AppMain.IzFadeIsExe() && !AppMain.IzFadeIsEnd())
+            else if (IzFadeIsExe() && !IzFadeIsEnd())
             {
-                AppMain.AoActSetFrame(main_work.act[3], 0.0f);
-                AppMain.AoActSetFrame(main_work.act[4], 0.0f);
-                AppMain.AoActSetFrame(main_work.act[5], 0.0f);
-                AppMain.AoActSetFrame(main_work.act[AppMain.dm_opt_top_menu_tex_tbl[index]], 0.0f);
+                AoActSetFrame(main_work.act[3], 0.0f);
+                AoActSetFrame(main_work.act[4], 0.0f);
+                AoActSetFrame(main_work.act[5], 0.0f);
+                AoActSetFrame(main_work.act[dm_opt_top_menu_tex_tbl[index]], 0.0f);
             }
             else if (main_work.trg_slct[index].GetState(0U)[0])
             {
-                AppMain.AoActSetFrame(main_work.act[3], 1f);
-                AppMain.AoActSetFrame(main_work.act[4], 1f);
-                AppMain.AoActSetFrame(main_work.act[5], 1f);
-                AppMain.AoActSetFrame(main_work.act[AppMain.dm_opt_top_menu_tex_tbl[index]], 1f);
+                AoActSetFrame(main_work.act[3], 1f);
+                AoActSetFrame(main_work.act[4], 1f);
+                AoActSetFrame(main_work.act[5], 1f);
+                AoActSetFrame(main_work.act[dm_opt_top_menu_tex_tbl[index]], 1f);
             }
             else
             {
-                AppMain.AoActSetFrame(main_work.act[3], 0.0f);
-                AppMain.AoActSetFrame(main_work.act[4], 0.0f);
-                AppMain.AoActSetFrame(main_work.act[5], 0.0f);
-                AppMain.AoActSetFrame(main_work.act[AppMain.dm_opt_top_menu_tex_tbl[index]], 0.0f);
+                AoActSetFrame(main_work.act[3], 0.0f);
+                AoActSetFrame(main_work.act[4], 0.0f);
+                AoActSetFrame(main_work.act[5], 0.0f);
+                AoActSetFrame(main_work.act[dm_opt_top_menu_tex_tbl[index]], 0.0f);
             }
-            AppMain.AoActAcmPush();
-            AppMain.AoActAcmInit();
-            AppMain.AoActAcmApplyTrans((float)(240.0 + (double)(index % 2) * 480.0), (float)(250.0 + (double)(index / 2) * 220.0), 0.0f);
+            AoActAcmPush();
+            AoActAcmInit();
+            AoActAcmApplyTrans((float)(240.0 + index % 2 * 480.0), (float)(250.0 + index / 2 * 220.0), 0.0f);
             if (main_work.cur_slct_top == index && (main_work.flag & 16U) > 0U)
-                AppMain.AoActAcmApplyFade(main_work.decide_menu_col);
-            AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
-            AppMain.AoActUpdate(main_work.act[3], 0.0f);
-            AppMain.AoActUpdate(main_work.act[4], 0.0f);
-            AppMain.AoActUpdate(main_work.act[5], 0.0f);
+                AoActAcmApplyFade(main_work.decide_menu_col);
+            AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
+            AoActUpdate(main_work.act[3], 0.0f);
+            AoActUpdate(main_work.act[4], 0.0f);
+            AoActUpdate(main_work.act[5], 0.0f);
             main_work.trg_slct[index].Update();
-            AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
-            AppMain.AoActUpdate(main_work.act[AppMain.dm_opt_top_menu_tex_tbl[index]], 0.0f);
-            main_work.act[AppMain.dm_opt_top_menu_tex_tbl[index]].sprite.center_y += 7f;
-            AppMain.AoActAcmPop();
-            AppMain.AoActSortExecute();
-            AppMain.AoActSortDraw();
-            AppMain.AoActSortUnregAll();
+            AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
+            AoActUpdate(main_work.act[dm_opt_top_menu_tex_tbl[index]], 0.0f);
+            main_work.act[dm_opt_top_menu_tex_tbl[index]].sprite.center_y += 7f;
+            AoActAcmPop();
+            AoActSortExecute();
+            AoActSortDraw();
+            AoActSortUnregAll();
         }
-        AppMain.AoActSortExecute();
-        AppMain.AoActSortDraw();
-        AppMain.AoActSortUnregAll();
+        AoActSortExecute();
+        AoActSortDraw();
+        AoActSortUnregAll();
     }
 
-    private static void dmOptSettingMenuDraw(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSettingMenuDraw(DMS_OPT_MAIN_WORK main_work)
     {
-        AppMain.AOS_ACT_COL aosActCol = new AppMain.AOS_ACT_COL();
+        AOS_ACT_COL aosActCol = new AOS_ACT_COL();
         float num = 0.0f;
-        AppMain.AoActSysSetDrawTaskPrio(8192U);
-        AppMain.AoWinSysDrawState(0, AppMain.AoTexGetTexList(main_work.tex[0]), 3U, 480f, 356f, 840f * main_work.win_size_rate[0], (float)(400.0 * (double)main_work.win_size_rate[1] * 0.899999976158142), AppMain.dm_opt_draw_state);
+        AoActSysSetDrawTaskPrio(8192U);
+        AoWinSysDrawState(0, AoTexGetTexList(main_work.tex[0]), 3U, 480f, 356f, 840f * main_work.win_size_rate[0], (float)(400.0 * main_work.win_size_rate[1] * 0.899999976158142), dm_opt_draw_state);
         if (((int)main_work.disp_flag & 1) == 0)
             return;
         for (int index1 = 0; index1 < 2; ++index1)
         {
-            AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
+            AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
             if (index1 < 2)
             {
                 for (uint index2 = 10; index2 <= 21U; ++index2)
-                    AppMain.AoActSortRegAction(main_work.act[(int)index2]);
+                    AoActSortRegAction(main_work.act[(int)index2]);
                 if (main_work.volume_data[index1] == 10)
-                    AppMain.AoActSortRegAction(main_work.act[6]);
+                    AoActSortRegAction(main_work.act[6]);
                 if (main_work.volume_data[index1] > 0)
-                    AppMain.AoActSortRegAction(main_work.act[7]);
-                AppMain.AoActSortRegAction(main_work.act[8]);
-                AppMain.AoActSortRegAction(main_work.act[9]);
+                    AoActSortRegAction(main_work.act[7]);
+                AoActSortRegAction(main_work.act[8]);
+                AoActSortRegAction(main_work.act[9]);
             }
-            AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
-            AppMain.AoActSortRegAction(main_work.act[AppMain.dm_opt_set_menu_tex_tbl[index1]]);
+            AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
+            AoActSortRegAction(main_work.act[dm_opt_set_menu_tex_tbl[index1]]);
             if (index1 > 1)
             {
-                AppMain.AoActSortRegAction(main_work.act[78]);
-                AppMain.AoActSortRegAction(main_work.act[79]);
+                AoActSortRegAction(main_work.act[78]);
+                AoActSortRegAction(main_work.act[79]);
             }
             if (main_work.cur_slct_set == index1)
             {
-                AppMain.AoActSetFrame(main_work.act[AppMain.dm_opt_set_menu_tex_tbl[index1]], 0.0f);
+                AoActSetFrame(main_work.act[dm_opt_set_menu_tex_tbl[index1]], 0.0f);
                 aosActCol.r = aosActCol.g = aosActCol.b = aosActCol.a = byte.MaxValue;
             }
             else
             {
                 aosActCol.r = aosActCol.g = aosActCol.b = byte.MaxValue;
-                aosActCol.a = (byte)60;
+                aosActCol.a = 60;
             }
-            AppMain.AoActSetFrame(main_work.act[6], 1f);
-            AppMain.AoActSetFrame(main_work.act[7], (float)(main_work.volume_data[index1] % 10));
-            AppMain.AoActSetFrame(main_work.act[8], 0.0f);
+            AoActSetFrame(main_work.act[6], 1f);
+            AoActSetFrame(main_work.act[7], main_work.volume_data[index1] % 10);
+            AoActSetFrame(main_work.act[8], 0.0f);
             if (index1 <= 1)
             {
                 for (int index2 = 0; index2 < 10; ++index2)
                 {
                     if (index2 < main_work.volume_data[index1])
-                        AppMain.AoActSetFrame(main_work.act[12 + index2], 0.0f);
+                        AoActSetFrame(main_work.act[12 + index2], 0.0f);
                     else
-                        AppMain.AoActSetFrame(main_work.act[12 + index2], 1f);
+                        AoActSetFrame(main_work.act[12 + index2], 1f);
                 }
             }
             if (main_work.set_vbrt == 0)
             {
-                AppMain.AoActSetFrame(main_work.act[78], 0.0f);
-                AppMain.AoActSetFrame(main_work.act[79], 1f);
+                AoActSetFrame(main_work.act[78], 0.0f);
+                AoActSetFrame(main_work.act[79], 1f);
             }
             else
             {
-                AppMain.AoActSetFrame(main_work.act[78], 1f);
-                AppMain.AoActSetFrame(main_work.act[79], 0.0f);
+                AoActSetFrame(main_work.act[78], 1f);
+                AoActSetFrame(main_work.act[79], 0.0f);
             }
-            AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
+            AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
             for (int index2 = 6; index2 <= 21; ++index2)
             {
-                AppMain.AoActAcmPush();
-                AppMain.AoActAcmInit();
-                AppMain.AoActAcmApplyTrans(480f + num, AppMain.dm_opt_set_tab_pos_y_tbl[index1], 0.0f);
-                if ((double)main_work.push_efct_timer[2 * index1] > 0.0 && index2 == 10)
-                    AppMain.AoActAcmApplyColor(main_work.vol_icon_col);
-                if ((double)main_work.push_efct_timer[1 + 2 * index1] > 0.0 && index2 == 11)
-                    AppMain.AoActAcmApplyColor(main_work.vol_icon_col);
-                AppMain.AoActUpdate(main_work.act[index2], 0.0f);
+                AoActAcmPush();
+                AoActAcmInit();
+                AoActAcmApplyTrans(480f + num, dm_opt_set_tab_pos_y_tbl[index1], 0.0f);
+                if (main_work.push_efct_timer[2 * index1] > 0.0 && index2 == 10)
+                    AoActAcmApplyColor(main_work.vol_icon_col);
+                if (main_work.push_efct_timer[1 + 2 * index1] > 0.0 && index2 == 11)
+                    AoActAcmApplyColor(main_work.vol_icon_col);
+                AoActUpdate(main_work.act[index2], 0.0f);
                 int index3;
                 switch (index2)
                 {
@@ -1263,25 +1253,25 @@ public partial class AppMain
                             ctrgAoActionArray = main_work.trg_se_btn;
                             break;
                         default:
-                            ctrgAoActionArray = (CTrgAoAction[])null;
+                            ctrgAoActionArray = null;
                             break;
                     }
                     ctrgAoActionArray?[index3].Update();
                 }
-                AppMain.AoActAcmPop();
+                AoActAcmPop();
             }
-            AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
+            AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
             for (uint index2 = 74; index2 <= 79U; ++index2)
             {
-                AppMain.AoActAcmPush();
-                AppMain.AoActAcmInit();
-                AppMain.AoActAcmApplyTrans(480f, AppMain.dm_opt_set_tab_pos_y_tbl[index1], 0.0f);
-                AppMain.AoActUpdate(main_work.act[(int)index2], 0.0f);
-                AppMain.AoActAcmPop();
+                AoActAcmPush();
+                AoActAcmInit();
+                AoActAcmApplyTrans(480f, dm_opt_set_tab_pos_y_tbl[index1], 0.0f);
+                AoActUpdate(main_work.act[(int)index2], 0.0f);
+                AoActAcmPop();
             }
-            AppMain.AoActSortExecute();
-            AppMain.AoActSortDraw();
-            AppMain.AoActSortUnregAll();
+            AoActSortExecute();
+            AoActSortDraw();
+            AoActSortUnregAll();
         }
         main_work.trg_bgm_slider.Update();
         main_work.trg_se_slider.Update();
@@ -1298,322 +1288,322 @@ public partial class AppMain
             frame2 = 1f;
         }
         for (int index = 22; index < 25; ++index)
-            AppMain.AoActSetFrame(main_work.act[index], frame1);
+            AoActSetFrame(main_work.act[index], frame1);
         for (int index = 80; index < 81; ++index)
-            AppMain.AoActSetFrame(main_work.act[index], frame1);
+            AoActSetFrame(main_work.act[index], frame1);
         for (int index = 25; index < 28; ++index)
-            AppMain.AoActSetFrame(main_work.act[index], frame2);
+            AoActSetFrame(main_work.act[index], frame2);
         for (int index = 81; index < 82; ++index)
-            AppMain.AoActSetFrame(main_work.act[index], frame2);
-        AppMain.AoActAcmPush();
-        AppMain.AoActAcmInit();
-        AppMain.AoActAcmApplyTrans(480f + num, AppMain.dm_opt_set_tab_pos_y_tbl[2], 0.0f);
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
+            AoActSetFrame(main_work.act[index], frame2);
+        AoActAcmPush();
+        AoActAcmInit();
+        AoActAcmApplyTrans(480f + num, dm_opt_set_tab_pos_y_tbl[2], 0.0f);
+        AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
         for (int index = 22; index < 28; ++index)
-            AppMain.AoActUpdate(main_work.act[index], 0.0f);
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
-        AppMain.AoActUpdate(main_work.act[76], 0.0f);
+            AoActUpdate(main_work.act[index], 0.0f);
+        AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
+        AoActUpdate(main_work.act[76], 0.0f);
         for (int index = 80; index < 82; ++index)
-            AppMain.AoActUpdate(main_work.act[index], 0.0f);
+            AoActUpdate(main_work.act[index], 0.0f);
         for (int index = 0; index < main_work.trg_ctrl_btn.Length; ++index)
             main_work.trg_ctrl_btn[index].Update();
-        AppMain.AoActAcmPop();
-        AppMain.AoActSortRegAction(main_work.act[76]);
+        AoActAcmPop();
+        AoActSortRegAction(main_work.act[76]);
         for (int index = 22; index < 28; ++index)
-            AppMain.AoActSortRegAction(main_work.act[index]);
+            AoActSortRegAction(main_work.act[index]);
         for (int index = 80; index < 82; ++index)
-            AppMain.AoActSortRegAction(main_work.act[index]);
-        AppMain.AoActSortExecute();
-        AppMain.AoActSortDraw();
-        AppMain.AoActSortUnregAll();
-        if (0.0 >= (double)main_work.ctrl_win_window_prgrs)
+            AoActSortRegAction(main_work.act[index]);
+        AoActSortExecute();
+        AoActSortDraw();
+        AoActSortUnregAll();
+        if (0.0 >= main_work.ctrl_win_window_prgrs)
             return;
-        AppMain.AoWinSysDrawState(0, AppMain.AoTexGetTexList(main_work.cmn_tex[3]), 0U, 480f, 356f, 1280f * main_work.ctrl_win_window_prgrs, (float)(720.0 * (double)main_work.ctrl_win_window_prgrs * 0.899999976158142), AppMain.dm_opt_draw_state);
-        if (1.0 == (double)main_work.ctrl_win_window_prgrs)
+        AoWinSysDrawState(0, AoTexGetTexList(main_work.cmn_tex[3]), 0U, 480f, 356f, 1280f * main_work.ctrl_win_window_prgrs, (float)(720.0 * main_work.ctrl_win_window_prgrs * 0.899999976158142), dm_opt_draw_state);
+        if (1.0 == main_work.ctrl_win_window_prgrs)
         {
-            AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
+            AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
             for (int index = 28; index < 42; ++index)
-                AppMain.AoActUpdate(main_work.act[index]);
-            AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
+                AoActUpdate(main_work.act[index]);
+            AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
             for (int index = 82; index < 88; ++index)
-                AppMain.AoActUpdate(main_work.act[index]);
+                AoActUpdate(main_work.act[index]);
             for (int index = 0; index < main_work.ctrl_win_trg_btn.Length; ++index)
                 main_work.ctrl_win_trg_btn[index].Update();
             SOption.EControl.Type control = SOption.CreateInstance().GetControl();
             if (SOption.EControl.Type.VirtualPadUp == control)
             {
-                AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
+                AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
                 for (int index = 36; index < 39; ++index)
                 {
-                    AppMain.AOS_ACTION act = main_work.act[index];
-                    AppMain.AoActSetFrame(act, 1f);
-                    AppMain.AoActUpdate(act, 0.0f);
+                    AOS_ACTION act = main_work.act[index];
+                    AoActSetFrame(act, 1f);
+                    AoActUpdate(act, 0.0f);
                 }
                 for (int index = 39; index < 42; ++index)
                 {
-                    AppMain.AOS_ACTION act = main_work.act[index];
-                    AppMain.AoActSetFrame(act, 0.0f);
-                    AppMain.AoActUpdate(act, 0.0f);
+                    AOS_ACTION act = main_work.act[index];
+                    AoActSetFrame(act, 0.0f);
+                    AoActUpdate(act, 0.0f);
                 }
-                AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
-                AppMain.AoActSetFrame(main_work.act[84], 1f);
-                AppMain.AoActSetFrame(main_work.act[85], 0.0f);
+                AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
+                AoActSetFrame(main_work.act[84], 1f);
+                AoActSetFrame(main_work.act[85], 0.0f);
                 for (int index = 84; index < 86; ++index)
-                    AppMain.AoActUpdate(main_work.act[index], 0.0f);
+                    AoActUpdate(main_work.act[index], 0.0f);
             }
             else
             {
-                AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
+                AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
                 for (int index = 36; index < 39; ++index)
                 {
-                    AppMain.AOS_ACTION act = main_work.act[index];
-                    AppMain.AoActSetFrame(act, 0.0f);
-                    AppMain.AoActUpdate(act, 0.0f);
+                    AOS_ACTION act = main_work.act[index];
+                    AoActSetFrame(act, 0.0f);
+                    AoActUpdate(act, 0.0f);
                 }
                 for (int index = 39; index < 42; ++index)
                 {
-                    AppMain.AOS_ACTION act = main_work.act[index];
-                    AppMain.AoActSetFrame(act, 1f);
-                    AppMain.AoActUpdate(act, 0.0f);
+                    AOS_ACTION act = main_work.act[index];
+                    AoActSetFrame(act, 1f);
+                    AoActUpdate(act, 0.0f);
                 }
-                AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
-                AppMain.AoActSetFrame(main_work.act[84], 0.0f);
-                AppMain.AoActSetFrame(main_work.act[85], 1f);
+                AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
+                AoActSetFrame(main_work.act[84], 0.0f);
+                AoActSetFrame(main_work.act[85], 1f);
                 for (int index = 84; index < 86; ++index)
-                    AppMain.AoActUpdate(main_work.act[index], 0.0f);
+                    AoActUpdate(main_work.act[index], 0.0f);
             }
             for (int index = 28; index < 29; ++index)
             {
-                AppMain.AOS_ACTION aosAction = main_work.act[index];
-                AppMain.AoActSortRegAction(main_work.act[index]);
+                AOS_ACTION aosAction = main_work.act[index];
+                AoActSortRegAction(main_work.act[index]);
             }
             for (int index = 36; index < 42; ++index)
             {
-                AppMain.AOS_ACTION aosAction = main_work.act[index];
-                AppMain.AoActSortRegAction(main_work.act[index]);
+                AOS_ACTION aosAction = main_work.act[index];
+                AoActSortRegAction(main_work.act[index]);
             }
             for (int index = 82; index < 86; ++index)
             {
-                AppMain.AOS_ACTION aosAction = main_work.act[index];
-                AppMain.AoActSortRegAction(main_work.act[index]);
+                AOS_ACTION aosAction = main_work.act[index];
+                AoActSortRegAction(main_work.act[index]);
             }
             if (SOption.EControl.Type.VirtualPadUp == control)
             {
-                AppMain.AoActSortRegAction(main_work.act[31]);
+                AoActSortRegAction(main_work.act[31]);
                 for (int index = 32; index < 36; ++index)
                 {
-                    AppMain.AOS_ACTION aosAction = main_work.act[index];
-                    AppMain.AoActSortRegAction(main_work.act[index]);
+                    AOS_ACTION aosAction = main_work.act[index];
+                    AoActSortRegAction(main_work.act[index]);
                 }
-                AppMain.AoActSortRegAction(main_work.act[87]);
+                AoActSortRegAction(main_work.act[87]);
             }
             else
             {
                 for (int index = 29; index < 31; ++index)
                 {
-                    AppMain.AOS_ACTION aosAction = main_work.act[index];
-                    AppMain.AoActSortRegAction(main_work.act[index]);
+                    AOS_ACTION aosAction = main_work.act[index];
+                    AoActSortRegAction(main_work.act[index]);
                 }
-                AppMain.AoActSortRegAction(main_work.act[86]);
+                AoActSortRegAction(main_work.act[86]);
             }
         }
-        AppMain.AoActSortRegAction(main_work.act[101]);
+        AoActSortRegAction(main_work.act[101]);
         for (int index = 1; index < 3; ++index)
-            AppMain.AoActSortRegAction(main_work.act[index]);
-        AppMain.AoActSortExecute();
-        AppMain.AoActSortDraw();
-        AppMain.AoActSortUnregAll();
+            AoActSortRegAction(main_work.act[index]);
+        AoActSortExecute();
+        AoActSortDraw();
+        AoActSortUnregAll();
     }
 
-    private static void dmOptControlMenuDraw(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptControlMenuDraw(DMS_OPT_MAIN_WORK main_work)
     {
-        AppMain.AoActSysSetDrawTaskPrio(8192U);
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
+        AoActSysSetDrawTaskPrio(8192U);
+        AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
         for (int index = 42; index <= 68; ++index)
         {
             if (index >= 52 && index <= 56)
             {
-                if ((AppMain.g_gs_main_sys_info.game_flag & 32U) > 0U && main_work.act[index] != null)
-                    AppMain.AoActSortRegAction(main_work.act[index]);
+                if ((g_gs_main_sys_info.game_flag & 32U) > 0U && main_work.act[index] != null)
+                    AoActSortRegAction(main_work.act[index]);
             }
             else if (index != 51 && main_work.act[index] != null)
-                AppMain.AoActSortRegAction(main_work.act[index]);
+                AoActSortRegAction(main_work.act[index]);
         }
         if (SOption.CreateInstance().GetControl() != SOption.EControl.Type.Tilt)
         {
             if (main_work.act[50] != null)
-                AppMain.AoActSetFrame(main_work.act[50], 0.0f);
+                AoActSetFrame(main_work.act[50], 0.0f);
             if (main_work.act[55] != null)
-                AppMain.AoActSetFrame(main_work.act[55], 0.0f);
+                AoActSetFrame(main_work.act[55], 0.0f);
         }
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
+        AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
         for (int index = 88; index <= 96; ++index)
         {
             if (index == 92)
             {
-                if ((AppMain.g_gs_main_sys_info.game_flag & 32U) > 0U && main_work.act[index] != null)
-                    AppMain.AoActSortRegAction(main_work.act[index]);
+                if ((g_gs_main_sys_info.game_flag & 32U) > 0U && main_work.act[index] != null)
+                    AoActSortRegAction(main_work.act[index]);
             }
             else if (main_work.act[index] != null)
-                AppMain.AoActSortRegAction(main_work.act[index]);
+                AoActSortRegAction(main_work.act[index]);
         }
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[0]));
+        AoActSetTexture(AoTexGetTexList(main_work.tex[0]));
         for (int index = 42; index <= 68; ++index)
         {
             if (main_work.act[index] != null)
-                AppMain.AoActUpdate(main_work.act[index]);
+                AoActUpdate(main_work.act[index]);
         }
-        AppMain.AoActSetTexture(AppMain.AoTexGetTexList(main_work.tex[1]));
+        AoActSetTexture(AoTexGetTexList(main_work.tex[1]));
         for (int index = 88; index <= 96; ++index)
         {
             if (main_work.act[index] != null)
-                AppMain.AoActUpdate(main_work.act[index]);
+                AoActUpdate(main_work.act[index]);
         }
-        AppMain.AoActSortExecuteFix();
-        AppMain.AoActSortDraw();
-        AppMain.AoActSortUnregAll();
+        AoActSortExecuteFix();
+        AoActSortDraw();
+        AoActSortUnregAll();
     }
 
-    private static void dmOptSetObiEfctPos(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetObiEfctPos(DMS_OPT_MAIN_WORK main_work)
     {
         for (uint index = 0; index < 2U; ++index)
         {
-            if ((double)main_work.obi_tex_pos[(int)index] < -1120.0)
+            if (main_work.obi_tex_pos[(int)index] < -1120.0)
                 main_work.obi_tex_pos[(int)index] = 1120f;
             main_work.obi_tex_pos[(int)index] += -3f;
         }
     }
 
-    private static void dmOptSetNextProcFunc(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetNextProcFunc(DMS_OPT_MAIN_WORK main_work)
     {
         switch (main_work.cur_slct_top)
         {
             case 0:
-                main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcManualStartFadeOut);
-                main_work.proc_input = (AppMain.DMS_OPT_MAIN_WORK._proc_input_)null;
+                main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcManualStartFadeOut);
+                main_work.proc_input = null;
                 main_work.state = 0;
-                if (AppMain.dm_opt_is_pause_maingame)
+                if (dm_opt_is_pause_maingame)
                 {
-                    AppMain.IzFadeInitEasyColor(0, (ushort)short.MaxValue, (ushort)61439, 18U, 0U, 1U, 32f, true);
+                    IzFadeInitEasyColor(0, (ushort)short.MaxValue, IZD_FADE_DT_PRIO_DEF, 18U, 0U, 1U, 32f, true);
                     break;
                 }
-                AppMain.IzFadeInitEasy(0U, 1U, 32f);
+                IzFadeInitEasy(0U, 1U, 32f);
                 break;
             case 1:
-                main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcCtrlMenuIdle);
-                main_work.proc_input = new AppMain.DMS_OPT_MAIN_WORK._proc_input_(AppMain.dmOptInputProcControlMenu);
-                main_work.proc_menu_draw = new AppMain.DMS_OPT_MAIN_WORK._proc_menu_draw_(AppMain.dmOptControlMenuDraw);
-                AppMain.dmOptControlResetAct(main_work);
+                main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcCtrlMenuIdle);
+                main_work.proc_input = new DMS_OPT_MAIN_WORK._proc_input_(dmOptInputProcControlMenu);
+                main_work.proc_menu_draw = new DMS_OPT_MAIN_WORK._proc_menu_draw_(dmOptControlMenuDraw);
+                dmOptControlResetAct(main_work);
                 main_work.state = 1;
                 break;
             case 2:
-                main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcSetMenuInEfct);
-                main_work.proc_input = (AppMain.DMS_OPT_MAIN_WORK._proc_input_)null;
-                main_work.proc_menu_draw = new AppMain.DMS_OPT_MAIN_WORK._proc_menu_draw_(AppMain.dmOptSettingMenuDraw);
+                main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcSetMenuInEfct);
+                main_work.proc_input = null;
+                main_work.proc_menu_draw = new DMS_OPT_MAIN_WORK._proc_menu_draw_(dmOptSettingMenuDraw);
                 main_work.state = 2;
                 main_work.cur_slct_set = 0;
-                if (!AppMain.dm_opt_is_pause_maingame)
-                    AppMain.DmSoundPlaySE("Window");
+                if (!dm_opt_is_pause_maingame)
+                    DmSoundPlaySE("Window");
                 else
-                    AppMain.GsSoundPlaySe("Window", main_work.se_handle, 0);
-                AppMain.dmOptSetSaveOptionData(main_work);
+                    GsSoundPlaySe("Window", main_work.se_handle, 0);
+                dmOptSetSaveOptionData(main_work);
                 break;
             case 3:
-                main_work.proc_update = new AppMain.DMS_OPT_MAIN_WORK._proc_update_(AppMain.dmOptProcStfrlStartFadeOut);
-                main_work.proc_input = (AppMain.DMS_OPT_MAIN_WORK._proc_input_)null;
+                main_work.proc_update = new DMS_OPT_MAIN_WORK._proc_update_(dmOptProcStfrlStartFadeOut);
+                main_work.proc_input = null;
                 main_work.state = 0;
-                if (AppMain.dm_opt_is_pause_maingame)
-                    AppMain.IzFadeInitEasyColor(0, (ushort)short.MaxValue, (ushort)61439, 18U, 0U, 1U, 32f, true);
+                if (dm_opt_is_pause_maingame)
+                    IzFadeInitEasyColor(0, (ushort)short.MaxValue, IZD_FADE_DT_PRIO_DEF, 18U, 0U, 1U, 32f, true);
                 else
-                    AppMain.IzFadeInitEasy(0U, 1U, 32f);
-                if (!AppMain.dm_opt_is_pause_maingame)
+                    IzFadeInitEasy(0U, 1U, 32f);
+                if (!dm_opt_is_pause_maingame)
                 {
-                    AppMain.DmSndBgmPlayerBgmStop();
+                    DmSndBgmPlayerBgmStop();
                     break;
                 }
-                AppMain.GsSoundStopBgm(main_work.bgm_scb, 32);
+                GsSoundStopBgm(main_work.bgm_scb, 32);
                 break;
         }
     }
 
-    private static void dmOptSetDefaultDataSetMenu(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetDefaultDataSetMenu(DMS_OPT_MAIN_WORK main_work)
     {
         for (uint index = 0; index < 2U; ++index)
             main_work.volume_data[(int)index] = 10;
-        AppMain.DmSoundSetVolumeBGM((float)main_work.volume_data[0]);
-        AppMain.DmSoundSetVolumeSE((float)main_work.volume_data[1]);
+        DmSoundSetVolumeBGM(main_work.volume_data[0]);
+        DmSoundSetVolumeSE(main_work.volume_data[1]);
         main_work.set_vbrt = 0;
     }
 
-    private static void dmOptSetTopMenuDecideEfctData(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetTopMenuDecideEfctData(DMS_OPT_MAIN_WORK main_work)
     {
         main_work.flag |= 16U;
     }
 
-    private static void dmOptSetTopMenuTabDecideEfct(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetTopMenuTabDecideEfct(DMS_OPT_MAIN_WORK main_work)
     {
-        float num1 = (float)main_work.decide_menu_col.a;
-        if ((double)main_work.timer <= 8.0)
+        float num1 = main_work.decide_menu_col.a;
+        if (main_work.timer <= 8.0)
         {
             float num2 = 31.875f;
             num1 += num2;
-            if ((double)num1 >= (double)byte.MaxValue)
-                num1 = (float)byte.MaxValue;
+            if (num1 >= (double)byte.MaxValue)
+                num1 = byte.MaxValue;
         }
-        else if ((double)main_work.timer <= 16.0)
+        else if (main_work.timer <= 16.0)
         {
             float num2 = 31.875f;
             num1 -= num2;
-            if ((double)num1 < 0.0)
+            if (num1 < 0.0)
                 num1 = 0.0f;
         }
         main_work.decide_menu_col.a = (byte)num1;
     }
 
-    private static bool dmOptIsTopMenuTabDecideEfctEnd(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static bool dmOptIsTopMenuTabDecideEfctEnd(DMS_OPT_MAIN_WORK main_work)
     {
-        if ((double)main_work.timer <= 28.0)
+        if (main_work.timer <= 28.0)
             return false;
         main_work.flag &= 4294967279U;
-        main_work.decide_menu_col.a = (byte)0;
+        main_work.decide_menu_col.a = 0;
         main_work.timer = 0.0f;
         return true;
     }
 
-    private static void dmOptSetCtrlFocusChangeEfct(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetCtrlFocusChangeEfct(DMS_OPT_MAIN_WORK main_work)
     {
         float num = (main_work.dst_crsr_pos_y - main_work.src_crsr_pos_y) / 8f;
         main_work.top_crsr_pos_y += num;
     }
 
-    private static bool dmOptIsCtrlFocusChangeEfctEnd(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static bool dmOptIsCtrlFocusChangeEfctEnd(DMS_OPT_MAIN_WORK main_work)
     {
         float num = main_work.dst_crsr_pos_y - main_work.src_crsr_pos_y;
-        if ((double)main_work.top_crsr_pos_y >= (double)main_work.dst_crsr_pos_y && (double)num >= 0.0)
+        if (main_work.top_crsr_pos_y >= (double)main_work.dst_crsr_pos_y && num >= 0.0)
         {
             main_work.top_crsr_pos_y = main_work.dst_crsr_pos_y;
             return true;
         }
-        if ((double)main_work.top_crsr_pos_y > (double)main_work.dst_crsr_pos_y || (double)num > 0.0)
+        if (main_work.top_crsr_pos_y > (double)main_work.dst_crsr_pos_y || num > 0.0)
             return false;
         main_work.top_crsr_pos_y = main_work.dst_crsr_pos_y;
         return true;
     }
 
-    private static void dmOptSetVolPushEfct(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetVolPushEfct(DMS_OPT_MAIN_WORK main_work)
     {
         for (int index = 0; index < 4; ++index)
         {
-            if ((double)main_work.push_efct_timer[index] > 0.0)
+            if (main_work.push_efct_timer[index] > 0.0)
                 --main_work.push_efct_timer[index];
             else
                 main_work.push_efct_timer[index] = 0.0f;
         }
     }
 
-    private static void dmOptSetDfltPushEfct(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetDfltPushEfct(DMS_OPT_MAIN_WORK main_work)
     {
-        if ((double)main_work.efct_timer > 10.0)
+        if (main_work.efct_timer > 10.0)
         {
             main_work.flag &= 4294966271U;
             main_work.efct_timer = 0.0f;
@@ -1621,9 +1611,9 @@ public partial class AppMain
         ++main_work.efct_timer;
     }
 
-    private static void dmOptSetWinOpenEfct(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetWinOpenEfct(DMS_OPT_MAIN_WORK main_work)
     {
-        if ((double)main_work.win_timer > 8.0)
+        if (main_work.win_timer > 8.0)
         {
             main_work.flag |= 2048U;
             main_work.win_timer = 0.0f;
@@ -1634,21 +1624,21 @@ public partial class AppMain
             ++main_work.win_timer;
         for (uint index = 0; index < 2U; ++index)
         {
-            main_work.win_size_rate[(int)index] = (double)main_work.win_timer == 0.0 ? 1f : main_work.win_timer / 8f;
-            if ((double)main_work.win_size_rate[(int)index] > 1.0)
+            main_work.win_size_rate[(int)index] = main_work.win_timer == 0.0 ? 1f : main_work.win_timer / 8f;
+            if (main_work.win_size_rate[(int)index] > 1.0)
                 main_work.win_size_rate[(int)index] = 1f;
         }
     }
 
-    private static void dmOptSetWinCloseEfct(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetWinCloseEfct(DMS_OPT_MAIN_WORK main_work)
     {
         for (uint index = 0; index < 2U; ++index)
         {
-            main_work.win_size_rate[(int)index] = (double)main_work.win_timer <= 0.0 ? 0.0f : main_work.win_timer / 8f;
-            if ((double)main_work.win_size_rate[(int)index] < 0.0)
+            main_work.win_size_rate[(int)index] = main_work.win_timer <= 0.0 ? 0.0f : main_work.win_timer / 8f;
+            if (main_work.win_size_rate[(int)index] < 0.0)
                 main_work.win_size_rate[(int)index] = 0.0f;
         }
-        if ((double)main_work.win_timer < 0.0)
+        if (main_work.win_timer < 0.0)
         {
             main_work.flag |= 2048U;
             main_work.win_timer = 0.0f;
@@ -1659,66 +1649,66 @@ public partial class AppMain
             --main_work.win_timer;
     }
 
-    private static void dmOptSetChngFocusCrsrData(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptSetChngFocusCrsrData(DMS_OPT_MAIN_WORK main_work)
     {
         main_work.src_crsr_pos_y = main_work.top_crsr_pos_y;
-        main_work.dst_crsr_pos_y = (float)(250.0 + (double)main_work.cur_slct_top * 220.0);
+        main_work.dst_crsr_pos_y = (float)(250.0 + main_work.cur_slct_top * 220.0);
         main_work.flag |= 262144U;
     }
 
-    private static int dmOptIsDataLoad(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static int dmOptIsDataLoad(DMS_OPT_MAIN_WORK main_work)
     {
         for (int index = 0; index < 2; ++index)
         {
-            if (!AppMain.amFsIsComplete(main_work.arc_amb_fs[index]))
+            if (!amFsIsComplete(main_work.arc_amb_fs[index]))
                 return 0;
         }
         for (int index = 0; index < 5; ++index)
         {
-            if (!AppMain.amFsIsComplete(main_work.arc_cmn_amb_fs[index]))
+            if (!amFsIsComplete(main_work.arc_cmn_amb_fs[index]))
                 return 0;
         }
         for (int index = 0; index < 2; ++index)
         {
-            if (!AppMain.amFsIsComplete(main_work.manual_arc_amb_fs[index]))
+            if (!amFsIsComplete(main_work.manual_arc_amb_fs[index]))
                 return 0;
         }
         return 1;
     }
 
-    private static int dmOptIsTexLoad(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static int dmOptIsTexLoad(DMS_OPT_MAIN_WORK main_work)
     {
         for (int index = 0; index < 2; ++index)
         {
-            if (!AppMain.AoTexIsLoaded(main_work.tex[index]))
+            if (!AoTexIsLoaded(main_work.tex[index]))
                 return 0;
         }
         for (int index = 0; index < 5; ++index)
         {
-            if (!AppMain.AoTexIsLoaded(main_work.cmn_tex[index]))
+            if (!AoTexIsLoaded(main_work.cmn_tex[index]))
                 return 0;
         }
-        return !AppMain.GsFontIsBuilded() || !AppMain.dm_opt_is_pause_maingame && !AppMain.DmSndBgmPlayerIsSndSysBuild() ? 0 : 1;
+        return !GsFontIsBuilded() || !dm_opt_is_pause_maingame && !DmSndBgmPlayerIsSndSysBuild() ? 0 : 1;
     }
 
-    private static int dmOptIsTexLoad2(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static int dmOptIsTexLoad2(DMS_OPT_MAIN_WORK main_work)
     {
-        return !AppMain.DmManualBuildCheck() ? 0 : 1;
+        return !DmManualBuildCheck() ? 0 : 1;
     }
 
-    private static int dmOptIsTexRelease(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static int dmOptIsTexRelease(DMS_OPT_MAIN_WORK main_work)
     {
         for (int index = 0; index < 2; ++index)
         {
-            if (!AppMain.AoTexIsReleased(main_work.tex[index]))
+            if (!AoTexIsReleased(main_work.tex[index]))
                 return 0;
         }
         for (int index = 0; index < 5; ++index)
         {
-            if (!AppMain.AoTexIsReleased(main_work.cmn_tex[index]))
+            if (!AoTexIsReleased(main_work.cmn_tex[index]))
                 return 0;
         }
-        return !AppMain.DmManualFlushCheck() ? 0 : 1;
+        return !DmManualFlushCheck() ? 0 : 1;
     }
 
     private static int dmOptGetRevisedTopMenuNo(int idx, int diff)
@@ -1751,114 +1741,114 @@ public partial class AppMain
         return num;
     }
 
-    private static void dmOptControlResetAct(AppMain.DMS_OPT_MAIN_WORK main_work)
+    private static void dmOptControlResetAct(DMS_OPT_MAIN_WORK main_work)
     {
-        AppMain.SResetLocalTable[][] sresetLocalTableArray = new AppMain.SResetLocalTable[3][]
+        SResetLocalTable[][] sresetLocalTableArray = new SResetLocalTable[3][]
         {
-      new AppMain.SResetLocalTable[23]
+      new SResetLocalTable[23]
       {
-        new AppMain.SResetLocalTable(51, 32, 0),
-        new AppMain.SResetLocalTable(52, 33, 0),
-        new AppMain.SResetLocalTable(53, 34, 0),
-        new AppMain.SResetLocalTable(54, 35, 0),
-        new AppMain.SResetLocalTable(55, 45, 0),
-        new AppMain.SResetLocalTable(56, 44, 0),
-        new AppMain.SResetLocalTable(57, 36, 0),
-        new AppMain.SResetLocalTable(58, 37, 0),
-        new AppMain.SResetLocalTable(59, 38, 0),
-        new AppMain.SResetLocalTable(60, 41, 0),
-        new AppMain.SResetLocalTable(61, 42, 0),
-        new AppMain.SResetLocalTable(62, 43, 0),
-        new AppMain.SResetLocalTable(63, 39, 0),
-        new AppMain.SResetLocalTable(64, 40, 0),
-        new AppMain.SResetLocalTable(65, -1, -1),
-        new AppMain.SResetLocalTable(66, 46, 0),
-        new AppMain.SResetLocalTable(88, 11, 1),
-        new AppMain.SResetLocalTable(89, 12, 1),
-        new AppMain.SResetLocalTable(92, 15, 1),
-        new AppMain.SResetLocalTable(93, 19, 1),
-        new AppMain.SResetLocalTable(94, 18, 1),
-        new AppMain.SResetLocalTable(95, 16, 1),
-        new AppMain.SResetLocalTable(96, 17, 1)
+        new SResetLocalTable(51, 32, 0),
+        new SResetLocalTable(52, 33, 0),
+        new SResetLocalTable(53, 34, 0),
+        new SResetLocalTable(54, 35, 0),
+        new SResetLocalTable(55, 45, 0),
+        new SResetLocalTable(56, 44, 0),
+        new SResetLocalTable(57, 36, 0),
+        new SResetLocalTable(58, 37, 0),
+        new SResetLocalTable(59, 38, 0),
+        new SResetLocalTable(60, 41, 0),
+        new SResetLocalTable(61, 42, 0),
+        new SResetLocalTable(62, 43, 0),
+        new SResetLocalTable(63, 39, 0),
+        new SResetLocalTable(64, 40, 0),
+        new SResetLocalTable(65, -1, -1),
+        new SResetLocalTable(66, 46, 0),
+        new SResetLocalTable(88, 11, 1),
+        new SResetLocalTable(89, 12, 1),
+        new SResetLocalTable(92, 15, 1),
+        new SResetLocalTable(93, 19, 1),
+        new SResetLocalTable(94, 18, 1),
+        new SResetLocalTable(95, 16, 1),
+        new SResetLocalTable(96, 17, 1)
       },
-      new AppMain.SResetLocalTable[23]
+      new SResetLocalTable[23]
       {
-        new AppMain.SResetLocalTable(51, 56, 0),
-        new AppMain.SResetLocalTable(52, 57, 0),
-        new AppMain.SResetLocalTable(53, 58, 0),
-        new AppMain.SResetLocalTable(54, 59, 0),
-        new AppMain.SResetLocalTable(55, 69, 0),
-        new AppMain.SResetLocalTable(56, -1, -1),
-        new AppMain.SResetLocalTable(57, 60, 0),
-        new AppMain.SResetLocalTable(58, 61, 0),
-        new AppMain.SResetLocalTable(59, 62, 0),
-        new AppMain.SResetLocalTable(60, 66, 0),
-        new AppMain.SResetLocalTable(61, 67, 0),
-        new AppMain.SResetLocalTable(62, 68, 0),
-        new AppMain.SResetLocalTable(63, 63, 0),
-        new AppMain.SResetLocalTable(64, 64, 0),
-        new AppMain.SResetLocalTable(65, 65, 0),
-        new AppMain.SResetLocalTable(66, -1, -1),
-        new AppMain.SResetLocalTable(88, 32, 1),
-        new AppMain.SResetLocalTable(89, 33, 1),
-        new AppMain.SResetLocalTable(92, 28, 1),
-        new AppMain.SResetLocalTable(93, -1, -1),
-        new AppMain.SResetLocalTable(94, 29, 1),
-        new AppMain.SResetLocalTable(95, 31, 1),
-        new AppMain.SResetLocalTable(96, 30, 1)
+        new SResetLocalTable(51, 56, 0),
+        new SResetLocalTable(52, 57, 0),
+        new SResetLocalTable(53, 58, 0),
+        new SResetLocalTable(54, 59, 0),
+        new SResetLocalTable(55, 69, 0),
+        new SResetLocalTable(56, -1, -1),
+        new SResetLocalTable(57, 60, 0),
+        new SResetLocalTable(58, 61, 0),
+        new SResetLocalTable(59, 62, 0),
+        new SResetLocalTable(60, 66, 0),
+        new SResetLocalTable(61, 67, 0),
+        new SResetLocalTable(62, 68, 0),
+        new SResetLocalTable(63, 63, 0),
+        new SResetLocalTable(64, 64, 0),
+        new SResetLocalTable(65, 65, 0),
+        new SResetLocalTable(66, -1, -1),
+        new SResetLocalTable(88, 32, 1),
+        new SResetLocalTable(89, 33, 1),
+        new SResetLocalTable(92, 28, 1),
+        new SResetLocalTable(93, -1, -1),
+        new SResetLocalTable(94, 29, 1),
+        new SResetLocalTable(95, 31, 1),
+        new SResetLocalTable(96, 30, 1)
       },
-      new AppMain.SResetLocalTable[23]
+      new SResetLocalTable[23]
       {
-        new AppMain.SResetLocalTable(51, 56, 0),
-        new AppMain.SResetLocalTable(52, 57, 0),
-        new AppMain.SResetLocalTable(53, 58, 0),
-        new AppMain.SResetLocalTable(54, 59, 0),
-        new AppMain.SResetLocalTable(55, 69, 0),
-        new AppMain.SResetLocalTable(56, -1, -1),
-        new AppMain.SResetLocalTable(57, 60, 0),
-        new AppMain.SResetLocalTable(58, 61, 0),
-        new AppMain.SResetLocalTable(59, 62, 0),
-        new AppMain.SResetLocalTable(60, 66, 0),
-        new AppMain.SResetLocalTable(61, 67, 0),
-        new AppMain.SResetLocalTable(62, 68, 0),
-        new AppMain.SResetLocalTable(63, 63, 0),
-        new AppMain.SResetLocalTable(64, 64, 0),
-        new AppMain.SResetLocalTable(65, 65, 0),
-        new AppMain.SResetLocalTable(66, -1, -1),
-        new AppMain.SResetLocalTable(88, 32, 1),
-        new AppMain.SResetLocalTable(89, 33, 1),
-        new AppMain.SResetLocalTable(92, 28, 1),
-        new AppMain.SResetLocalTable(93, -1, -1),
-        new AppMain.SResetLocalTable(94, 29, 1),
-        new AppMain.SResetLocalTable(95, 31, 1),
-        new AppMain.SResetLocalTable(96, 30, 1)
+        new SResetLocalTable(51, 56, 0),
+        new SResetLocalTable(52, 57, 0),
+        new SResetLocalTable(53, 58, 0),
+        new SResetLocalTable(54, 59, 0),
+        new SResetLocalTable(55, 69, 0),
+        new SResetLocalTable(56, -1, -1),
+        new SResetLocalTable(57, 60, 0),
+        new SResetLocalTable(58, 61, 0),
+        new SResetLocalTable(59, 62, 0),
+        new SResetLocalTable(60, 66, 0),
+        new SResetLocalTable(61, 67, 0),
+        new SResetLocalTable(62, 68, 0),
+        new SResetLocalTable(63, 63, 0),
+        new SResetLocalTable(64, 64, 0),
+        new SResetLocalTable(65, 65, 0),
+        new SResetLocalTable(66, -1, -1),
+        new SResetLocalTable(88, 32, 1),
+        new SResetLocalTable(89, 33, 1),
+        new SResetLocalTable(92, 28, 1),
+        new SResetLocalTable(93, -1, -1),
+        new SResetLocalTable(94, 29, 1),
+        new SResetLocalTable(95, 31, 1),
+        new SResetLocalTable(96, 30, 1)
       }
         };
         for (int index = 0; index < sresetLocalTableArray[0].Length; ++index)
         {
             if (main_work.act[sresetLocalTableArray[0][index].act_idx] != null)
             {
-                AppMain.AoActDelete(main_work.act[sresetLocalTableArray[0][index].act_idx]);
-                main_work.act[sresetLocalTableArray[0][index].act_idx] = (AppMain.AOS_ACTION)null;
+                AoActDelete(main_work.act[sresetLocalTableArray[0][index].act_idx]);
+                main_work.act[sresetLocalTableArray[0][index].act_idx] = null;
             }
         }
         SOption.EControl.Type control = SOption.CreateInstance().GetControl();
         for (int index = 0; index < sresetLocalTableArray[(int)control].Length; ++index)
         {
             if (0 <= sresetLocalTableArray[(int)control][index].act_id)
-                main_work.act[sresetLocalTableArray[(int)control][index].act_idx] = AppMain.AoActCreate(main_work.ama[sresetLocalTableArray[(int)control][index].ama_idx], (uint)sresetLocalTableArray[(int)control][index].act_id);
+                main_work.act[sresetLocalTableArray[(int)control][index].act_idx] = AoActCreate(main_work.ama[sresetLocalTableArray[(int)control][index].ama_idx], (uint)sresetLocalTableArray[(int)control][index].act_id);
         }
         if (control != SOption.EControl.Type.Tilt)
             return;
         for (int index = 42; index != 69; ++index)
         {
             if (main_work.act[index] != null)
-                AppMain.AoActSetFrame(main_work.act[index], 0.0f);
+                AoActSetFrame(main_work.act[index], 0.0f);
         }
         for (int index = 88; index != 97; ++index)
         {
             if (main_work.act[index] != null)
-                AppMain.AoActSetFrame(main_work.act[index], 0.0f);
+                AoActSetFrame(main_work.act[index], 0.0f);
         }
     }
 }

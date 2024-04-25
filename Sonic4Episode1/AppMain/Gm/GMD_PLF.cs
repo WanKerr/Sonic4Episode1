@@ -1,0 +1,39 @@
+﻿public partial class AppMain
+{
+    public const uint GMD_PLF_USER1 = 1;
+    public const uint GMD_PLF_USER2 = 2;
+    public const uint GMD_PLF_USER3 = 4;
+    public const uint GMD_PLF_USER4 = 8;
+    public const uint GMD_PLF_USER_MASK = 15;
+    public const uint GMD_PLF_PGM_TURN = 16;
+    public const uint GMD_PLF_NOJUMPMOVE = 32;
+    public const uint GMD_PLF_NOHOMING_SEARCH = 64;
+    public const uint GMD_PLF_NOHOMING = 128;
+    public const uint GMD_PLF_PGM_TURN_RDM = 256;
+    public const uint GMD_PLF_WALK_SMK_EFCT_OFF = 512;
+    public const uint GMD_PLF_DIE = 1024;
+    public const uint GMD_PLF_COLDIE = 2048;
+    public const uint GMD_PLF_NOCOLDIE = 4096;
+    public const uint GMD_PLF_NOCAMERA_OFST = 8192;
+    public const uint GMD_PLF_SUPER_SONIC = 16384;
+    public const uint GMD_PLF_AUTO_RUN = 32768;
+    public const uint GMD_PLF_TATK_RETRY = 65536;
+    public const uint GMD_PLF_PINBALL_SONIC = 0x20000;
+    public const uint GMD_PLF_TRUCK_RIDE = 262144;
+    public const uint GMD_PLF_NO_ITEMSLOW = 524288;
+    public const uint GMD_PLF_ACT_GOAL = 1048576;
+    public const uint GMD_PLF_BOSS_GOAL_PRE = 2097152;
+    public const uint GMD_PLF_NOKEY = 4194304;
+    public const uint GMD_PLF_GAMEOVER = 8388608;
+    public const uint GMD_PLF_GOAL = 16777216;
+    public const uint GMD_PLF_RESET_FALL_PARAM = 33554432;
+    public const uint GMD_PLF_WATER = 0x4000000;
+    public const uint GMD_PLF_NOBRAKE = 134217728;
+    public const uint GMD_PLF_BARRIER = 268435456;
+    public const uint GMD_PLF_MAGNET = 536870912;
+    public const uint GMD_PLF_BOSS5_DEMO = 1073741824;
+    public const uint GMD_PLF_PGM_FALL_TURN = 2147483648;
+    public const uint GMD_PLF_PGM_TURN_MASK = 2147483920;
+    public const uint GMD_PLF_STATE_INIT_CLEAR_MASK = 599727;
+    public const uint GMD_PLF_STATE_GIMMICK_INIT_CLEAR_MASK = 533167;
+}

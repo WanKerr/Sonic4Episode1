@@ -1,80 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-
-public partial class AppMain
+﻿public partial class AppMain
 {
-    public static void AoTexBuild(AppMain.AOS_TEXTURE tex, AppMain.AMS_AMB_HEADER amb)
+    public static void AoTexBuild(AOS_TEXTURE tex, AMS_AMB_HEADER amb)
     {
         if (tex == null || amb == null)
             return;
-        AppMain.aoTexInitTex(tex);
+        aoTexInitTex(tex);
         tex.amb = amb;
-        AppMain.AmbChunk ambChunk = AppMain.amBindSearchEx(amb, ".txb");
-        tex.txb = AppMain.readTXBfile(ambChunk.array, ambChunk.offset, amb.dir);
-        AppMain.TXB_HEADER txb = tex.txb;
+        AmbChunk ambChunk = amBindSearchEx(amb, ".txb");
+        tex.txb = readTXBfile(ambChunk.array, ambChunk.offset, amb.dir);
+        TXB_HEADER txb = tex.txb;
     }
 
-    public static void AoTexLoad(AppMain.AOS_TEXTURE tex)
+    public static void AoTexLoad(AOS_TEXTURE tex)
     {
         if (tex == null || tex.txb == null || (tex.amb == null || tex.reg_id >= 0))
             return;
-        uint count = AppMain.amTxbGetCount(tex.txb);
-        AppMain.nnSetUpTexlist(out tex.texlist, (int)count, ref tex.texlist_buf);
-        AppMain.NNS_TEXFILELIST texFileList = AppMain.amTxbGetTexFileList(tex.txb);
-        tex.reg_id = AppMain.amTextureLoad(tex.texlist, texFileList, (string)null, tex.amb);
+        uint count = amTxbGetCount(tex.txb);
+        nnSetUpTexlist(out tex.texlist, (int)count, ref tex.texlist_buf);
+        NNS_TEXFILELIST texFileList = amTxbGetTexFileList(tex.txb);
+        tex.reg_id = amTextureLoad(tex.texlist, texFileList, null, tex.amb);
     }
 
-    public static bool AoTexIsLoaded(AppMain.AOS_TEXTURE tex)
+    public static bool AoTexIsLoaded(AOS_TEXTURE tex)
     {
         if (tex == null || tex.texlist == null)
             return false;
-        if (tex.reg_id >= 0 && AppMain.amDrawIsRegistComplete(tex.reg_id))
+        if (tex.reg_id >= 0 && amDrawIsRegistComplete(tex.reg_id))
             tex.reg_id = -1;
         return tex.reg_id < 0;
     }
 
-    public static AppMain.NNS_TEXLIST AoTexGetTexList(AppMain.AOS_TEXTURE tex)
+    public static NNS_TEXLIST AoTexGetTexList(AOS_TEXTURE tex)
     {
-        return tex == null || tex.texlist == null || tex.reg_id >= 0 ? (AppMain.NNS_TEXLIST)null : tex.texlist;
+        return tex == null || tex.texlist == null || tex.reg_id >= 0 ? null : tex.texlist;
     }
 
-    public AppMain.TXB_HEADER AoTexGetTxb(ref AppMain.AOS_TEXTURE tex)
+    public TXB_HEADER AoTexGetTxb(ref AOS_TEXTURE tex)
     {
-        return tex == null || tex.texlist == null || tex.reg_id >= 0 ? (AppMain.TXB_HEADER)null : tex.txb;
+        return tex == null || tex.texlist == null || tex.reg_id >= 0 ? null : tex.txb;
     }
 
-    private static void AoTexRelease(AppMain.AOS_TEXTURE tex)
+    private static void AoTexRelease(AOS_TEXTURE tex)
     {
-        if (!AppMain.AoTexIsLoaded(tex))
+        if (!AoTexIsLoaded(tex))
             return;
-        tex.reg_id = AppMain.amTextureRelease(tex.texlist);
-        tex.texlist = (AppMain.NNS_TEXLIST)null;
+        tex.reg_id = amTextureRelease(tex.texlist);
+        tex.texlist = null;
     }
 
-    private static bool AoTexIsReleased(AppMain.AOS_TEXTURE tex)
+    private static bool AoTexIsReleased(AOS_TEXTURE tex)
     {
         if (tex == null || tex.reg_id < 0)
             return true;
-        if (!AppMain.amDrawIsRegistComplete(tex.reg_id))
+        if (!amDrawIsRegistComplete(tex.reg_id))
             return false;
-        AppMain.aoTexInitTex(tex);
+        aoTexInitTex(tex);
         return true;
     }
 
-    private static void aoTexInitTex(AppMain.AOS_TEXTURE tex)
+    private static void aoTexInitTex(AOS_TEXTURE tex)
     {
-        tex.texlist = (AppMain.NNS_TEXLIST)null;
+        tex.texlist = null;
         tex.reg_id = -1;
-        tex.amb = (AppMain.AMS_AMB_HEADER)null;
-        tex.txb = (AppMain.TXB_HEADER)null;
+        tex.amb = null;
+        tex.txb = null;
     }
 
 

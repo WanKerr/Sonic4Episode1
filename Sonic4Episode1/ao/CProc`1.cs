@@ -6,114 +6,114 @@
 
 namespace ao
 {
-  public class CProc<T>
-  {
-    private CProc<T>.TypeProcedure m_proc;
-    private uint m_counter;
-    private uint m_counter_next;
-
-    public CProc()
+    public class CProc<T>
     {
-      this.SetOwnProcNone();
-      this.m_counter = 0U;
-    }
+        private TypeProcedure m_proc;
+        private uint m_counter;
+        private uint m_counter_next;
 
-    public void SetOwnProcNone()
-    {
-      this.SetOwnProc((CProc<T>.TypeProcedure) null);
-    }
+        public CProc()
+        {
+            this.SetOwnProcNone();
+            this.m_counter = 0U;
+        }
 
-    public void SetProcNone(uint no)
-    {
-      this.SetProc(no, (CProc<T>.TypeProcedure) null);
-    }
+        public void SetOwnProcNone()
+        {
+            this.SetOwnProc(null);
+        }
 
-    public void SetOwnProc()
-    {
-      this.SetOwnProc((CProc<T>.TypeProcedure) null);
-    }
+        public void SetProcNone(uint no)
+        {
+            this.SetProc(no, null);
+        }
 
-    public void SetProc(uint no)
-    {
-      this.SetProc(no, (CProc<T>.TypeProcedure) null);
-    }
+        public void SetOwnProc()
+        {
+            this.SetOwnProc(null);
+        }
 
-    public void SetOwnProc(CProc<T>.TypeProcedure proc)
-    {
-      this.m_proc = proc;
-      this.m_counter_next = 0U;
-    }
+        public void SetProc(uint no)
+        {
+            this.SetProc(no, null);
+        }
 
-    public void SetProc(uint no, CProc<T>.TypeProcedure proc)
-    {
-      this.SetOwnProc(proc);
-    }
+        public void SetOwnProc(TypeProcedure proc)
+        {
+            this.m_proc = proc;
+            this.m_counter_next = 0U;
+        }
 
-    public CProc<T>.TypeProcedure GetOwnProc()
-    {
-      return this.m_proc;
-    }
+        public void SetProc(uint no, TypeProcedure proc)
+        {
+            this.SetOwnProc(proc);
+        }
 
-    public CProc<T>.TypeProcedure GetProc(uint no)
-    {
-      return this.GetOwnProc();
-    }
+        public TypeProcedure GetOwnProc()
+        {
+            return this.m_proc;
+        }
 
-    public bool IsOwnProcNone()
-    {
-      return this.m_proc == null;
-    }
+        public TypeProcedure GetProc(uint no)
+        {
+            return this.GetOwnProc();
+        }
 
-    public bool IsProcNone(uint no)
-    {
-      return this.IsOwnProcNone();
-    }
+        public bool IsOwnProcNone()
+        {
+            return this.m_proc == null;
+        }
 
-    public bool IsOwnProc(CProc<T>.TypeProcedure proc)
-    {
-      return proc == this.m_proc;
-    }
+        public bool IsProcNone(uint no)
+        {
+            return this.IsOwnProcNone();
+        }
 
-    public bool IsProc(uint no, CProc<T>.TypeProcedure proc)
-    {
-      return this.IsOwnProc(proc);
-    }
+        public bool IsOwnProc(TypeProcedure proc)
+        {
+            return proc == this.m_proc;
+        }
 
-    public uint GetCount()
-    {
-      return this.m_counter;
-    }
+        public bool IsProc(uint no, TypeProcedure proc)
+        {
+            return this.IsOwnProc(proc);
+        }
 
-    public void ResetCount()
-    {
-      this.m_counter_next = 0U;
-    }
+        public uint GetCount()
+        {
+            return this.m_counter;
+        }
 
-    public void operator_brackets()
-    {
-      this.m_counter = this.m_counter_next;
-      if (this.m_counter_next < uint.MaxValue)
-        ++this.m_counter_next;
-      if (this.m_proc == null)
-        return;
-      this.m_proc();
-    }
+        public void ResetCount()
+        {
+            this.m_counter_next = 0U;
+        }
 
-    public void operator_brackets(uint no)
-    {
-      this.operator_brackets();
-    }
+        public void operator_brackets()
+        {
+            this.m_counter = this.m_counter_next;
+            if (this.m_counter_next < uint.MaxValue)
+                ++this.m_counter_next;
+            if (this.m_proc == null)
+                return;
+            this.m_proc();
+        }
 
-    public void Call()
-    {
-      this.operator_brackets();
-    }
+        public void operator_brackets(uint no)
+        {
+            this.operator_brackets();
+        }
 
-    public void Call(uint no)
-    {
-      this.operator_brackets(no);
-    }
+        public void Call()
+        {
+            this.operator_brackets();
+        }
 
-    public delegate void TypeProcedure();
-  }
+        public void Call(uint no)
+        {
+            this.operator_brackets(no);
+        }
+
+        public delegate void TypeProcedure();
+    }
 }

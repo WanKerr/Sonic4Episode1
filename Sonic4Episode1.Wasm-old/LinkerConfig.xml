@@ -1,0 +1,15 @@
+<linker>
+	<assembly fullname="mscorlib" />
+	<assembly fullname="System.Core" />
+	<assembly fullname="FNA">
+		<namespace fullname="ObjCRuntime" />
+		<namespace fullname="Microsoft.Xna.Framework.Content" />
+	</assembly>
+	<assembly fullname="System.Runtime.CompilerServices">
+		<type fullname="*" />
+	</assembly>
+	<assembly fullname="System.Runtime.InteropServices">
+		<type fullname="*" />
+	</assembly>
+	<assembly fullname="Sonic4Episode1.Wasm" />
+</linker>

@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-
-public partial class AppMain
+﻿public partial class AppMain
 {
-    public static AppMain.AMS_CRIAUDIO_INTERFACE amCriAudioGetGlobal()
+    public static AMS_CRIAUDIO_INTERFACE amCriAudioGetGlobal()
     {
-        return AppMain.pAu;
+        return pAu;
     }
 
     private void amCriAudioInit()
@@ -24,10 +13,10 @@ public partial class AppMain
     {
         for (uint index = 0; index < 8U; ++index)
         {
-            if (AppMain.pAu.auply[(int)index] != null)
+            if (pAu.auply[(int)index] != null)
             {
-                AppMain.pAu.auply[(int)index].Destroy();
-                AppMain.pAu.auply[(int)index] = (AppMain.CriAuPlayer)null;
+                pAu.auply[(int)index].Destroy();
+                pAu.auply[(int)index] = null;
             }
         }
     }
@@ -40,10 +29,10 @@ public partial class AppMain
     {
         for (uint index = 0; index < 8U; ++index)
         {
-            if (AppMain.pAu.auply[(int)index] != null)
+            if (pAu.auply[(int)index] != null)
             {
-                AppMain.pAu.auply[(int)index].Destroy();
-                AppMain.pAu.auply[(int)index] = (AppMain.CriAuPlayer)null;
+                pAu.auply[(int)index].Destroy();
+                pAu.auply[(int)index] = null;
             }
         }
     }
@@ -52,16 +41,16 @@ public partial class AppMain
     {
         for (uint index = 0; index < 8U; ++index)
         {
-            if (AppMain.pAu.auply[(int)index] != null && AppMain.pAu.auply[(int)index].GetStatus() != 0)
-                AppMain.pAu.auply[(int)index].Update();
+            if (pAu.auply[(int)index] != null && pAu.auply[(int)index].GetStatus() != 0)
+                pAu.auply[(int)index].Update();
         }
     }
 
     private static void amCriAudioStrmPlay(uint Id, string CueName)
     {
-        AppMain.pAu.auply[(int)Id].Stop();
-        AppMain.pAu.auply[(int)Id].SetCue(CueName);
-        AppMain.pAu.auply[(int)Id].Play();
+        pAu.auply[(int)Id].Stop();
+        pAu.auply[(int)Id].SetCue(CueName);
+        pAu.auply[(int)Id].Play();
     }
 
 }

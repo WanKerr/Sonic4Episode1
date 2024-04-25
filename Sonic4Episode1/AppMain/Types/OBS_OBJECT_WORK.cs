@@ -1,55 +1,30 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
 
 public partial class AppMain
 {
-    public class OBS_OBJECT_WORK : AppMain.IClearable
+    public class OBS_OBJECT_WORK : IClearable
     {
         public readonly short[] view_out_ofst_plus = new short[4];
-        public AppMain.VecU16 dir = new AppMain.VecU16();
-        public AppMain.VecFx32 scale = new AppMain.VecFx32();
-        public AppMain.VecFx32 pos = new AppMain.VecFx32();
-        public AppMain.VecFx32 ofst = new AppMain.VecFx32();
-        public AppMain.VecFx32 prev_ofst = new AppMain.VecFx32();
-        public AppMain.VecFx32 parent_ofst = new AppMain.VecFx32();
-        public AppMain.VecFx32 lock_ofst = new AppMain.VecFx32();
-        public AppMain.VecFx32 prev_pos = new AppMain.VecFx32();
-        public AppMain.VecFx32 spd = new AppMain.VecFx32();
-        public AppMain.VecFx32 spd_add = new AppMain.VecFx32();
-        public AppMain.VecFx32 flow = new AppMain.VecFx32();
-        public AppMain.VecFx32 move = new AppMain.VecFx32();
+        public VecU16 dir = new VecU16();
+        public VecFx32 scale = new VecFx32();
+        public VecFx32 pos = new VecFx32();
+        public VecFx32 ofst = new VecFx32();
+        public VecFx32 prev_ofst = new VecFx32();
+        public VecFx32 parent_ofst = new VecFx32();
+        public VecFx32 lock_ofst = new VecFx32();
+        public VecFx32 prev_pos = new VecFx32();
+        public VecFx32 spd = new VecFx32();
+        public VecFx32 spd_add = new VecFx32();
+        public VecFx32 flow = new VecFx32();
+        public VecFx32 move = new VecFx32();
         public readonly short[] field_rect = new short[4];
-        public AppMain.VecFx32 temp_ofst = new AppMain.VecFx32();
-        public AppMain.VecFx32 prev_temp_ofst = new AppMain.VecFx32();
-        public AppMain.OBS_OBJECT_WORK prev;
-        public AppMain.OBS_OBJECT_WORK next;
-        public AppMain.OBS_OBJECT_WORK draw_prev;
-        public AppMain.OBS_OBJECT_WORK draw_next;
-        public AppMain.MTS_TASK_TCB tcb;
+        public VecFx32 temp_ofst = new VecFx32();
+        public VecFx32 prev_temp_ofst = new VecFx32();
+        public OBS_OBJECT_WORK prev;
+        public OBS_OBJECT_WORK next;
+        public OBS_OBJECT_WORK draw_prev;
+        public OBS_OBJECT_WORK draw_next;
+        public MTS_TASK_TCB tcb;
         public int pause_level;
         public ushort obj_type;
         public int vib_timer;
@@ -90,31 +65,31 @@ public partial class AppMain
         public sbyte field_ajst_h_dt_l;
         public sbyte field_ajst_h_dr_r;
         public sbyte field_ajst_h_dr_l;
-        public AppMain.MPP_VOID_OBS_OBJECT_WORK ppFunc;
-        public AppMain.MPP_VOID_OBS_OBJECT_WORK ppIn;
-        public AppMain.MPP_VOID_OBS_OBJECT_WORK ppOut;
-        public AppMain.MPP_VOID_OBS_OBJECT_WORK ppOutSub;
-        public AppMain.MPP_VOID_OBS_OBJECT_WORK ppMove;
-        public AppMain.OBS_OBJECT_WORK_Delegate2 ppActCall;
-        public AppMain.MPP_VOID_OBS_OBJECT_WORK ppRec;
-        public AppMain.MPP_VOID_OBS_OBJECT_WORK ppLast;
-        public AppMain.MPP_VOID_OBS_OBJECT_WORK ppCol;
-        public AppMain.OBS_OBJECT_WORK_Delegate3 ppViewCheck;
-        public AppMain.OBS_OBJECT_WORK_Delegate4 ppUserRelease;
-        public AppMain.OBS_OBJECT_WORK_Delegate4 ppUserReleaseWait;
-        public AppMain.OBS_OBJECT_WORK ride_obj;
-        public AppMain.OBS_OBJECT_WORK touch_obj;
-        public AppMain.OBS_OBJECT_WORK parent_obj;
-        public AppMain.OBS_OBJECT_WORK lock_obj;
-        public AppMain.OBS_OBJECT_WORK locker_obj;
+        public MPP_VOID_OBS_OBJECT_WORK ppFunc;
+        public MPP_VOID_OBS_OBJECT_WORK ppIn;
+        public MPP_VOID_OBS_OBJECT_WORK ppOut;
+        public MPP_VOID_OBS_OBJECT_WORK ppOutSub;
+        public MPP_VOID_OBS_OBJECT_WORK ppMove;
+        public OBS_OBJECT_WORK_Delegate2 ppActCall;
+        public MPP_VOID_OBS_OBJECT_WORK ppRec;
+        public MPP_VOID_OBS_OBJECT_WORK ppLast;
+        public MPP_VOID_OBS_OBJECT_WORK ppCol;
+        public OBS_OBJECT_WORK_Delegate3 ppViewCheck;
+        public OBS_OBJECT_WORK_Delegate4 ppUserRelease;
+        public OBS_OBJECT_WORK_Delegate4 ppUserReleaseWait;
+        public OBS_OBJECT_WORK ride_obj;
+        public OBS_OBJECT_WORK touch_obj;
+        public OBS_OBJECT_WORK parent_obj;
+        public OBS_OBJECT_WORK lock_obj;
+        public OBS_OBJECT_WORK locker_obj;
         public object ex_work;
-        public AppMain.OBS_ACTION3D_NN_WORK obj_3d;
-        public AppMain.OBS_ACTION3D_ES_WORK obj_3des;
-        public AppMain.OBS_ACTION2D_AMA_WORK obj_2d;
-        public AppMain.OBS_COLLISION_WORK col_work;
-        public AppMain.OBS_TBL_WORK tbl_work;
+        public OBS_ACTION3D_NN_WORK obj_3d;
+        public OBS_ACTION3D_ES_WORK obj_3des;
+        public OBS_ACTION2D_AMA_WORK obj_2d;
+        public OBS_COLLISION_WORK col_work;
+        public OBS_TBL_WORK tbl_work;
         public uint rect_num;
-        public AppMain.ArrayPointer<AppMain.OBS_RECT_WORK> rect_work;
+        public ArrayPointer<OBS_RECT_WORK> rect_work;
         public object holder;
         public object m_primaryHolder;
 
@@ -123,7 +98,7 @@ public partial class AppMain
         }
 
         private OBS_OBJECT_WORK(object _holder)
-          : this(_holder, (object)null)
+          : this(_holder, null)
         {
         }
 
@@ -133,571 +108,571 @@ public partial class AppMain
             this.m_primaryHolder = _primaryHolder;
         }
 
-        public static AppMain.OBS_OBJECT_WORK Create()
+        public static OBS_OBJECT_WORK Create()
         {
-            return new AppMain.OBS_OBJECT_WORK();
+            return new OBS_OBJECT_WORK();
         }
 
-        public static AppMain.OBS_OBJECT_WORK Create(object _holder)
+        public static OBS_OBJECT_WORK Create(object _holder)
         {
-            AppMain.OBS_OBJECT_WORK obsObjectWork = AppMain.OBS_OBJECT_WORK.Create();
+            OBS_OBJECT_WORK obsObjectWork = Create();
             obsObjectWork.holder = _holder;
-            obsObjectWork.m_primaryHolder = (object)null;
+            obsObjectWork.m_primaryHolder = null;
             return obsObjectWork;
         }
 
-        public static AppMain.OBS_OBJECT_WORK Create(object _holder, object _primaryHolder)
+        public static OBS_OBJECT_WORK Create(object _holder, object _primaryHolder)
         {
-            AppMain.OBS_OBJECT_WORK obsObjectWork = AppMain.OBS_OBJECT_WORK.Create();
+            OBS_OBJECT_WORK obsObjectWork = Create();
             obsObjectWork.holder = _holder;
             obsObjectWork.m_primaryHolder = _primaryHolder;
             return obsObjectWork;
         }
 
-        public static explicit operator AppMain.GMS_GMK_WATER_SLIDER_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_WATER_SLIDER_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_WATER_SLIDER_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_WATER_SLIDER_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_UPBUMPER_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_UPBUMPER_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_UPBUMPER_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_UPBUMPER_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_STEAMP_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_STEAMP_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_STEAMP_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_STEAMP_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_PWALL_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_PWALL_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_PWALL_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_PWALL_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_SEESAWPARTS_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_SEESAWPARTS_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_SEESAWPARTS_WORK)(AppMain.GMS_EFFECT_3DNN_WORK)p;
+            return (GMS_GMK_SEESAWPARTS_WORK)(GMS_EFFECT_3DNN_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_PRESSWALL_PARTS(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_PRESSWALL_PARTS(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_PRESSWALL_PARTS)(AppMain.GMS_EFFECT_3DNN_WORK)p;
+            return (GMS_GMK_PRESSWALL_PARTS)(GMS_EFFECT_3DNN_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_PWALLCTRL_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_PWALLCTRL_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_PWALLCTRL_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_PWALLCTRL_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_SEESAW_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_SEESAW_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_SEESAW_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_SEESAW_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_SHUTTER_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_SHUTTER_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_SHUTTER_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_SHUTTER_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_P_STEAM_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_P_STEAM_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_P_STEAM_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_P_STEAM_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_PISTONROD_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_PISTONROD_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_PISTONROD_WORK)(AppMain.GMS_EFFECT_3DNN_WORK)p;
+            return (GMS_GMK_PISTONROD_WORK)(GMS_EFFECT_3DNN_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_PISTON_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_PISTON_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_PISTON_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_PISTON_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_DRAIN_TANK_OUT_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_DRAIN_TANK_OUT_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_DRAIN_TANK_OUT_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_DRAIN_TANK_OUT_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_BOSS3_PILLAR_WALL_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_BOSS3_PILLAR_WALL_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_BOSS3_PILLAR_WALL_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_BOSS3_PILLAR_WALL_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_LAND_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS5_LAND_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS5_LAND_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS5_LAND_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_CTPLT_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS5_CTPLT_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS5_CTPLT_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS5_CTPLT_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_ROCKET_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS5_ROCKET_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS5_ROCKET_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS5_ROCKET_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_MGR_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS5_MGR_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS5_MGR_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS5_MGR_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_BODY_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS5_BODY_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS5_BODY_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS5_BODY_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS4_BODY_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS4_BODY_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS4_BODY_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS4_BODY_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS4_CAP_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS4_CAP_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS4_CAP_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS4_CAP_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS4_CHIBI_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS4_CHIBI_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS4_CHIBI_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS4_CHIBI_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS4_EGG_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS4_EGG_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS4_EGG_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS4_EGG_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS4_MGR_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS4_MGR_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS4_MGR_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS4_MGR_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_TRUCK_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_TRUCK_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_TRUCK_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_TRUCK_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS2_BALL_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS2_BALL_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS2_BALL_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS2_BALL_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS2_EGG_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS2_EGG_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS2_EGG_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS2_EGG_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS2_BODY_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS2_BODY_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS2_BODY_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS2_BODY_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS2_MGR_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS2_MGR_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS2_MGR_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS2_MGR_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS3_EGG_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS3_EGG_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS3_EGG_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS3_EGG_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS3_BODY_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS3_BODY_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS3_BODY_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS3_BODY_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS3_MGR_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS3_MGR_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS3_MGR_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS3_MGR_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_ENE_UNIDES_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_UNIDES_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_UNIDES_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_ENE_UNIDES_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_ENE_UNIUNI_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_UNIUNI_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_UNIUNI_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_ENE_UNIUNI_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_ENE_BUKU_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_BUKU_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_BUKU_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_ENE_BUKU_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_ENE_T_STAR_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_T_STAR_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_T_STAR_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_ENE_T_STAR_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_ENE_KANI_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_KANI_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_KANI_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_ENE_KANI_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_ENE_KAMA_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_KAMA_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_KAMA_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_ENE_KAMA_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_ENE_MOGU_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_MOGU_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_MOGU_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_ENE_MOGU_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_PLAYER_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_PLAYER_WORK(OBS_OBJECT_WORK p)
         {
-            return p == null ? (AppMain.GMS_PLAYER_WORK)null : (AppMain.GMS_PLAYER_WORK)p.holder;
+            return p == null ? null : (GMS_PLAYER_WORK)p.holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_SPCTPLT_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_SPCTPLT_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_SPCTPLT_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_SPCTPLT_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_SLOT_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_SLOT_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_SLOT_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_SLOT_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_CANNONPARTS_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_CANNONPARTS_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_CANNONPARTS_WORK)(AppMain.GMS_EFFECT_3DNN_WORK)p;
+            return (GMS_GMK_CANNONPARTS_WORK)(GMS_EFFECT_3DNN_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_LDPART_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS5_LDPART_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS5_LDPART_WORK)(AppMain.GMS_EFFECT_3DNN_WORK)p;
+            return (GMS_BOSS5_LDPART_WORK)(GMS_EFFECT_3DNN_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_SLOTPARTS_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_SLOTPARTS_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_SLOTPARTS_WORK)(AppMain.GMS_EFFECT_3DNN_WORK)p;
+            return (GMS_GMK_SLOTPARTS_WORK)(GMS_EFFECT_3DNN_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS1_EFF_SHOCKWAVE_SUB_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS1_EFF_SHOCKWAVE_SUB_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS1_EFF_SHOCKWAVE_SUB_WORK)(AppMain.GMS_EFFECT_3DES_WORK)p;
+            return (GMS_BOSS1_EFF_SHOCKWAVE_SUB_WORK)(GMS_EFFECT_3DES_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_EFCT_GENERAL_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS5_EFCT_GENERAL_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS5_EFCT_GENERAL_WORK)(AppMain.GMS_EFFECT_3DES_WORK)p;
+            return (GMS_BOSS5_EFCT_GENERAL_WORK)(GMS_EFFECT_3DES_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS4_EFF_COMMON_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS4_EFF_COMMON_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS4_EFF_COMMON_WORK)(AppMain.GMS_EFFECT_3DES_WORK)p;
+            return (GMS_BOSS4_EFF_COMMON_WORK)(GMS_EFFECT_3DES_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS1_EFF_SHOCKWAVE_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS1_EFF_SHOCKWAVE_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS1_EFF_SHOCKWAVE_WORK)(AppMain.GMS_EFFECT_3DES_WORK)p;
+            return (GMS_BOSS1_EFF_SHOCKWAVE_WORK)(GMS_EFFECT_3DES_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_POPSTEAMPARTS_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_POPSTEAMPARTS_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_POPSTEAMPARTS_WORK)(AppMain.GMS_EFFECT_COM_WORK)p;
+            return (GMS_GMK_POPSTEAMPARTS_WORK)(GMS_EFFECT_COM_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS1_FLASH_SCREEN_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS1_FLASH_SCREEN_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS1_FLASH_SCREEN_WORK)(AppMain.GMS_EFFECT_COM_WORK)p;
+            return (GMS_BOSS1_FLASH_SCREEN_WORK)(GMS_EFFECT_COM_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BS_CMN_NODE_CTRL_OBJECT(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BS_CMN_NODE_CTRL_OBJECT(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BS_CMN_NODE_CTRL_OBJECT)(AppMain.GMS_EFFECT_COM_WORK)p;
+            return (GMS_BS_CMN_NODE_CTRL_OBJECT)(GMS_EFFECT_COM_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_ENE_HARO_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_HARO_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_HARO_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_ENE_HARO_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_STOPPER_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_STOPPER_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_STOPPER_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_STOPPER_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS1_CHAIN_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS1_CHAIN_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS1_CHAIN_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS1_CHAIN_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_ENE_GARDON_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_GARDON_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_GARDON_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_ENE_GARDON_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_BUMPER_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_BUMPER_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_BUMPER_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_BUMPER_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS1_EGG_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS1_EGG_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS1_EGG_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS1_EGG_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS1_MGR_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS1_MGR_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS1_MGR_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS1_MGR_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS1_BODY_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS1_BODY_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS1_BODY_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_BOSS1_BODY_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_BOSS3_PILLAR_MANAGER_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_BOSS3_PILLAR_MANAGER_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_BOSS3_PILLAR_MANAGER_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_BOSS3_PILLAR_MANAGER_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_BLAND_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_BLAND_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_BLAND_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_BLAND_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_BWALL_PARTS(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_BWALL_PARTS(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_BWALL_PARTS)(AppMain.GMS_EFFECT_3DNN_WORK)p;
+            return (GMS_GMK_BWALL_PARTS)(GMS_EFFECT_3DNN_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_BWALL_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_BWALL_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_BWALL_WORK)((AppMain.GMS_ENEMY_3D_WORK)p.m_primaryHolder).holder;
+            return (GMS_GMK_BWALL_WORK)((GMS_ENEMY_3D_WORK)p.m_primaryHolder).holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_SW_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_SW_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_SW_WORK)((AppMain.GMS_ENEMY_3D_WORK)p.m_primaryHolder).holder;
+            return (GMS_GMK_SW_WORK)((GMS_ENEMY_3D_WORK)p.m_primaryHolder).holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_PMARKER_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_PMARKER_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_PMARKER_WORK)(AppMain.GMS_ENEMY_3D_WORK)p.m_primaryHolder;
+            return (GMS_GMK_PMARKER_WORK)(GMS_ENEMY_3D_WORK)p.m_primaryHolder;
         }
 
-        public static explicit operator AppMain.GMS_EFFECT_3DNN_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_EFFECT_3DNN_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_EFFECT_3DNN_WORK)((AppMain.GMS_EFFECT_COM_WORK)p.holder).holder;
+            return (GMS_EFFECT_3DNN_WORK)((GMS_EFFECT_COM_WORK)p.holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_CAM_SCR_LIMIT_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_CAM_SCR_LIMIT_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_CAM_SCR_LIMIT_WORK)p.m_primaryHolder;
+            return (GMS_GMK_CAM_SCR_LIMIT_WORK)p.m_primaryHolder;
         }
 
-        public static explicit operator AppMain.GMS_ENE_STING_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_STING_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_STING_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_ENE_STING_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_EGG_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS5_EGG_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS5_EGG_WORK)(AppMain.GMS_ENEMY_3D_WORK)p.m_primaryHolder;
+            return (GMS_BOSS5_EGG_WORK)(GMS_ENEMY_3D_WORK)p.m_primaryHolder;
         }
 
-        public static explicit operator AppMain.GMS_ENEMY_3D_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENEMY_3D_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENEMY_3D_WORK)(AppMain.GMS_ENEMY_COM_WORK)p;
+            return (GMS_ENEMY_3D_WORK)(GMS_ENEMY_COM_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_DECO_SUBMODEL_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_DECO_SUBMODEL_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_DECO_SUBMODEL_WORK)(AppMain.GMS_DECO_WORK)p.holder;
+            return (GMS_DECO_SUBMODEL_WORK)(GMS_DECO_WORK)p.holder;
         }
 
-        public static explicit operator AppMain.GMS_DECO_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_DECO_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_DECO_WORK)p.holder;
+            return (GMS_DECO_WORK)p.holder;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_CORE_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS5_CORE_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS5_CORE_WORK)(AppMain.GMS_ENEMY_COM_WORK)p;
+            return (GMS_BOSS5_CORE_WORK)(GMS_ENEMY_COM_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_ENEMY_COM_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENEMY_COM_WORK(OBS_OBJECT_WORK p)
         {
-            return p == null ? (AppMain.GMS_ENEMY_COM_WORK)null : (AppMain.GMS_ENEMY_COM_WORK)p.holder;
+            return p == null ? null : (GMS_ENEMY_COM_WORK)p.holder;
         }
 
-        public static explicit operator AppMain.GMS_SCORE_DISP_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_SCORE_DISP_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_SCORE_DISP_WORK)p.holder;
+            return (GMS_SCORE_DISP_WORK)p.holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_CANNON_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_CANNON_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_CANNON_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_CANNON_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_BOSS3_PILLAR_MAIN_WORK(
-          AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_BOSS3_PILLAR_MAIN_WORK(
+          OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_BOSS3_PILLAR_MAIN_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_BOSS3_PILLAR_MAIN_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_TURRET_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_BOSS5_TURRET_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_BOSS5_TURRET_WORK)((AppMain.GMS_ENEMY_3D_WORK)((AppMain.GMS_ENEMY_COM_WORK)p.holder).holder).holder;
+            return (GMS_BOSS5_TURRET_WORK)((GMS_ENEMY_3D_WORK)((GMS_ENEMY_COM_WORK)p.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_ENE_HARI_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_HARI_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_HARI_WORK)((AppMain.GMS_ENEMY_3D_WORK)((AppMain.GMS_ENEMY_COM_WORK)p.holder).holder).holder;
+            return (GMS_ENE_HARI_WORK)((GMS_ENEMY_3D_WORK)((GMS_ENEMY_COM_WORK)p.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_PULLEY_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_PULLEY_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_PULLEY_WORK)((AppMain.GMS_ENEMY_3D_WORK)((AppMain.GMS_ENEMY_COM_WORK)p.holder).holder).holder;
+            return (GMS_GMK_PULLEY_WORK)((GMS_ENEMY_3D_WORK)((GMS_ENEMY_COM_WORK)p.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_ENE_MOTORA_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_ENE_MOTORA_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_ENE_MOTORA_WORK)((AppMain.GMS_ENEMY_3D_WORK)((AppMain.GMS_ENEMY_COM_WORK)p.holder).holder).holder;
+            return (GMS_ENE_MOTORA_WORK)((GMS_ENEMY_3D_WORK)((GMS_ENEMY_COM_WORK)p.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_BOBJ_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_BOBJ_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_BOBJ_WORK)((AppMain.GMS_ENEMY_3D_WORK)((AppMain.GMS_ENEMY_COM_WORK)p.holder).holder).holder;
+            return (GMS_GMK_BOBJ_WORK)((GMS_ENEMY_3D_WORK)((GMS_ENEMY_COM_WORK)p.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_BOBJ_PARTS(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_BOBJ_PARTS(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_BOBJ_PARTS)((AppMain.GMS_EFFECT_3DNN_WORK)((AppMain.GMS_EFFECT_COM_WORK)p.holder).holder).holder;
+            return (GMS_GMK_BOBJ_PARTS)((GMS_EFFECT_3DNN_WORK)((GMS_EFFECT_COM_WORK)p.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_EFFECT_3DES_WORK(AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_EFFECT_3DES_WORK(OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_EFFECT_3DES_WORK)(AppMain.GMS_EFFECT_COM_WORK)work.holder;
+            return (GMS_EFFECT_3DES_WORK)(GMS_EFFECT_COM_WORK)work.holder;
         }
 
-        public static explicit operator AppMain.DMS_STFRL_BOSS_BODY_WORK(
-          AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator DMS_STFRL_BOSS_BODY_WORK(
+          OBS_OBJECT_WORK work)
         {
-            return (AppMain.DMS_STFRL_BOSS_BODY_WORK)work.holder;
+            return (DMS_STFRL_BOSS_BODY_WORK)work.holder;
         }
 
-        public static explicit operator AppMain.DMS_STFRL_BOSS_EGG_WORK(
-          AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator DMS_STFRL_BOSS_EGG_WORK(
+          OBS_OBJECT_WORK work)
         {
-            return (AppMain.DMS_STFRL_BOSS_EGG_WORK)work.holder;
+            return (DMS_STFRL_BOSS_EGG_WORK)work.holder;
         }
 
-        public static explicit operator AppMain.DMS_STFRL_RING_WORK(AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator DMS_STFRL_RING_WORK(OBS_OBJECT_WORK work)
         {
-            return (AppMain.DMS_STFRL_RING_WORK)work.holder;
+            return (DMS_STFRL_RING_WORK)work.holder;
         }
 
-        public static explicit operator AppMain.DMS_STFRL_SONIC_WORK(AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator DMS_STFRL_SONIC_WORK(OBS_OBJECT_WORK work)
         {
-            return (AppMain.DMS_STFRL_SONIC_WORK)work.holder;
+            return (DMS_STFRL_SONIC_WORK)work.holder;
         }
 
-        public static explicit operator AppMain.GMS_FADE_OBJ_WORK(AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_FADE_OBJ_WORK(OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_FADE_OBJ_WORK)work.holder;
+            return (GMS_FADE_OBJ_WORK)work.holder;
         }
 
-        public static explicit operator AppMain.GMS_SMSG_2D_OBJ_WORK(AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_SMSG_2D_OBJ_WORK(OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_SMSG_2D_OBJ_WORK)work.holder;
+            return (GMS_SMSG_2D_OBJ_WORK)work.holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_GEAR_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_GEAR_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_GEAR_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_GEAR_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_BELTC_WORK(AppMain.OBS_OBJECT_WORK p)
+        public static explicit operator GMS_GMK_BELTC_WORK(OBS_OBJECT_WORK p)
         {
-            return (AppMain.GMS_GMK_BELTC_WORK)(AppMain.GMS_ENEMY_3D_WORK)p;
+            return (GMS_GMK_BELTC_WORK)(GMS_ENEMY_3D_WORK)p;
         }
 
-        public static explicit operator AppMain.GMS_GMK_ROCK_FALL_WORK(
-          AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_GMK_ROCK_FALL_WORK(
+          OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_GMK_ROCK_FALL_WORK)((AppMain.GMS_ENEMY_3D_WORK)((AppMain.GMS_ENEMY_COM_WORK)work.holder).holder).holder;
+            return (GMS_GMK_ROCK_FALL_WORK)((GMS_ENEMY_3D_WORK)((GMS_ENEMY_COM_WORK)work.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_ROCK_FALL_MGR_WORK(
-          AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_GMK_ROCK_FALL_MGR_WORK(
+          OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_GMK_ROCK_FALL_MGR_WORK)((AppMain.GMS_ENEMY_3D_WORK)((AppMain.GMS_ENEMY_COM_WORK)work.holder).holder).holder;
+            return (GMS_GMK_ROCK_FALL_MGR_WORK)((GMS_ENEMY_3D_WORK)((GMS_ENEMY_COM_WORK)work.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_ALARM_FADE_WORK(
-          AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_BOSS5_ALARM_FADE_WORK(
+          OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_BOSS5_ALARM_FADE_WORK)(AppMain.GMS_FADE_OBJ_WORK)work.holder;
+            return (GMS_BOSS5_ALARM_FADE_WORK)(GMS_FADE_OBJ_WORK)work.holder;
         }
 
-        public static explicit operator AppMain.GMS_BOSS5_FLASH_SCREEN_WORK(
-          AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_BOSS5_FLASH_SCREEN_WORK(
+          OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_BOSS5_FLASH_SCREEN_WORK)(AppMain.GMS_EFFECT_COM_WORK)work.holder;
+            return (GMS_BOSS5_FLASH_SCREEN_WORK)(GMS_EFFECT_COM_WORK)work.holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_ROCK_CHASE_WORK(
-          AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_GMK_ROCK_CHASE_WORK(
+          OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_GMK_ROCK_CHASE_WORK)((AppMain.GMS_ENEMY_3D_WORK)((AppMain.GMS_ENEMY_COM_WORK)work.holder).holder).holder;
+            return (GMS_GMK_ROCK_CHASE_WORK)((GMS_ENEMY_3D_WORK)((GMS_ENEMY_COM_WORK)work.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_SPEARPARTS_WORK(
-          AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_GMK_SPEARPARTS_WORK(
+          OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_GMK_SPEARPARTS_WORK)((AppMain.GMS_EFFECT_3DNN_WORK)((AppMain.GMS_EFFECT_COM_WORK)work.holder).holder).holder;
+            return (GMS_GMK_SPEARPARTS_WORK)((GMS_EFFECT_3DNN_WORK)((GMS_EFFECT_COM_WORK)work.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_SPEAR_WORK(AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_GMK_SPEAR_WORK(OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_GMK_SPEAR_WORK)((AppMain.GMS_ENEMY_3D_WORK)((AppMain.GMS_ENEMY_COM_WORK)work.holder).holder).holder;
+            return (GMS_GMK_SPEAR_WORK)((GMS_ENEMY_3D_WORK)((GMS_ENEMY_COM_WORK)work.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_ROCK_WORK(AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_GMK_ROCK_WORK(OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_GMK_ROCK_WORK)((AppMain.GMS_ENEMY_3D_WORK)((AppMain.GMS_ENEMY_COM_WORK)work.holder).holder).holder;
+            return (GMS_GMK_ROCK_WORK)((GMS_ENEMY_3D_WORK)((GMS_ENEMY_COM_WORK)work.holder).holder).holder;
         }
 
-        public static explicit operator AppMain.GMS_GMK_SWWALL_WORK(AppMain.OBS_OBJECT_WORK work)
+        public static explicit operator GMS_GMK_SWWALL_WORK(OBS_OBJECT_WORK work)
         {
-            return (AppMain.GMS_GMK_SWWALL_WORK)((AppMain.GMS_ENEMY_3D_WORK)((AppMain.GMS_ENEMY_COM_WORK)work.holder).holder).holder;
+            return (GMS_GMK_SWWALL_WORK)((GMS_ENEMY_3D_WORK)((GMS_ENEMY_COM_WORK)work.holder).holder).holder;
         }
 
         public void Clear()
         {
-            this.prev = this.next = this.draw_prev = this.draw_next = (AppMain.OBS_OBJECT_WORK)null;
-            this.tcb = (AppMain.MTS_TASK_TCB)null;
+            this.prev = this.next = this.draw_prev = this.draw_next = null;
+            this.tcb = null;
             this.pause_level = 0;
-            this.obj_type = (ushort)0;
+            this.obj_type = 0;
             this.vib_timer = this.hitstop_timer = this.invincible_timer = 0;
-            this.view_out_ofst = (short)0;
-            Array.Clear((Array)this.view_out_ofst_plus, 0, this.view_out_ofst_plus.Length);
-            this.user_work_OBJECT = (object)null;
-            this.user_flag_OBJECT = (object)null;
+            this.view_out_ofst = 0;
+            Array.Clear(view_out_ofst_plus, 0, this.view_out_ofst_plus.Length);
+            this.user_work_OBJECT = null;
+            this.user_flag_OBJECT = null;
             this.flag = 0U;
             this.move_flag = 0U;
             this.disp_flag = 0U;
@@ -710,89 +685,65 @@ public partial class AppMain
             this.ofst.Clear();
             this.prev_ofst.Clear();
             this.parent_ofst.Clear();
-            this.lock_obj = (AppMain.OBS_OBJECT_WORK)null;
+            this.lock_obj = null;
             this.prev_pos.Clear();
             this.spd.Clear();
             this.spd_add.Clear();
             this.flow.Clear();
             this.move.Clear();
             this.spd_m = 0;
-            this.dir_slope = this.dir_fall = (ushort)0;
+            this.dir_slope = this.dir_fall = 0;
             this.spd_slope = this.spd_slope_max = this.spd_fall = this.spd_fall_max = this.push_max = 0;
             this.col_flag = this.col_flag_prev = 0U;
-            Array.Clear((Array)this.field_rect, 0, this.field_rect.Length);
-            this.field_ajst_w_db_f = this.field_ajst_w_db_b = this.field_ajst_w_dl_f = this.field_ajst_w_dl_b = (sbyte)0;
-            this.field_ajst_w_dt_f = this.field_ajst_w_dt_b = this.field_ajst_w_dr_f = this.field_ajst_w_dr_b = (sbyte)0;
-            this.field_ajst_h_db_r = this.field_ajst_h_db_l = this.field_ajst_h_dl_r = this.field_ajst_h_dl_l = (sbyte)0;
-            this.field_ajst_h_dt_r = this.field_ajst_h_dt_l = this.field_ajst_h_dr_r = this.field_ajst_h_dr_l = (sbyte)0;
-            this.ppFunc = this.ppIn = this.ppOut = this.ppOutSub = this.ppMove = (AppMain.MPP_VOID_OBS_OBJECT_WORK)null;
-            this.ppActCall = (AppMain.OBS_OBJECT_WORK_Delegate2)null;
-            this.ppRec = this.ppLast = this.ppCol = (AppMain.MPP_VOID_OBS_OBJECT_WORK)null;
-            this.ppViewCheck = (AppMain.OBS_OBJECT_WORK_Delegate3)null;
+            Array.Clear(field_rect, 0, this.field_rect.Length);
+            this.field_ajst_w_db_f = this.field_ajst_w_db_b = this.field_ajst_w_dl_f = this.field_ajst_w_dl_b = 0;
+            this.field_ajst_w_dt_f = this.field_ajst_w_dt_b = this.field_ajst_w_dr_f = this.field_ajst_w_dr_b = 0;
+            this.field_ajst_h_db_r = this.field_ajst_h_db_l = this.field_ajst_h_dl_r = this.field_ajst_h_dl_l = 0;
+            this.field_ajst_h_dt_r = this.field_ajst_h_dt_l = this.field_ajst_h_dr_r = this.field_ajst_h_dr_l = 0;
+            this.ppFunc = this.ppIn = this.ppOut = this.ppOutSub = this.ppMove = null;
+            this.ppActCall = null;
+            this.ppRec = this.ppLast = this.ppCol = null;
+            this.ppViewCheck = null;
             this.ppUserRelease = this.ppUserReleaseWait;
-            this.ride_obj = this.touch_obj = this.lock_obj = this.locker_obj = (AppMain.OBS_OBJECT_WORK)null;
-            this.parent_obj = (AppMain.OBS_OBJECT_WORK)null;
-            this.ex_work = (object)null;
-            this.obj_3d = (AppMain.OBS_ACTION3D_NN_WORK)null;
-            this.obj_3des = (AppMain.OBS_ACTION3D_ES_WORK)null;
-            this.obj_2d = (AppMain.OBS_ACTION2D_AMA_WORK)null;
-            this.col_work = (AppMain.OBS_COLLISION_WORK)null;
-            this.tbl_work = (AppMain.OBS_TBL_WORK)null;
+            this.ride_obj = this.touch_obj = this.lock_obj = this.locker_obj = null;
+            this.parent_obj = null;
+            this.ex_work = null;
+            this.obj_3d = null;
+            this.obj_3des = null;
+            this.obj_2d = null;
+            this.col_work = null;
+            this.tbl_work = null;
             this.temp_ofst.Clear();
             this.prev_temp_ofst.Clear();
             this.rect_num = 0U;
-            this.rect_work = (AppMain.ArrayPointer<AppMain.OBS_RECT_WORK>)(AppMain.OBS_RECT_WORK[])null;
+            this.rect_work = null;
         }
 
         public uint user_flag
         {
-            get
-            {
-                return this.__user_flag != null ? Convert.ToUInt32(this.__user_flag is ValueType ? this.__user_flag : (object)1) : 0U;
-            }
-            set
-            {
-                this.__user_flag = (object)value;
-            }
+            get => this.__user_flag != null ? Convert.ToUInt32(this.__user_flag is ValueType ? this.__user_flag : 1) : 0U;
+            set => this.__user_flag = value;
         }
 
         public uint user_work
         {
-            get
-            {
-                return Convert.ToUInt32(this.__user_work);
-            }
-            set
-            {
-                this.__user_work = (object)value;
-            }
+            get => Convert.ToUInt32(this.__user_work);
+            set => this.__user_work = value;
         }
 
         public object user_flag_OBJECT
         {
-            get
-            {
-                return this.__user_flag;
-            }
-            set
-            {
-                this.__user_flag = value;
-            }
+            get => this.__user_flag;
+            set => this.__user_flag = value;
         }
 
         public object user_work_OBJECT
         {
-            get
-            {
-                return this.__user_work;
-            }
-            set
-            {
-                this.__user_work = value;
-            }
+            get => this.__user_work;
+            set => this.__user_work = value;
         }
 
-        public AppMain.OBS_OBJECT_WORK Assign(AppMain.OBS_OBJECT_WORK objectWork)
+        public OBS_OBJECT_WORK Assign(OBS_OBJECT_WORK objectWork)
         {
             if (this != objectWork)
             {

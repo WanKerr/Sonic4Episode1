@@ -1,45 +1,22 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using mpp;
-using setting;
 
 public partial class AppMain
 {
     public class GLVertexBuffer_ : OpenGL.GLVertexData
     {
         private OpenGL.GLVertexElementType[] elementTypes_;
-        private AppMain.NNS_VTXARRAY_GL posArray_;
-        private AppMain.NNS_VTXARRAY_GL normArray_;
-        private AppMain.NNS_VTXARRAY_GL colArray_;
-        private AppMain.NNS_VTXARRAY_GL texCoord0Array_;
-        private AppMain.NNS_VTXARRAY_GL texCoord1Array_;
-        private AppMain.NNS_VTXARRAY_GL blWeightArray_;
-        private AppMain.NNS_VTXARRAY_GL blIndexArray_;
-        private AppMain.NNS_VTXLIST_GL_DESC pVtxDesc_;
+        private NNS_VTXARRAY_GL posArray_;
+        private NNS_VTXARRAY_GL normArray_;
+        private NNS_VTXARRAY_GL colArray_;
+        private NNS_VTXARRAY_GL texCoord0Array_;
+        private NNS_VTXARRAY_GL texCoord1Array_;
+        private NNS_VTXARRAY_GL blWeightArray_;
+        private NNS_VTXARRAY_GL blIndexArray_;
+        private NNS_VTXLIST_GL_DESC pVtxDesc_;
 
-        public GLVertexBuffer_(AppMain.NNS_VTXLIST_GL_DESC pVtxDesc)
+        public GLVertexBuffer_(NNS_VTXLIST_GL_DESC pVtxDesc)
         {
             this.pVtxDesc_ = pVtxDesc;
             this.elementTypes_ = new OpenGL.GLVertexElementType[this.pVtxDesc_.nArray];
@@ -98,21 +75,9 @@ public partial class AppMain
             }
         }
 
-        public OpenGL.GLVertexElementType[] DataComponents
-        {
-            get
-            {
-                return this.elementTypes_;
-            }
-        }
+        public OpenGL.GLVertexElementType[] DataComponents => this.elementTypes_;
 
-        public int VertexCount
-        {
-            get
-            {
-                return this.pVtxDesc_.nVertex;
-            }
-        }
+        public int VertexCount => this.pVtxDesc_.nVertex;
 
         public void ExtractTo(OpenGL.Vertex[] dst, int count)
         {
@@ -144,7 +109,7 @@ public partial class AppMain
                     byte num2 = this.colArray_.Pointer[index1 + 1];
                     byte num3 = this.colArray_.Pointer[index1 + 2];
                     byte num4 = this.colArray_.Pointer[index1 + 3];
-                    dst[index3].Color = new Color((int)num1, (int)num2, (int)num3, (int)num4);
+                    dst[index3].Color = new Color(num1, num2, num3, (int)num4);
                     index1 += this.colArray_.Stride;
                 }
                 else
@@ -182,7 +147,7 @@ public partial class AppMain
                     byte num2 = this.blIndexArray_.Size > 1 ? this.blIndexArray_.Pointer[index2 + 1] : (byte)0;
                     byte num3 = this.blIndexArray_.Size > 2 ? this.blIndexArray_.Pointer[index2 + 2] : (byte)0;
                     byte num4 = this.blIndexArray_.Size > 3 ? this.blIndexArray_.Pointer[index2 + 3] : (byte)0;
-                    dst[index3].BlendIndices = new Byte4((float)num1, (float)num2, (float)num3, (float)num4);
+                    dst[index3].BlendIndices = new Byte4(num1, num2, num3, num4);
                     index2 += this.blIndexArray_.Stride;
                 }
                 else
@@ -192,7 +157,44 @@ public partial class AppMain
 
         public void ExtractTo(OpenGL.VertexPosTexColNorm[] dst, int dstOffset, int count)
         {
-            throw new NotImplementedException();
+            int getOffset1 = 0;
+            int getOffset2 = 0;
+            int index1 = 0;
+            int getOffset3 = 0;
+            for (int index3 = 0; index3 < count; ++index3)
+            {
+                float x1 = this.posArray_.Pointer.GetFloat(getOffset1);
+                float y1 = this.posArray_.Pointer.GetFloat(getOffset1 + 4);
+                float z1 = this.posArray_.Pointer.GetFloat(getOffset1 + 8);
+                dst[index3].Position = new Vector3(x1, y1, z1);
+                getOffset1 += this.posArray_.Stride;
+                if (this.normArray_ != null)
+                {
+                    float x2 = this.normArray_.Pointer.GetFloat(getOffset2);
+                    float y2 = this.normArray_.Pointer.GetFloat(getOffset2 + 4);
+                    float z2 = this.normArray_.Pointer.GetFloat(getOffset2 + 8);
+                    dst[index3].Normal = new Vector3(x2, y2, z2);
+                    getOffset2 += this.normArray_.Stride;
+                }
+                if (this.colArray_ != null)
+                {
+                    byte num1 = this.colArray_.Pointer[index1];
+                    byte num2 = this.colArray_.Pointer[index1 + 1];
+                    byte num3 = this.colArray_.Pointer[index1 + 2];
+                    byte num4 = this.colArray_.Pointer[index1 + 3];
+                    dst[index3].Color = new Color(num1, num2, num3, (int)num4);
+                    index1 += this.colArray_.Stride;
+                }
+                else
+                    dst[index3].Color = Color.White;
+                if (this.texCoord0Array_ != null)
+                {
+                    float x2 = this.texCoord0Array_.Pointer.GetFloat(getOffset3);
+                    float y2 = this.texCoord0Array_.Pointer.GetFloat(getOffset3 + 4);
+                    dst[index3].TextureCoordinate = new Vector2(x2, y2);
+                    getOffset3 += this.texCoord0Array_.Stride;
+                }
+            }
         }
     }
 }

@@ -4,70 +4,53 @@
 // MVID: 093CE2FC-33E2-4332-B0FE-1EA1E44D3AE7
 // Assembly location: C:\Users\wamwo\Documents\GitHub\Sonic4Ep1-WP7-Decompilation\XAP\Sonic4 ep I.dll
 
+using System;
+using System.Collections.Generic;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Sonic4ep1;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
 
 public class LiveFeature : XBOXLive
 {
-    private static readonly string[] zone_names = new string[6]
+    static Rectangle SCALE(Rectangle rect)
     {
-    Strings.ID_STAGE1,
-    Strings.ID_STAGE2,
-    Strings.ID_STAGE3,
-    Strings.ID_STAGE4,
-    Strings.ID_FINALZONE,
-    Strings.ID_SSTAGE
-    };
-    public static readonly string[] lang_suffix = new string[11]
-    {
-    "ja",
-    "us",
-    "fr",
-    "it",
-    "ge",
-    "es",
-    "fi",
-    "pt",
-    "ru",
-    "cn",
-    "hk"
-    };
+        return new Rectangle(rect.X * 2, rect.Y * 2, rect.Width * 2, rect.Height * 2);
+    }
+
+
+    private static readonly string[] zone_names =
+    [
+        Strings.ID_STAGE1,
+        Strings.ID_STAGE2,
+        Strings.ID_STAGE3,
+        Strings.ID_STAGE4,
+        Strings.ID_FINALZONE,
+        Strings.ID_SSTAGE
+    ];
+    public static readonly string[] lang_suffix =
+    [
+        "ja", "us", "fr", "it", "ge", "es", "fi", "pt", "ru",
+        "cn", "hk"
+    ];
     public static int interruptMainLoop = 0;
     public static readonly int[,] table_x = new int[4, 2]
     {
-    {
-      60,
-      70
-    },
-    {
-      145,
-      160
-    },
-    {
-      260,
-      275
-    },
-    {
-      385,
-      395
-    }
+        { 60, 70 }, { 145, 160 },
+        { 260, 275 }, { 385, 395 }
     };
+
     public static int arrow_offset = 0;
-    public static readonly Rectangle arrow1_Left = new Rectangle(165, 240, 40, 40);
-    public static readonly Rectangle arrow1_Right = new Rectangle(285, 240, 40, 40);
-    public static readonly Rectangle arrow2_Up = new Rectangle(430, 60, 35, 35);
-    public static readonly Rectangle arrow2_Down = new Rectangle(430, 180, 35, 35);
-    public static Rectangle num_src_rect = new Rectangle(0, 0, 16, 32);
-    public static Rectangle num_dst_rect = new Rectangle(0, 240, 16, 32);
+    public static readonly Rectangle arrow1_Left = SCALE(new Rectangle(165, 240, 40, 40));
+    public static readonly Rectangle arrow1_Right = SCALE(new Rectangle(285, 240, 40, 40));
+    public static readonly Rectangle arrow2_Up = SCALE(new Rectangle(430, 60, 35, 35));
+    public static readonly Rectangle arrow2_Down = SCALE(new Rectangle(430, 180, 35, 35));
+    public static Rectangle num_src_rect = SCALE(new Rectangle(0, 0, 16, 32));
+    public static Rectangle num_dst_rect = SCALE(new Rectangle(0, 240, 16, 32));
     public static readonly Color transparent_achiev = new Color(128, 128, 128, 128);
-    private LiveFeature.HISCORE_ENTRY[][] hiScoresTables = new LiveFeature.HISCORE_ENTRY[48][];
-    private LiveFeature.LBStatus[] l_status = new LiveFeature.LBStatus[48];
+    private HISCORE_ENTRY[][] hiScoresTables = new HISCORE_ENTRY[48][];
+    private LBStatus[] l_status = new LBStatus[48];
     public int startedRead = -1;
     private const int screenw = 480;
     private const int screenh = 288;
@@ -117,18 +100,18 @@ public class LiveFeature : XBOXLive
     private static Texture2D arrowImg2;
     private static Texture2D titleImg;
     private static Texture2D nums;
-    private static LiveFeature.AchievementText[] achievementTextArray;
+    private static AchievementText[] achievementTextArray;
 
     public LiveFeature()
     {
         try
         {
-            XBOXLive.signinStatus = XBOXLive.SigninStatus.SigningIn;
-            XBOXLive.isTrial(true);
+            signinStatus = SigninStatus.SigningIn;
+            isTrial(true);
             for (int index = 0; index < 48; ++index)
             {
-                this.hiScoresTables[index] = new LiveFeature.HISCORE_ENTRY[0];
-                this.l_status[index] = LiveFeature.LBStatus.NotRead;
+                this.hiScoresTables[index] = new HISCORE_ENTRY[0];
+                this.l_status[index] = LBStatus.NotRead;
             }
         }
         //catch (GameUpdateRequiredException ex)
@@ -137,14 +120,14 @@ public class LiveFeature : XBOXLive
         //}
         catch (Exception ex)
         {
-            XBOXLive.signinStatus = XBOXLive.SigninStatus.Error;
+            signinStatus = SigninStatus.Error;
         }
-        LiveFeature.instance = this;
-        XBOXLive.instanceXBOX = (XBOXLive)this;
+        instance = this;
+        instanceXBOX = this;
     }
-    
 
-    public LiveFeature.LBStatus getLeaderBoardStatus(int mode)
+
+    public LBStatus getLeaderBoardStatus(int mode)
     {
         return this.l_status[mode];
     }
@@ -161,11 +144,11 @@ public class LiveFeature : XBOXLive
 
     public static LiveFeature getInstance()
     {
-        if (LiveFeature.instance == null)
-            LiveFeature.instance = new LiveFeature();
-        return LiveFeature.instance;
+        if (instance == null)
+            instance = new LiveFeature();
+        return instance;
     }
-    
+
     public bool GotAchievment(string achievementKey)
     {
         return true;
@@ -175,8 +158,8 @@ public class LiveFeature : XBOXLive
     {
         for (int index = 0; index < 48; ++index)
         {
-            this.l_status[index] = LiveFeature.LBStatus.NotRead;
-            this.hiScoresTables[index] = (LiveFeature.HISCORE_ENTRY[])null;
+            this.l_status[index] = LBStatus.NotRead;
+            this.hiScoresTables[index] = null;
         }
     }
 
@@ -194,58 +177,58 @@ public class LiveFeature : XBOXLive
 
     internal void ShowAchievements()
     {
-        LiveFeature.interruptMainLoop = 1;
+        interruptMainLoop = 1;
         this.offsetY = 0;
         int length = AppMain.achievements.Length;
-        LiveFeature.achievements_total = 0;
-        LiveFeature.achievements_current = 0;
-        if (LiveFeature.a_images == null)
-            LiveFeature.a_images = new Texture2D[AppMain.achievements.Length];
-        LiveFeature.achievementTextArray = new LiveFeature.AchievementText[length];
+        achievements_total = 0;
+        achievements_current = 0;
+        if (a_images == null)
+            a_images = new Texture2D[AppMain.achievements.Length];
+        achievementTextArray = new AchievementText[length];
         for (int index = 0; index < length; ++index)
         {
-            LiveFeature.achievements_total += AppMain.achievements[index].cost;
+            achievements_total += AppMain.achievements[index].cost;
             if (AppMain.gs_trophy_acquisition_tbl[index] == 2)
-                LiveFeature.achievements_current += AppMain.achievements[index].cost;
-            LiveFeature.a_images[index] = Texture2D.FromStream(LiveFeature.GAME.GraphicsDevice, TitleContainer.OpenStream("Content\\LIVE\\live_a" + (object)(index + 1) + ".png"));
-            LiveFeature.achievementTextArray[index].verticalSize = -1;
+                achievements_current += AppMain.achievements[index].cost;
+            a_images[index] = GAME.Content.Load<Texture2D>("LIVE\\live_a" + (index + 1));
+            achievementTextArray[index].verticalSize = -1;
         }
-        if (LiveFeature.a_bg == null)
-            LiveFeature.a_bg = Texture2D.FromStream(LiveFeature.GAME.GraphicsDevice, TitleContainer.OpenStream("Content\\LIVE\\tab.png"));
-        if (LiveFeature.arrowImg2 == null)
-            LiveFeature.arrowImg2 = Texture2D.FromStream(LiveFeature.GAME.GraphicsDevice, TitleContainer.OpenStream("Content\\LIVE\\arrow2.png"));
-        if (LiveFeature.titleImg != null)
+        if (a_bg == null)
+            a_bg = GAME.Content.Load<Texture2D>(("LIVE\\tab"));
+        if (arrowImg2 == null)
+            arrowImg2 = GAME.Content.Load<Texture2D>(("LIVE\\arrow2"));
+        if (titleImg != null)
             return;
-        LiveFeature.titleImg = Texture2D.FromStream(LiveFeature.GAME.GraphicsDevice, TitleContainer.OpenStream("Content\\LIVE\\ach_top_" + LiveFeature.lang_suffix[AppMain.GsEnvGetLanguage()] + ".png"));
+        titleImg = GAME.Content.Load<Texture2D>(("LIVE\\ach_top_" + lang_suffix[AppMain.GsEnvGetLanguage()]));
     }
 
     internal void ShowLeaderboards()
     {
-        LiveFeature.interruptMainLoop = 2;
+        interruptMainLoop = 2;
         this.offsetY = 0;
         this.curStage = 24;
         this.clearHiScores();
-        if (LiveFeature.arrowImg == null)
-            LiveFeature.arrowImg = Texture2D.FromStream(LiveFeature.GAME.GraphicsDevice, TitleContainer.OpenStream("Content\\LIVE\\arrow.png"));
-        if (LiveFeature.a_bg == null)
-            LiveFeature.a_bg = Texture2D.FromStream(LiveFeature.GAME.GraphicsDevice, TitleContainer.OpenStream("Content\\LIVE\\tab.png"));
-        if (LiveFeature.nums == null)
-            LiveFeature.nums = Texture2D.FromStream(LiveFeature.GAME.GraphicsDevice, TitleContainer.OpenStream("Content\\LIVE\\nums.png"));
+        if (arrowImg == null)
+            arrowImg = GAME.Content.Load<Texture2D>(("LIVE\\arrow"));
+        if (a_bg == null)
+            a_bg = GAME.Content.Load<Texture2D>(("LIVE\\tab"));
+        if (nums == null)
+            nums = GAME.Content.Load<Texture2D>(("LIVE\\nums"));
         this.startReadingLeaderBoard(this.curStage);
     }
 
     public bool InputOverride()
     {
-        if (LiveFeature.interruptMainLoop == 0)
+        if (interruptMainLoop == 0)
             return false;
         MouseState state = Mouse.GetState();
         this.cX = state.X;
         this.cY = state.Y;
         if ((state.LeftButton == ButtonState.Pressed && this.pX != 0 && this.pY != 0 || state.LeftButton == ButtonState.Released) && (this.cY > 240 && this.cX > 350))
             return false;
-        if (LiveFeature.interruptMainLoop == 2)
+        if (interruptMainLoop == 2)
         {
-            if (AppMain.GsTrialIsTrial() || XBOXLive.signinStatus == XBOXLive.SigninStatus.Local)
+            if (AppMain.GsTrialIsTrial() || signinStatus == SigninStatus.Local)
                 return false;
             if (state.LeftButton == ButtonState.Pressed)
             {
@@ -255,14 +238,14 @@ public class LiveFeature : XBOXLive
             if (state.LeftButton == ButtonState.Released && this.pX != 0 && this.pY != 0)
             {
                 bool flag = false;
-                if (LiveFeature.arrow1_Left.Contains(this.cX, this.cY))
+                if (arrow1_Left.Contains(this.cX, this.cY))
                 {
                     --this.curStage;
                     if (this.curStage < 24)
                         this.curStage = 47;
                     flag = true;
                 }
-                else if (LiveFeature.arrow1_Right.Contains(this.cX, this.cY))
+                else if (arrow1_Right.Contains(this.cX, this.cY))
                 {
                     ++this.curStage;
                     if (this.curStage > 47)
@@ -270,7 +253,7 @@ public class LiveFeature : XBOXLive
                     flag = true;
                 }
                 this.cX = this.pX = this.pY = this.cY = 0;
-                if (flag && this.l_status[this.curStage] != LiveFeature.LBStatus.ReadSuccess && this.l_status[this.curStage] != LiveFeature.LBStatus.ReadFail)
+                if (flag && this.l_status[this.curStage] != LBStatus.ReadSuccess && this.l_status[this.curStage] != LBStatus.ReadFail)
                     this.startReadingLeaderBoard(this.curStage);
             }
         }
@@ -289,7 +272,7 @@ public class LiveFeature : XBOXLive
                 {
                     this.pX = this.cX;
                     this.pY = this.cY;
-                    if (LiveFeature.arrow2_Up.Contains(this.cX, this.cY))
+                    if (arrow2_Up.Contains(this.cX, this.cY))
                     {
                         this.offsetY += 5;
                         if (this.offsetY > 0)
@@ -297,7 +280,7 @@ public class LiveFeature : XBOXLive
                         this.pX = 0;
                         this.pY = 0;
                     }
-                    if (LiveFeature.arrow2_Down.Contains(this.cX, this.cY))
+                    if (arrow2_Down.Contains(this.cX, this.cY))
                     {
                         this.offsetY -= 5;
                         this.pX = 0;
@@ -327,20 +310,20 @@ public class LiveFeature : XBOXLive
         {
             if (AppMain.dm_xbox_show_progress != 100)
             {
-                spriteBatch.Draw(LiveFeature.a_bg, new Rectangle(10, 55, 230, (int)(170.0 * (double)((float)AppMain.dm_xbox_show_progress / 100f))), new Rectangle?(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, 0.0f);
-                spriteBatch.Draw(LiveFeature.a_bg, new Rectangle(240, 55, 230, (int)(170.0 * (double)((float)AppMain.dm_xbox_show_progress / 100f))), new Rectangle?(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0.0f);
+                spriteBatch.Draw(a_bg, SCALE(new Rectangle(10, 55, 230, (int)(170.0 * (AppMain.dm_xbox_show_progress / 100f)))), new Rectangle(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, 0.0f);
+                spriteBatch.Draw(a_bg, SCALE(new Rectangle(240, 55, 230, (int)(170.0 * (AppMain.dm_xbox_show_progress / 100f)))), new Rectangle(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0.0f);
             }
             else
             {
-                spriteBatch.Draw(LiveFeature.a_bg, new Rectangle(10, 55, 230, 170), new Rectangle?(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, 0.0f);
-                spriteBatch.Draw(LiveFeature.a_bg, new Rectangle(240, 55, 230, 170), new Rectangle?(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0.0f);
+                spriteBatch.Draw(a_bg, SCALE(new Rectangle(10, 55, 230, 170)), new Rectangle(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, 0.0f);
+                spriteBatch.Draw(a_bg, SCALE(new Rectangle(240, 55, 230, 170)), new Rectangle(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0.0f);
             }
-            spriteBatch.Draw(LiveFeature.titleImg, new Rectangle(15, 22, 128, 16), Color.White);
+            spriteBatch.Draw(titleImg, SCALE(new Rectangle(15, 22, 128, 16)), Color.White);
             if (AppMain.dm_xbox_show_progress == 100)
             {
-                string text = LiveFeature.achievements_current.ToString() + AppMain.AMD_FS_PATH_CHAR + (object)LiveFeature.achievements_total + " G";
+                string text = achievements_current.ToString() + AppMain.AMD_FS_PATH_CHAR + achievements_total + " G";
                 Vector2 vector2 = fonts[1].MeasureString(text);
-                spriteBatch.DrawString(fonts[0], text, new Vector2((float)(240 - ((int)vector2.X >> 1)), 60f), Color.White);
+                spriteBatch.DrawString(fonts[0], text, new Vector2(240 - ((int)vector2.X >> 1), 60f), Color.White);
             }
         }
         finally
@@ -349,16 +332,16 @@ public class LiveFeature : XBOXLive
         }
         if (AppMain.dm_xbox_show_progress == 100)
         {
-            LiveFeature.GAME.GraphicsDevice.ScissorRectangle = new Rectangle(15, 80, 450, 140);
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, (SamplerState)null, (DepthStencilState)null, LiveFeature.GAME.scissorState);
+            GAME.GraphicsDevice.ScissorRectangle = SCALE(new Rectangle(15, 80, 450, 140));
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, GAME.scissorState);
             try
             {
-                y = this.offsetY + 80;
-                Rectangle destinationRectangle = new Rectangle(30, y, 35, 35);
+                y = this.offsetY + (80 * 2);
+                Rectangle destinationRectangle = SCALE(new Rectangle(30, y, 35, 35));
                 for (int index = 0; index < AppMain.achievements.Length; ++index)
                 {
                     bool flag = AppMain.gs_trophy_acquisition_tbl[index] == 2;
-                    spriteBatch.Draw(LiveFeature.a_images[index], destinationRectangle, flag ? Color.White : LiveFeature.transparent_achiev);
+                    spriteBatch.Draw(a_images[index], destinationRectangle, flag ? Color.White : transparent_achiev);
                     if (!flag)
                     {
                         Color gray = Color.Gray;
@@ -367,18 +350,18 @@ public class LiveFeature : XBOXLive
                     {
                         Color white = Color.White;
                     }
-                    string text = AppMain.achievements[index].name + " (" + (object)AppMain.achievements[index].cost + " G)";
+                    string text = AppMain.achievements[index].name + " (" + AppMain.achievements[index].cost + " G)";
                     Vector2 vector2 = fonts[1].MeasureString(text);
                     if (y > 0 && y < 220)
-                        spriteBatch.DrawString(fonts[1], text, new Vector2(70f, (float)y), Color.White);
+                        spriteBatch.DrawString(fonts[1], text, new Vector2(70f * 2, y), Color.White);
                     y += (int)vector2.Y;
-                    if (y > 0 && y < 220 || LiveFeature.achievementTextArray[index].verticalSize == -1)
+                    if (y > 0 && y < 220 || achievementTextArray[index].verticalSize == -1)
                     {
-                        if (LiveFeature.achievementTextArray[index].text == null)
-                            LiveFeature.achievementTextArray[index].text = LiveFeature._wrapString(AppMain.achievements[index].description, 380, fonts[0]);
-                        LiveFeature.achievementTextArray[index].verticalSize = LiveFeature._drawWrapText(LiveFeature.achievementTextArray[index].text, 70, y, 380, Color.White, false, fonts[0], spriteBatch);
+                        if (achievementTextArray[index].text == null)
+                            achievementTextArray[index].text = _wrapString(AppMain.achievements[index].description, 380, fonts[0]);
+                        achievementTextArray[index].verticalSize = _drawWrapText(achievementTextArray[index].text, 70 * 2, y, 380, Color.White, false, fonts[0], spriteBatch);
                     }
-                    y += LiveFeature.achievementTextArray[index].verticalSize;
+                    y += achievementTextArray[index].verticalSize;
                     destinationRectangle.Y = y;
                 }
                 if (y < 220)
@@ -387,28 +370,28 @@ public class LiveFeature : XBOXLive
             finally
             {
                 spriteBatch.End();
-                LiveFeature.GAME.GraphicsDevice.ScissorRectangle = new Rectangle(0, 0, 480, 288);
+                GAME.GraphicsDevice.ScissorRectangle = SCALE(new Rectangle(0, 0, 480, 288));
             }
         }
         if (AppMain.dm_xbox_show_progress != 100)
             return;
-        LiveFeature.arrow_offset += 2;
-        if (LiveFeature.arrow_offset > 16)
-            LiveFeature.arrow_offset = -16;
+        arrow_offset += 2;
+        if (arrow_offset > 16)
+            arrow_offset = -16;
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
         try
         {
             if (this.offsetY != 0)
             {
-                Rectangle arrow2Up = LiveFeature.arrow2_Up;
-                arrow2Up.Y -= Math.Abs(LiveFeature.arrow_offset);
-                spriteBatch.Draw(LiveFeature.arrowImg2, arrow2Up, Color.White);
+                Rectangle arrow2Up = arrow2_Up;
+                arrow2Up.Y -= Math.Abs(arrow_offset);
+                spriteBatch.Draw(arrowImg2, arrow2Up, Color.White);
             }
             if (y <= 220)
                 return;
-            Rectangle arrow2Down = LiveFeature.arrow2_Down;
-            arrow2Down.Y += Math.Abs(LiveFeature.arrow_offset);
-            spriteBatch.Draw(LiveFeature.arrowImg2, arrow2Down, new Rectangle?(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipVertically, 0.0f);
+            Rectangle arrow2Down = arrow2_Down;
+            arrow2Down.Y += Math.Abs(arrow_offset);
+            spriteBatch.Draw(arrowImg2, arrow2Down, new Rectangle(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipVertically, 0.0f);
         }
         finally
         {
@@ -423,13 +406,13 @@ public class LiveFeature : XBOXLive
         {
             if (AppMain.dm_xbox_show_progress != 100)
             {
-                spriteBatch.Draw(LiveFeature.a_bg, new Rectangle(10, 55 - (int)(40.0 * (double)((float)AppMain.dm_xbox_show_progress / 100f)), 230, (int)(220.0 * (double)((float)AppMain.dm_xbox_show_progress / 100f))), new Rectangle?(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, 0.0f);
-                spriteBatch.Draw(LiveFeature.a_bg, new Rectangle(240, 55 - (int)(40.0 * (double)((float)AppMain.dm_xbox_show_progress / 100f)), 230, (int)(220.0 * (double)((float)AppMain.dm_xbox_show_progress / 100f))), new Rectangle?(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0.0f);
+                spriteBatch.Draw(a_bg, SCALE(new Rectangle(10, 55 - (int)(40.0 * (AppMain.dm_xbox_show_progress / 100f)), 230, (int)(220.0 * (AppMain.dm_xbox_show_progress / 100f)))), new Rectangle(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, 0.0f);
+                spriteBatch.Draw(a_bg, SCALE(new Rectangle(240, 55 - (int)(40.0 * (AppMain.dm_xbox_show_progress / 100f)), 230, (int)(220.0 * (AppMain.dm_xbox_show_progress / 100f)))), new Rectangle(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0.0f);
             }
             else
             {
-                spriteBatch.Draw(LiveFeature.a_bg, new Rectangle(10, 15, 230, 220), new Rectangle?(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, 0.0f);
-                spriteBatch.Draw(LiveFeature.a_bg, new Rectangle(240, 15, 230, 220), new Rectangle?(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0.0f);
+                spriteBatch.Draw(a_bg, SCALE(new Rectangle(10, 15, 230, 220)), new Rectangle(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, 0.0f);
+                spriteBatch.Draw(a_bg, SCALE(new Rectangle(240, 15, 230, 220)), new Rectangle(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0.0f);
             }
             if (AppMain.dm_xbox_show_progress != 100)
                 return;
@@ -439,73 +422,73 @@ public class LiveFeature : XBOXLive
             string text1;
             if (curStage < 16)
             {
-                string zoneName = LiveFeature.zone_names[curStage / 4];
+                string zoneName = zone_names[curStage / 4];
                 if (curStage % 4 == 3)
-                    text1 = string.Format(zoneName, (object)Strings.ID_BOSS);
+                    text1 = string.Format(zoneName, Strings.ID_BOSS);
                 else
-                    text1 = string.Format(zoneName, (object)string.Format(Strings.ID_ACT, (object[])new string[1]
+                    text1 = string.Format(zoneName, string.Format(Strings.ID_ACT, new string[1]
                     {
-            string.Concat((object) (curStage % 4 + 1))
+            string.Concat( curStage % 4 + 1)
                     }));
             }
             else if (curStage == 16)
                 text1 = Strings.ID_FINALZONE;
             else
-                text1 = string.Format(LiveFeature.zone_names[5], (object[])new string[1]
+                text1 = string.Format(zone_names[5], new string[1]
                 {
-          string.Concat((object) (curStage - 16))
+          string.Concat( curStage - 16)
                 });
             Vector2 vector2 = fonts[2].MeasureString(text1);
-            spriteBatch.DrawString(fonts[2], text1, new Vector2((float)(240 - ((int)vector2.X >> 1)), 27f), Color.White);
-            LiveFeature.arrow_offset += 2;
-            if (LiveFeature.arrow_offset > 16)
-                LiveFeature.arrow_offset = -16;
-            Rectangle arrow1Left = LiveFeature.arrow1_Left;
-            arrow1Left.X -= Math.Abs(LiveFeature.arrow_offset);
-            spriteBatch.Draw(LiveFeature.arrowImg, arrow1Left, new Rectangle?(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, 0.0f);
-            Rectangle arrow1Right = LiveFeature.arrow1_Right;
-            arrow1Right.X += Math.Abs(LiveFeature.arrow_offset);
-            spriteBatch.Draw(LiveFeature.arrowImg, arrow1Right, new Rectangle?(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0.0f);
-            string str = string.Concat((object)(curStage + 1));
+            spriteBatch.DrawString(fonts[2], text1, new Vector2(240 - ((int)vector2.X >> 1), 27f), Color.White);
+            arrow_offset += 2;
+            if (arrow_offset > 16)
+                arrow_offset = -16;
+            Rectangle arrow1Left = arrow1_Left;
+            arrow1Left.X -= Math.Abs(arrow_offset);
+            spriteBatch.Draw(arrowImg, arrow1Left, new Rectangle(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, 0.0f);
+            Rectangle arrow1Right = arrow1_Right;
+            arrow1Right.X += Math.Abs(arrow_offset);
+            spriteBatch.Draw(arrowImg, arrow1Right, new Rectangle(), Color.White, 0.0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0.0f);
+            string str = string.Concat(curStage + 1);
             int index1 = 0;
             int length = str.Length;
             while (index1 < str.Length)
             {
-                LiveFeature.num_dst_rect.X = 240 - 10 * length;
-                LiveFeature.num_src_rect.X = str[index1] != '0' ? 16 * ((int)str[index1] - 49) : 144;
-                spriteBatch.Draw(LiveFeature.nums, LiveFeature.num_dst_rect, new Rectangle?(LiveFeature.num_src_rect), Color.White);
+                num_dst_rect.X = 240 - 10 * length;
+                num_src_rect.X = str[index1] != '0' ? 16 * (str[index1] - 49) : 144;
+                spriteBatch.Draw(nums, num_dst_rect, (num_src_rect), Color.White);
                 ++index1;
                 --length;
             }
-            LiveFeature.num_src_rect.X = 160;
-            LiveFeature.num_src_rect.Width = 32;
-            LiveFeature.num_dst_rect.X = 240;
-            spriteBatch.Draw(LiveFeature.nums, LiveFeature.num_dst_rect, new Rectangle?(LiveFeature.num_src_rect), Color.White);
-            LiveFeature.num_src_rect.Width = 16;
-            LiveFeature.num_dst_rect.X = 250;
-            LiveFeature.num_src_rect.X = 16;
-            spriteBatch.Draw(LiveFeature.nums, LiveFeature.num_dst_rect, new Rectangle?(LiveFeature.num_src_rect), Color.White);
-            LiveFeature.num_dst_rect.X = 260;
-            LiveFeature.num_src_rect.X = 48;
-            spriteBatch.Draw(LiveFeature.nums, LiveFeature.num_dst_rect, new Rectangle?(LiveFeature.num_src_rect), Color.White);
+            num_src_rect.X = 160;
+            num_src_rect.Width = 32;
+            num_dst_rect.X = 240;
+            spriteBatch.Draw(nums, num_dst_rect, (num_src_rect), Color.White);
+            num_src_rect.Width = 16;
+            num_dst_rect.X = 250;
+            num_src_rect.X = 16;
+            spriteBatch.Draw(nums, num_dst_rect, (num_src_rect), Color.White);
+            num_dst_rect.X = 260;
+            num_src_rect.X = 48;
+            spriteBatch.Draw(nums, num_dst_rect, (num_src_rect), Color.White);
             int index2 = AppMain.g_gs_env_language == 0 || AppMain.g_gs_env_language == 1 || (AppMain.g_gs_env_language == 4 || AppMain.g_gs_env_language == 5) ? 0 : 1;
             string idLbRank = Strings.ID_LB_RANK;
             vector2 = fonts[1].MeasureString(idLbRank);
-            spriteBatch.DrawString(fonts[1], idLbRank, new Vector2((float)(LiveFeature.table_x[0, index2] - ((int)vector2.X >> 1)), 47f), Color.White);
+            spriteBatch.DrawString(fonts[1], idLbRank, new Vector2(table_x[0, index2] - ((int)vector2.X >> 1), 47f), Color.White);
             string idLbGtag = Strings.ID_LB_GTAG;
             vector2 = fonts[1].MeasureString(idLbGtag);
-            spriteBatch.DrawString(fonts[1], idLbGtag, new Vector2((float)(LiveFeature.table_x[1, index2] - ((int)vector2.X >> 1)), 47f), Color.White);
+            spriteBatch.DrawString(fonts[1], idLbGtag, new Vector2(table_x[1, index2] - ((int)vector2.X >> 1), 47f), Color.White);
             string idBesttime = Strings.ID_BESTTIME;
             vector2 = fonts[1].MeasureString(idBesttime);
-            spriteBatch.DrawString(fonts[1], idBesttime, new Vector2((float)(LiveFeature.table_x[2, index2] - ((int)vector2.X >> 1)), 47f), Color.White);
+            spriteBatch.DrawString(fonts[1], idBesttime, new Vector2(table_x[2, index2] - ((int)vector2.X >> 1), 47f), Color.White);
             string idLbDate = Strings.ID_LB_DATE;
             vector2 = fonts[1].MeasureString(idLbDate);
-            spriteBatch.DrawString(fonts[1], idLbDate, new Vector2((float)(LiveFeature.table_x[3, index2] - ((int)vector2.X >> 1)), 47f), Color.White);
+            spriteBatch.DrawString(fonts[1], idLbDate, new Vector2(table_x[3, index2] - ((int)vector2.X >> 1), 47f), Color.White);
             int num = 67;
-            if (this.l_status[this.curStage] == LiveFeature.LBStatus.StartedRead)
-                LiveFeature._drawWrapText(Strings.ID_LOADING, 240, 144, 450, Color.White, true, fonts[1], spriteBatch);
-            else if (this.l_status[this.curStage] == LiveFeature.LBStatus.ReadFail)
-                LiveFeature._drawWrapText(Strings.ID_LB_UNABLE, 240, 144, 450, Color.White, true, fonts[1], spriteBatch);
+            if (this.l_status[this.curStage] == LBStatus.StartedRead)
+                _drawWrapText(Strings.ID_LOADING, 240, 144, 450, Color.White, true, fonts[1], spriteBatch);
+            else if (this.l_status[this.curStage] == LBStatus.ReadFail)
+                _drawWrapText(Strings.ID_LB_UNABLE, 240, 144, 450, Color.White, true, fonts[1], spriteBatch);
             else if (this.hiScoresTables[this.curStage] != null && this.hiScoresTables[this.curStage].Length != 0)
             {
                 if (AppMain.dm_xbox_show_progress != 100)
@@ -515,13 +498,13 @@ public class LiveFeature : XBOXLive
                 {
                     if (index3 < 5 || index3 >= 5 && this.hiScoresTables[this.curStage][index3].isMe)
                     {
-                        Color color = this.hiScoresTables[this.curStage][index3].isMe ? new Color(154 - Math.Abs(LiveFeature.arrow_offset << 3), (int)byte.MaxValue, 100 - Math.Abs(LiveFeature.arrow_offset << 2)) : Color.WhiteSmoke;
-                        string text2 = string.Concat((object)this.hiScoresTables[this.curStage][index3].index);
+                        Color color = this.hiScoresTables[this.curStage][index3].isMe ? new Color(154 - Math.Abs(arrow_offset << 3), byte.MaxValue, 100 - Math.Abs(arrow_offset << 2)) : Color.WhiteSmoke;
+                        string text2 = string.Concat(hiScoresTables[this.curStage][index3].index);
                         vector2 = fonts[0].MeasureString(text2);
-                        spriteBatch.DrawString(fonts[0], text2, new Vector2((float)(LiveFeature.table_x[0, index2] - ((int)vector2.X >> 1)), (float)num), color);
+                        spriteBatch.DrawString(fonts[0], text2, new Vector2(table_x[0, index2] - ((int)vector2.X >> 1), num), color);
                         string name = this.hiScoresTables[this.curStage][index3].name;
                         vector2 = fonts[0].MeasureString(name);
-                        spriteBatch.DrawString(fonts[0], name, new Vector2((float)(LiveFeature.table_x[1, index2] - ((int)vector2.X >> 1)), (float)num), color);
+                        spriteBatch.DrawString(fonts[0], name, new Vector2(table_x[1, index2] - ((int)vector2.X >> 1), num), color);
                         string text3;
                         if (this.curStage > 23)
                         {
@@ -530,32 +513,32 @@ public class LiveFeature : XBOXLive
                             ushort msec = 0;
                             AppMain.AkUtilFrame60ToTime((uint)this.hiScoresTables[this.curStage][index3].value, ref min, ref sec, ref msec);
                             StringBuilder stringBuilder = new StringBuilder();
-                            if (min < (ushort)10)
+                            if (min < 10)
                                 stringBuilder.Append("0");
                             stringBuilder.Append(min);
                             stringBuilder.Append("'");
-                            if (sec < (ushort)10)
+                            if (sec < 10)
                                 stringBuilder.Append("0");
                             stringBuilder.Append(sec);
                             stringBuilder.Append("''");
-                            if (msec < (ushort)10)
+                            if (msec < 10)
                                 stringBuilder.Append("0");
                             stringBuilder.Append(msec);
                             text3 = stringBuilder.ToString();
                         }
                         else
-                            text3 = string.Concat((object)this.hiScoresTables[this.curStage][index3].value);
+                            text3 = string.Concat(hiScoresTables[this.curStage][index3].value);
                         vector2 = fonts[0].MeasureString(text3);
-                        spriteBatch.DrawString(fonts[0], text3, new Vector2((float)(LiveFeature.table_x[2, index2] - ((int)vector2.X >> 1)), (float)num), color);
-                        string text4 = string.Concat((object)this.hiScoresTables[this.curStage][index3].date);
+                        spriteBatch.DrawString(fonts[0], text3, new Vector2(table_x[2, index2] - ((int)vector2.X >> 1), num), color);
+                        string text4 = string.Concat(hiScoresTables[this.curStage][index3].date);
                         vector2 = fonts[0].MeasureString(text4);
-                        spriteBatch.DrawString(fonts[0], text4, new Vector2((float)(LiveFeature.table_x[3, index2] - ((int)vector2.X >> 1)), (float)num), color);
+                        spriteBatch.DrawString(fonts[0], text4, new Vector2(table_x[3, index2] - ((int)vector2.X >> 1), num), color);
                         num += (int)vector2.Y;
                     }
                 }
             }
             else
-                LiveFeature._drawWrapText(Strings.ID_LB_NORECORDS, 240, 144, 450, Color.White, true, fonts[1], spriteBatch);
+                _drawWrapText(Strings.ID_LB_NORECORDS, 240, 144, 450, Color.White, true, fonts[1], spriteBatch);
         }
         finally
         {
@@ -565,55 +548,55 @@ public class LiveFeature : XBOXLive
 
     public void ShowOverride()
     {
-        if (LiveFeature.interruptMainLoop == 0)
+        if (interruptMainLoop == 0)
             return;
-        if (LiveFeature.interruptMainLoop == 2)
+        if (interruptMainLoop == 2)
         {
-            this._drawLeaderboards(LiveFeature.GAME.spriteBatch, LiveFeature.GAME.fnts);
+            this._drawLeaderboards(GAME.spriteBatch, GAME.fnts);
         }
         else
         {
-            if (LiveFeature.interruptMainLoop != 1)
+            if (interruptMainLoop != 1)
                 return;
-            this._drawAchievements(LiveFeature.GAME.spriteBatch, LiveFeature.GAME.fnts);
+            this._drawAchievements(GAME.spriteBatch, GAME.fnts);
         }
     }
 
     public static bool isInterrupted()
     {
-        return LiveFeature.interruptMainLoop != 0;
+        return interruptMainLoop != 0;
     }
 
     internal static void endInterrupt()
     {
-        if (LiveFeature.interruptMainLoop == 1)
+        if (interruptMainLoop == 1)
         {
             int length = AppMain.achievements.Length;
             for (int index = 0; index < length; ++index)
             {
-                LiveFeature.a_images[index].Dispose();
-                LiveFeature.a_images[index] = (Texture2D)null;
+                a_images[index].Dispose();
+                a_images[index] = null;
             }
-            LiveFeature.a_images = (Texture2D[])null;
-            LiveFeature.a_bg.Dispose();
-            LiveFeature.a_bg = (Texture2D)null;
-            LiveFeature.arrowImg2.Dispose();
-            LiveFeature.arrowImg2 = (Texture2D)null;
-            LiveFeature.titleImg.Dispose();
-            LiveFeature.titleImg = (Texture2D)null;
-            LiveFeature.achievementTextArray = (LiveFeature.AchievementText[])null;
+            a_images = null;
+            a_bg.Dispose();
+            a_bg = null;
+            arrowImg2.Dispose();
+            arrowImg2 = null;
+            titleImg.Dispose();
+            titleImg = null;
+            achievementTextArray = null;
         }
-        if (LiveFeature.interruptMainLoop == 2)
+        if (interruptMainLoop == 2)
         {
-            LiveFeature.a_bg.Dispose();
-            LiveFeature.a_bg = (Texture2D)null;
-            LiveFeature.arrowImg.Dispose();
-            LiveFeature.arrowImg = (Texture2D)null;
-            LiveFeature.nums.Dispose();
-            LiveFeature.nums = (Texture2D)null;
-            LiveFeature.getInstance().clearHiScores();
+            a_bg.Dispose();
+            a_bg = null;
+            arrowImg.Dispose();
+            arrowImg = null;
+            nums.Dispose();
+            nums = null;
+            getInstance().clearHiScores();
         }
-        LiveFeature.interruptMainLoop = 0;
+        interruptMainLoop = 0;
     }
 
     public static string[] _wrapString(string s, int width, SpriteFont font)
@@ -626,7 +609,7 @@ public class LiveFeature : XBOXLive
         foreach (string str in strArray)
         {
             Vector2 vector2 = font.MeasureString(str + " ");
-            if ((double)vector2.X + (double)num1 > (double)width)
+            if (vector2.X + (double)num1 > width)
             {
                 int num2 = 0;
                 stringList.Add(stringBuilder.ToString());
@@ -659,7 +642,7 @@ public class LiveFeature : XBOXLive
       SpriteBatch sb,
       float corrector)
     {
-        return LiveFeature._drawWrapText(LiveFeature._wrapString(text, width, font), x, y, width, color, isXCenter, font, sb, corrector);
+        return _drawWrapText(_wrapString(text, width, font), x, y, width, color, isXCenter, font, sb, corrector);
     }
 
     public static int _drawWrapText(
@@ -672,7 +655,7 @@ public class LiveFeature : XBOXLive
       SpriteFont font,
       SpriteBatch sb)
     {
-        return LiveFeature._drawWrapText(LiveFeature._wrapString(text, width, font), x, y, width, color, isXCenter, font, sb);
+        return _drawWrapText(_wrapString(text, width, font), x, y, width, color, isXCenter, font, sb);
     }
 
     public static int _drawWrapText(
@@ -686,16 +669,16 @@ public class LiveFeature : XBOXLive
       SpriteBatch sb,
       float corrector)
     {
-        Vector2 position = new Vector2((float)x, (float)y);
+        Vector2 position = new Vector2(x, y);
         int num = 0;
         foreach (string text in s)
         {
             Vector2 vector2 = font.MeasureString(text);
             if (isXCenter)
-                position.X = (float)(x - ((int)vector2.X >> 1));
+                position.X = x - ((int)vector2.X >> 1);
             sb.DrawString(font, text, position, color);
             position.Y += vector2.Y * corrector;
-            num += (int)((double)vector2.Y * (double)corrector);
+            num += (int)(vector2.Y * (double)corrector);
         }
         return num;
     }
@@ -710,7 +693,7 @@ public class LiveFeature : XBOXLive
       SpriteFont font,
       SpriteBatch sb)
     {
-        return LiveFeature._drawWrapText(s, x, y, width, color, isXCenter, font, sb, 1f);
+        return _drawWrapText(s, x, y, width, color, isXCenter, font, sb, 1f);
     }
 
     public enum Stages

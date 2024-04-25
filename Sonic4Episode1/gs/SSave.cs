@@ -4,8 +4,6 @@
 // MVID: 093CE2FC-33E2-4332-B0FE-1EA1E44D3AE7
 // Assembly location: C:\Users\wamwo\Documents\GitHub\Sonic4Ep1-WP7-Decompilation\XAP\Sonic4 ep I.dll
 
-using System.IO;
-
 namespace gs.backup
 {
     public class SSave : SBase
@@ -27,7 +25,7 @@ namespace gs.backup
                 return;
 
             this.save = save = save ?? new Sonic4Save();
-            for (int index = 0; index < 1; ++index)
+            for (int index = 0; index < c_save_size; ++index)
             {
                 this.m_system[index] = new SSystem(save);
                 this.m_system[index].Init();
@@ -46,20 +44,12 @@ namespace gs.backup
 
         public override bool GetDirty()
         {
-            if (GetSystem().GetDirty())
-                return true;
-            if (GetOption().GetDirty())
-                return true;
-            if (GetStage().GetDirty())
-                return true;
-            if (GetSpecial().GetDirty())
-                return true;
-            if (GetRemaster().GetDirty())
-                return true;
-            if (GetDebug().GetDirty())
-                return true;
-
-            return base.GetDirty();
+            return base.GetDirty() || GetSystem().GetDirty() || 
+                GetOption().GetDirty() || 
+                GetStage().GetDirty() || 
+                GetSpecial().GetDirty() || 
+                GetRemaster().GetDirty() || 
+                GetDebug().GetDirty();
         }
 
         public Sonic4Save GetSave()
@@ -141,7 +131,7 @@ namespace gs.backup
 
         public static SSave CreateInstance()
         {
-            return (SSave)AppMain.GsGetMainSysInfo().Save;
+            return AppMain.GsGetMainSysInfo().Save;
         }
     }
 }

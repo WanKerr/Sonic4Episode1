@@ -1,35 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
 using er;
-using er.web;
-using gs;
-using gs.backup;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
 using setting;
 
 public partial class AppMain
 {
-    private class CMain_PauseMenu : AppMain.ITaskLinkAsv
+    private class CMain_PauseMenu : ITaskLinkAsv
     {
-        private static AppMain.CMain_PauseMenu instance_ = new AppMain.CMain_PauseMenu();
+        private static CMain_PauseMenu instance_ = new CMain_PauseMenu();
         private static readonly int[] c_return_table = new int[3]
         {
       0,
@@ -41,105 +18,105 @@ public partial class AppMain
       2,
       3
         };
-        private static AppMain.CMain_PauseMenu.SLocalCreateActionTable[] local_create_action_table = new AppMain.CMain_PauseMenu.SLocalCreateActionTable[17]
+        private static SLocalCreateActionTable[] local_create_action_table = new SLocalCreateActionTable[17]
         {
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 0,
         tex = 0,
         idx = 0
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 0,
         tex = 0,
         idx = 1
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 0,
         tex = 0,
         idx = 2
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 0,
         tex = 0,
         idx = 3
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 0,
         tex = 0,
         idx = 4
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 0,
         tex = 0,
         idx = 5
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 0,
         tex = 0,
         idx = 6
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 0,
         tex = 0,
         idx = 7
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 0,
         tex = 0,
         idx = 8
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 0,
         tex = 0,
         idx = 9
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 1,
         tex = 1,
         idx = 0
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 1,
         tex = 1,
         idx = 1
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 1,
         tex = 1,
         idx = 3
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 1,
         tex = 1,
         idx = 4
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 1,
         tex = 1,
         idx = 5
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 1,
         tex = 1,
         idx = 9
       },
-      new AppMain.CMain_PauseMenu.SLocalCreateActionTable()
+      new SLocalCreateActionTable()
       {
         file = 1,
         tex = 1,
@@ -182,30 +159,30 @@ public partial class AppMain
       "Pause"
         };
         private readonly bool[] m_flag = new bool[9];
-        private readonly AppMain.AMS_FS[] m_fs = new AppMain.AMS_FS[4];
+        private readonly AMS_FS[] m_fs = new AMS_FS[4];
         private readonly object[] m_file = new object[4];
-        private readonly AppMain.AOS_TEXTURE[] m_tex = AppMain.New<AppMain.AOS_TEXTURE>(2);
-        private AppMain.CMain_PauseMenu.SAction[] m_act = AppMain.New<AppMain.CMain_PauseMenu.SAction>(17);
-        private readonly CTrgAoAction[] m_trg = AppMain.New<CTrgAoAction>(3);
+        private readonly AOS_TEXTURE[] m_tex = New<AOS_TEXTURE>(2);
+        private SAction[] m_act = New<SAction>(17);
+        private readonly CTrgAoAction[] m_trg = New<CTrgAoAction>(3);
         private const uint c_pause_btn_se_frame = 15;
         private const uint c_fade_in_frame = 8;
         private const uint c_fade_out_frame = 8;
         private const uint c_fade_enter_efct_frame = 10;
-        public AppMain.AMS_FS pause_amb;
-        public AppMain.AMS_FS lang_amb;
+        public AMS_FS pause_amb;
+        public AMS_FS lang_amb;
         private int m_return;
         private int m_really;
-        private AppMain.GSS_SND_SE_HANDLE m_se_handle;
-        private AppMain.CProcCount m_procCount;
+        private GSS_SND_SE_HANDLE m_se_handle;
+        private CProcCount m_procCount;
 
         private CMain_PauseMenu()
         {
-            this.m_procCount = new AppMain.CProcCount((object)this);
+            this.m_procCount = new CProcCount(this);
         }
 
-        public static AppMain.CMain_PauseMenu CreateInstance()
+        public static CMain_PauseMenu CreateInstance()
         {
-            return AppMain.CMain_PauseMenu.instance_;
+            return instance_;
         }
 
         public override void operator_brackets()
@@ -231,7 +208,7 @@ public partial class AppMain
             if (this.m_flag[3])
             {
                 for (int index = 0; index < this.m_file.Length; ++index)
-                    this.m_file[0] = (object)null;
+                    this.m_file[0] = null;
                 this.m_flag[3] = false;
                 this.m_flag[4] = false;
             }
@@ -311,20 +288,20 @@ public partial class AppMain
         {
             if (!this.m_flag[7])
                 return;
-            AppMain.AoActAcmPush();
-            AppMain.AoActAcmApplyTrans(0.0f, 0.0f, -1000f);
+            AoActAcmPush();
+            AoActAcmApplyTrans(0.0f, 0.0f, -1000f);
             for (int index = 0; index < this.m_act.Length; ++index)
             {
                 this.m_act[index].Update();
                 if (index == 16 || index == 15)
                     this.m_act[index].act.sprite.center_y += 5f;
             }
-            AppMain.AoActAcmPop();
+            AoActAcmPop();
         }
 
         private void draw()
         {
-            if (!AppMain._am_sample_draw_enable || !this.m_flag[7] || this.m_flag[1])
+            if (!_am_sample_draw_enable || !this.m_flag[7] || this.m_flag[1])
                 return;
             for (int index = 0; index < this.m_act.Length; ++index)
                 this.m_act[index].Draw();
@@ -332,41 +309,41 @@ public partial class AppMain
 
         private void fileLoadingStart()
         {
-            this.m_file[0] = (object)AppMain.readAMAFile("G_COM/MENU/G_PAUSE.AMA");
-            this.pause_amb = AppMain.amFsReadBackground("G_COM/MENU/G_PAUSE.AMB");
-            this.m_file[1] = (object)AppMain.readAMAFile("G_COM/MENU/G_PAUSE_L.AMA");
-            int language = AppMain.GsEnvGetLanguage();
-            this.lang_amb = AppMain.amFsReadBackground(file.c_lang_amb[language]);
+            this.m_file[0] = readAMAFile("G_COM/MENU/G_PAUSE.AMA");
+            this.pause_amb = amFsReadBackground("G_COM/MENU/G_PAUSE.AMB");
+            this.m_file[1] = readAMAFile("G_COM/MENU/G_PAUSE_L.AMA");
+            int language = GsEnvGetLanguage();
+            this.lang_amb = amFsReadBackground(file1.c_lang_amb[language]);
             this.m_flag[0] = true;
             this.m_flag[3] = true;
             this.AttachTask("gmPauseMenu.Load", 28928U, 0U, 0U);
-            this.m_procCount.SetProc(new AppMain.ITaskAsv.FProc(this.fileLoading));
+            this.m_procCount.SetProc(new FProc(this.fileLoading));
         }
 
         private void fileLoading()
         {
-            if (!AppMain.amFsIsComplete(this.pause_amb))
+            if (!amFsIsComplete(this.pause_amb))
                 return;
-            this.m_file[2] = (object)AppMain.readAMBFile(this.pause_amb);
-            AppMain.GsEnvGetLanguage();
-            if (!AppMain.amFsIsComplete(this.lang_amb))
+            this.m_file[2] = readAMBFile(this.pause_amb);
+            GsEnvGetLanguage();
+            if (!amFsIsComplete(this.lang_amb))
                 return;
-            this.m_file[3] = (object)AppMain.readAMBFile(this.lang_amb);
+            this.m_file[3] = readAMBFile(this.lang_amb);
             this.m_flag[4] = true;
             this.DetachTask();
         }
 
         private void creatingStart()
         {
-            for (int index1 = 0; index1 < AppMain.CMain_PauseMenu.c_local_create_table.Length; ++index1)
+            for (int index1 = 0; index1 < c_local_create_table.Length; ++index1)
             {
-                int index2 = AppMain.CMain_PauseMenu.c_local_create_table[index1];
-                AppMain.AoTexBuild(this.m_tex[index1], (AppMain.AMS_AMB_HEADER)this.m_file[index2]);
-                AppMain.AoTexLoad(this.m_tex[index1]);
+                int index2 = c_local_create_table[index1];
+                AoTexBuild(this.m_tex[index1], (AMS_AMB_HEADER)this.m_file[index2]);
+                AoTexLoad(this.m_tex[index1]);
             }
             this.m_flag[5] = true;
             this.AttachTask("gmPauseMenu.Build", 28928U, 0U, 0U);
-            this.m_procCount.SetProc(new AppMain.ITaskAsv.FProc(this.creating));
+            this.m_procCount.SetProc(new FProc(this.creating));
         }
 
         private void creating()
@@ -374,7 +351,7 @@ public partial class AppMain
             bool flag = true;
             for (int index = 0; index < this.m_tex.Length; ++index)
             {
-                if (!AppMain.AoTexIsLoaded(this.m_tex[index]))
+                if (!AoTexIsLoaded(this.m_tex[index]))
                 {
                     flag = false;
                     break;
@@ -393,23 +370,23 @@ public partial class AppMain
 
         private void fadeInStart(int prio)
         {
-            if (!AppMain.CMain_PauseMenu.canGoStageSelect())
+            if (!canGoStageSelect())
             {
-                AppMain.CMain_PauseMenu.local_create_action_table[11].idx = 2;
-                AppMain.CMain_PauseMenu.local_create_action_table[14].idx = 7;
+                local_create_action_table[11].idx = 2;
+                local_create_action_table[14].idx = 7;
             }
             else
             {
-                AppMain.CMain_PauseMenu.local_create_action_table[11].idx = 1;
-                AppMain.CMain_PauseMenu.local_create_action_table[14].idx = 5;
+                local_create_action_table[11].idx = 1;
+                local_create_action_table[14].idx = 5;
             }
-            AppMain.CMain_PauseMenu.local_create_action_table[13].idx = !AppMain.CMain_PauseMenu.isSpecialStage() ? 4 : 6;
+            local_create_action_table[13].idx = !isSpecialStage() ? 4 : 6;
             for (int index = 0; index < 17; ++index)
             {
-                AppMain.CMain_PauseMenu.SLocalCreateActionTable createActionTable = AppMain.CMain_PauseMenu.local_create_action_table[index];
-                AppMain.A2S_AMA_HEADER ama = (AppMain.A2S_AMA_HEADER)this.m_file[createActionTable.file];
-                AppMain.CMain_PauseMenu.SAction saction = this.m_act[index];
-                saction.act = AppMain.AoActCreate(ama, (uint)createActionTable.idx);
+                SLocalCreateActionTable createActionTable = local_create_action_table[index];
+                A2S_AMA_HEADER ama = (A2S_AMA_HEADER)this.m_file[createActionTable.file];
+                SAction saction = this.m_act[index];
+                saction.act = AoActCreate(ama, (uint)createActionTable.idx);
                 saction.tex = this.m_tex[createActionTable.tex];
                 saction.flag[0] = true;
                 saction.flag[1] = true;
@@ -417,16 +394,16 @@ public partial class AppMain
             }
             for (int index = 0; index < 3; ++index)
             {
-                AppMain.CMain_PauseMenu.SAction saction = this.m_act[AppMain.CMain_PauseMenu.c_local_create_trg_table[index]];
+                SAction saction = this.m_act[c_local_create_trg_table[index]];
                 this.m_trg[index].Create(saction.act);
             }
             this.m_flag[7] = true;
             this.m_act[0].flag[1] = false;
             this.m_act[0].scale = new Vector2(0.0f, 0.0f);
-            this.m_se_handle = AppMain.GsSoundAllocSeHandle();
+            this.m_se_handle = GsSoundAllocSeHandle();
             this.AttachTask("gmPauseMenu.Execute", (uint)prio, 0U, 0U);
             this.playSe(0);
-            this.m_procCount.SetProc(new AppMain.ITaskAsv.FProc(this.fadeIn));
+            this.m_procCount.SetProc(new FProc(this.fadeIn));
         }
 
         private void fadeIn()
@@ -434,12 +411,12 @@ public partial class AppMain
             if (15U >= this.m_procCount.GetCount())
                 return;
             this.playSe(3);
-            this.m_procCount.SetProc(new AppMain.ITaskAsv.FProc(this.fadeIn2));
+            this.m_procCount.SetProc(new FProc(this.fadeIn2));
         }
 
         private void fadeIn2()
         {
-            float num = (float)(this.m_procCount.GetCount() / 8U);
+            float num = this.m_procCount.GetCount() / 8U;
             this.m_act[0].scale = new Vector2(num, num);
             if (8U >= this.m_procCount.GetCount())
                 return;
@@ -450,15 +427,15 @@ public partial class AppMain
         {
             for (int index = 1; index < 13; ++index)
                 this.m_act[index].flag[1] = false;
-            this.m_procCount.SetProc(new AppMain.ITaskAsv.FProc(this.wait));
+            this.m_procCount.SetProc(new FProc(this.wait));
         }
 
         private void wait()
         {
             bool flag = false;
-            for (int index = 0; index < AppMain._am_tp_touch.Length; ++index)
+            for (int index = 0; index < _am_tp_touch.Length; ++index)
             {
-                if (AppMain.amTpIsTouchOn(index))
+                if (amTpIsTouchOn(index))
                 {
                     flag = true;
                     break;
@@ -474,7 +451,7 @@ public partial class AppMain
             for (int index = 0; index < this.m_act.Length; ++index)
             {
                 this.m_act[index].flag[0] = true;
-                AppMain.AoActSetFrame(this.m_act[index].act, 0.0f);
+                AoActSetFrame(this.m_act[index].act, 0.0f);
                 this.m_act[index].pos = new Vector3(0.0f, 0.0f, 0.0f);
             }
             for (int index = 1; index < 13; ++index)
@@ -482,15 +459,15 @@ public partial class AppMain
             for (int index = 13; index < 17; ++index)
                 this.m_act[index].flag[1] = true;
             this.m_return = 6;
-            this.m_procCount.SetProc(new AppMain.ITaskAsv.FProc(this.select));
+            this.m_procCount.SetProc(new FProc(this.select));
         }
 
         private void select()
         {
             int trg_idx = -1;
-            for (int index1 = 0; index1 < AppMain.CMain_PauseMenu.c_trg_table_select.Length; ++index1)
+            for (int index1 = 0; index1 < c_trg_table_select.Length; ++index1)
             {
-                CTrgAoAction ctrgAoAction = this.m_trg[AppMain.CMain_PauseMenu.c_trg_table_select[index1]];
+                CTrgAoAction ctrgAoAction = this.m_trg[c_trg_table_select[index1]];
                 float frame;
                 if (ctrgAoAction.GetState(0U)[10] && ctrgAoAction.GetState(0U)[1])
                 {
@@ -499,28 +476,28 @@ public partial class AppMain
                 }
                 else
                     frame = !ctrgAoAction.GetState(0U)[0] ? 0.0f : 3f;
-                for (int index2 = 0; index2 < AppMain.CMain_PauseMenu.c_btn_action_table_select[index1].Length; ++index2)
-                    AppMain.AoActSetFrame(this.m_act[AppMain.CMain_PauseMenu.c_btn_action_table_select[index1][index2]].act, frame);
+                for (int index2 = 0; index2 < c_btn_action_table_select[index1].Length; ++index2)
+                    AoActSetFrame(this.m_act[c_btn_action_table_select[index1][index2]].act, frame);
             }
             if (-1 != trg_idx)
             {
-                int[] numArray = AppMain.CMain_PauseMenu.c_btn_action_table_select[trg_idx];
+                int[] numArray = c_btn_action_table_select[trg_idx];
                 for (int index = numArray[0]; index < numArray[2] + 1; ++index)
                     this.m_act[index].flag[0] = false;
-                this.m_return = AppMain.CMain_PauseMenu.TrgIdxToReturnIdx(trg_idx);
+                this.m_return = TrgIdxToReturnIdx(trg_idx);
             }
             else if (this.m_flag[8])
                 this.m_return = 4;
-            if (0 <= AppMain.GmMainKeyCheckPauseKeyPush())
+            if (0 <= GmMainKeyCheckPauseKeyPush())
             {
                 this.pauseBtnCancelStart();
             }
             else
             {
-                if (AppMain.isBackKeyPressed())
+                if (isBackKeyPressed())
                 {
                     this.m_return = 4;
-                    AppMain.setBackKeyRequest(false);
+                    setBackKeyRequest(false);
                 }
                 switch (this.m_return)
                 {
@@ -542,16 +519,16 @@ public partial class AppMain
         {
             for (int index = 0; index < this.m_act.Length; ++index)
             {
-                AppMain.CMain_PauseMenu.SAction saction = this.m_act[index];
+                SAction saction = this.m_act[index];
                 saction.flag[0] = true;
-                AppMain.AoActSetFrame(saction.act, 0.0f);
+                AoActSetFrame(saction.act, 0.0f);
                 saction.pos = new Vector3(0.0f, 0.0f, 0.0f);
             }
             for (int index = 7; index < 10; ++index)
                 this.m_act[index].flag[1] = true;
             for (int index = 13; index < 15; ++index)
             {
-                AppMain.CMain_PauseMenu.SAction saction = this.m_act[index];
+                SAction saction = this.m_act[index];
                 float num = 27f / 16f;
                 saction.pos = new Vector3(480f, 269f, 0.0f);
                 saction.scale = new Vector2(num, num);
@@ -587,15 +564,15 @@ public partial class AppMain
                     break;
             }
             this.m_really = 6;
-            this.m_procCount.SetProc(new AppMain.ITaskAsv.FProc(this.really));
+            this.m_procCount.SetProc(new FProc(this.really));
         }
 
         private void really()
         {
             int trg_idx = -1;
-            for (int index1 = 0; index1 < AppMain.CMain_PauseMenu.c_trg_table.Length; ++index1)
+            for (int index1 = 0; index1 < c_trg_table.Length; ++index1)
             {
-                CTrgAoAction ctrgAoAction = this.m_trg[AppMain.CMain_PauseMenu.c_trg_table[index1]];
+                CTrgAoAction ctrgAoAction = this.m_trg[c_trg_table[index1]];
                 float frame;
                 if (ctrgAoAction.GetState(0U)[10] && ctrgAoAction.GetState(0U)[1])
                 {
@@ -604,27 +581,27 @@ public partial class AppMain
                 }
                 else
                     frame = !ctrgAoAction.GetState(0U)[0] ? 0.0f : 3f;
-                for (int index2 = 0; index2 < AppMain.CMain_PauseMenu.c_btn_action_table[index1].Length; ++index2)
-                    AppMain.AoActSetFrame(this.m_act[AppMain.CMain_PauseMenu.c_btn_action_table[index1][index2]].act, frame);
+                for (int index2 = 0; index2 < c_btn_action_table[index1].Length; ++index2)
+                    AoActSetFrame(this.m_act[c_btn_action_table[index1][index2]].act, frame);
             }
             if (-1 != trg_idx)
             {
-                int[] numArray = AppMain.CMain_PauseMenu.c_btn_action_table[trg_idx];
+                int[] numArray = c_btn_action_table[trg_idx];
                 for (int index = numArray[0]; index < numArray[2] + 1; ++index)
                     this.m_act[index].flag[0] = false;
-                this.m_really = AppMain.CMain_PauseMenu.TrgIdxToReturnIdx(trg_idx);
+                this.m_really = TrgIdxToReturnIdx(trg_idx);
             }
             else if (this.m_flag[8])
                 this.m_really = 4;
-            if (0 <= AppMain.GmMainKeyCheckPauseKeyPush())
+            if (0 <= GmMainKeyCheckPauseKeyPush())
             {
                 this.m_return = 4;
                 this.pauseBtnCancelStart();
             }
-            else if (AppMain.isBackKeyPressed())
+            else if (isBackKeyPressed())
             {
                 this.m_return = 4;
-                AppMain.setBackKeyRequest(false);
+                setBackKeyRequest(false);
                 this.playSe(1);
                 this.selectStart();
             }
@@ -647,7 +624,7 @@ public partial class AppMain
 
         private void enterEfctStart()
         {
-            this.m_procCount.SetProc(new AppMain.ITaskAsv.FProc(this.enterEfct));
+            this.m_procCount.SetProc(new FProc(this.enterEfct));
         }
 
         private void enterEfct()
@@ -660,7 +637,7 @@ public partial class AppMain
         private void pauseBtnCancelStart()
         {
             this.playSe(0);
-            this.m_procCount.SetProc(new AppMain.ITaskAsv.FProc(this.pauseBtnCancel));
+            this.m_procCount.SetProc(new FProc(this.pauseBtnCancel));
         }
 
         private void pauseBtnCancel()
@@ -672,7 +649,7 @@ public partial class AppMain
 
         private void fadeOutStart()
         {
-            foreach (AppMain.CMain_PauseMenu.SAction saction in this.m_act)
+            foreach (SAction saction in this.m_act)
             {
                 saction.flag[0] = true;
                 saction.flag[1] = true;
@@ -680,36 +657,36 @@ public partial class AppMain
             this.m_act[0].flag[0] = false;
             this.m_act[0].flag[1] = false;
             this.playSe(3);
-            this.m_procCount.SetProc(new AppMain.ITaskAsv.FProc(this.fadeOut));
+            this.m_procCount.SetProc(new FProc(this.fadeOut));
         }
 
         private void fadeOut()
         {
-            float num = 1f - (float)(this.m_procCount.GetCount() / 8U);
+            float num = 1f - this.m_procCount.GetCount() / 8U;
             this.m_act[0].scale = new Vector2(num, num);
             if (8U >= this.m_procCount.GetCount())
                 return;
-            foreach (AppMain.CMain_PauseMenu.SAction saction in this.m_act)
-                AppMain.AoActDelete(saction.act);
-            AppMain.GsSoundFreeSeHandle(this.m_se_handle);
+            foreach (SAction saction in this.m_act)
+                AoActDelete(saction.act);
+            GsSoundFreeSeHandle(this.m_se_handle);
             this.m_flag[7] = false;
             this.DetachTask();
         }
 
         private void releasingStart()
         {
-            foreach (AppMain.AOS_TEXTURE tex in this.m_tex)
-                AppMain.AoTexRelease(tex);
+            foreach (AOS_TEXTURE tex in this.m_tex)
+                AoTexRelease(tex);
             this.AttachTask("gmPauseMenu.Flush", 28928U, 0U, 0U);
-            this.m_procCount.SetProc(new AppMain.ITaskAsv.FProc(this.releasing));
+            this.m_procCount.SetProc(new FProc(this.releasing));
         }
 
         private void releasing()
         {
             bool flag = true;
-            foreach (AppMain.AOS_TEXTURE tex in this.m_tex)
+            foreach (AOS_TEXTURE tex in this.m_tex)
             {
-                if (!AppMain.AoTexIsReleased(tex))
+                if (!AoTexIsReleased(tex))
                 {
                     flag = false;
                     break;
@@ -724,23 +701,23 @@ public partial class AppMain
 
         private void playSe(int se)
         {
-            AppMain.GmSoundPlaySE(AppMain.CMain_PauseMenu.c_se_name_tbl[se]);
+            GmSoundPlaySE(c_se_name_tbl[se]);
         }
 
         private static bool canGoStageSelect()
         {
-            return AppMain.GsMainSysIsStageClear(0) && !AppMain.GsTrialIsTrial();
+            return GsMainSysIsStageClear(0) && !GsTrialIsTrial();
         }
 
         private static bool isSpecialStage()
         {
-            return AppMain.GSM_MAIN_STAGE_IS_SPSTAGE();
+            return GSM_MAIN_STAGE_IS_SPSTAGE();
         }
 
         private static int TrgIdxToReturnIdx(int trg_idx)
         {
-            int num = AppMain.CMain_PauseMenu.c_return_table[trg_idx];
-            if (!AppMain.CMain_PauseMenu.canGoStageSelect() && 2 == num)
+            int num = c_return_table[trg_idx];
+            if (!canGoStageSelect() && 2 == num)
                 num = 3;
             return num;
         }
@@ -824,11 +801,11 @@ public partial class AppMain
         private class SAction
         {
             public readonly bool[] flag = new bool[2];
-            public AppMain.AOS_ACTION act;
-            public AppMain.AOS_TEXTURE tex;
+            public AOS_ACTION act;
+            public AOS_TEXTURE tex;
             public Vector2 scale;
             public Vector3 pos;
-            public AppMain.AOS_ACT_COL color;
+            public AOS_ACT_COL color;
 
             public void AcmInit()
             {
@@ -839,24 +816,24 @@ public partial class AppMain
 
             public void Update()
             {
-                AppMain.AoActAcmPush();
+                AoActAcmPush();
                 float frame = this.flag[0] ? 0.0f : 1f;
-                AppMain.AoActSetTexture(AppMain.AoTexGetTexList(this.tex));
-                if (1.0 != (double)this.scale.X || 1.0 != (double)this.scale.Y)
-                    AppMain.AoActAcmApplyScale(this.scale.X, this.scale.Y);
-                if (0.0 != (double)this.pos.X || 0.0 != (double)this.pos.Y || 0.0 != (double)this.pos.Z)
-                    AppMain.AoActAcmApplyTrans(this.pos.X, this.pos.Y, this.pos.Z);
+                AoActSetTexture(AoTexGetTexList(this.tex));
+                if (1.0 != scale.X || 1.0 != scale.Y)
+                    AoActAcmApplyScale(this.scale.X, this.scale.Y);
+                if (0.0 != pos.X || 0.0 != pos.Y || 0.0 != pos.Z)
+                    AoActAcmApplyTrans(this.pos.X, this.pos.Y, this.pos.Z);
                 if (uint.MaxValue != this.color.c)
-                    AppMain.AoActAcmApplyColor(this.color);
-                AppMain.AoActUpdate(this.act, frame);
-                AppMain.AoActAcmPop();
+                    AoActAcmApplyColor(this.color);
+                AoActUpdate(this.act, frame);
+                AoActAcmPop();
             }
 
             public void Draw()
             {
                 if (this.flag[1])
                     return;
-                AppMain.AoActSortRegAction(this.act);
+                AoActSortRegAction(this.act);
             }
 
             public class BFlag

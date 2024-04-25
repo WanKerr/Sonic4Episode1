@@ -6,57 +6,57 @@
 
 public struct QuadType<I, E1, E2, E3>
 {
-  private object Value;
+    private object Value;
 
-  public static implicit operator QuadType<I, E1, E2, E3>(I i)
-  {
-    return new QuadType<I, E1, E2, E3>()
+    public static implicit operator QuadType<I, E1, E2, E3>(I i)
     {
-      Value = (object) i
-    };
-  }
+        return new QuadType<I, E1, E2, E3>()
+        {
+            Value = i
+        };
+    }
 
-  public static implicit operator QuadType<I, E1, E2, E3>(E1 e1)
-  {
-    return new QuadType<I, E1, E2, E3>()
+    public static implicit operator QuadType<I, E1, E2, E3>(E1 e1)
     {
-      Value = (object) e1
-    };
-  }
+        return new QuadType<I, E1, E2, E3>()
+        {
+            Value = e1
+        };
+    }
 
-  public static implicit operator QuadType<I, E1, E2, E3>(E2 e2)
-  {
-    return new QuadType<I, E1, E2, E3>()
+    public static implicit operator QuadType<I, E1, E2, E3>(E2 e2)
     {
-      Value = (object) e2
-    };
-  }
+        return new QuadType<I, E1, E2, E3>()
+        {
+            Value = e2
+        };
+    }
 
-  public static implicit operator QuadType<I, E1, E2, E3>(E3 e3)
-  {
-    return new QuadType<I, E1, E2, E3>()
+    public static implicit operator QuadType<I, E1, E2, E3>(E3 e3)
     {
-      Value = (object) e3
-    };
-  }
+        return new QuadType<I, E1, E2, E3>()
+        {
+            Value = e3
+        };
+    }
 
-  public static implicit operator I(QuadType<I, E1, E2, E3> quadType)
-  {
-    return quadType.Value is I ? (I) quadType.Value : default (I);
-  }
+    public static implicit operator I(QuadType<I, E1, E2, E3> quadType)
+    {
+        return quadType.Value is I ? (I)quadType.Value : default(I);
+    }
 
-  public static explicit operator E1(QuadType<I, E1, E2, E3> quadType)
-  {
-    return quadType.Value is E1 ? (E1) quadType.Value : default (E1);
-  }
+    public static explicit operator E1(QuadType<I, E1, E2, E3> quadType)
+    {
+        return quadType.Value is E1 ? (E1)quadType.Value : default(E1);
+    }
 
-  public static explicit operator E2(QuadType<I, E1, E2, E3> quadType)
-  {
-    return quadType.Value is E2 ? (E2) quadType.Value : default (E2);
-  }
+    public static explicit operator E2(QuadType<I, E1, E2, E3> quadType)
+    {
+        return quadType.Value is E2 ? (E2)quadType.Value : default(E2);
+    }
 
-  public static explicit operator E3(QuadType<I, E1, E2, E3> quadType)
-  {
-    return quadType.Value is E3 ? (E3) quadType.Value : default (E3);
-  }
+    public static explicit operator E3(QuadType<I, E1, E2, E3> quadType)
+    {
+        return quadType.Value is E3 ? (E3)quadType.Value : default(E3);
+    }
 }

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 public class AoPad
 {
-    private static ControllerSource controllerSource 
+    internal static ControllerSource controllerSource
         = new ControllerSource();
 
     public static void AoPadUpdate()
@@ -166,7 +162,7 @@ public class AoPad
         }
         return 0;
     }
-
+    
     public static int AoPadSomeoneDirect(ControllerConsts key)
     {
         for (int i = 0; i < (controllerSource?.Count ?? 0); i++)
@@ -267,7 +263,7 @@ public class AoPad
     {
         for (int i = 0; i < (controllerSource?.Count ?? 0); i++)
         {
-            if ((PAD_MDIRECT(i) & (int)key) != 0)
+            if ((PAD_MDIRECT(i) & key) != 0)
             {
                 return i;
             }
@@ -275,7 +271,7 @@ public class AoPad
         return -1;
     }
 
-    public static int AoPadSomeoneMStand(ushort key)
+    public static int AoPadSomeoneMStand(ControllerConsts key)
     {
         for (int i = 0; i < (controllerSource?.Count ?? 0); i++)
         {
@@ -291,7 +287,7 @@ public class AoPad
     {
         for (int i = 0; i < (controllerSource?.Count ?? 0); i++)
         {
-            if ((PAD_MREPEAT(i) & (int)key) != 0)
+            if ((PAD_MREPEAT(i) & key) != 0)
             {
                 return i;
             }
@@ -303,7 +299,7 @@ public class AoPad
     {
         for (int i = 0; i < (controllerSource?.Count ?? 0); i++)
         {
-            if ((PAD_MRELEASE(i) & (int)key) != 0)
+            if ((PAD_MRELEASE(i) & key) != 0)
             {
                 return i;
             }
@@ -315,7 +311,7 @@ public class AoPad
     {
         return PAD_DIRECT((int)port);
     }
-    
+
     public static ControllerConsts AoPadPortStand(uint port)
     {
         return PAD_STAND((int)port);
@@ -408,7 +404,7 @@ public class AoPad
     }
 
     public static void AoPadSetVibration(ushort left, ushort right)
-    {
+    {    
         if (AppMain.AoAccountGetCurrentId() < (controllerSource?.Count ?? 0))
         {
             controllerSource[AppMain.AoAccountGetCurrentId()].SetVibration(left, right);
@@ -417,7 +413,7 @@ public class AoPad
 
     public static int PAD_CONNECT(int _port)
     {
-        return (int)(controllerSource[_port] != null ? 1 : 0);
+        return controllerSource[_port] != null ? 1 : 0;
     }
 
     public static ControllerConsts PAD_DIRECT(int _port)
@@ -465,22 +461,22 @@ public class AoPad
 
     public static int PAD_MDIRECT(int _port)
     {
-        return (int)(controllerSource[_port].reading.direct | controllerSource[_port].reading.adirect);
+        return controllerSource[_port].reading.direct | controllerSource[_port].reading.adirect;
     }
 
     public static int PAD_MSTAND(int _port)
     {
-        return (int)(controllerSource[_port].reading.stand | controllerSource[_port].reading.astand);
+        return controllerSource[_port].reading.stand | controllerSource[_port].reading.astand;
     }
 
     public static int PAD_MREPEAT(int _port)
     {
-        return (int)(controllerSource[_port].reading.repeat | controllerSource[_port].reading.arepeat);
+        return controllerSource[_port].reading.repeat | controllerSource[_port].reading.arepeat;
     }
 
     public static int PAD_MRELEASE(int _port)
     {
-        return (int)(controllerSource[_port].reading.release | controllerSource[_port].reading.arelease);
+        return controllerSource[_port].reading.release | controllerSource[_port].reading.arelease;
     }
 
     public static short PAD_A_LX(int _port)

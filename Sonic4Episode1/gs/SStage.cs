@@ -4,8 +4,6 @@
 // MVID: 093CE2FC-33E2-4332-B0FE-1EA1E44D3AE7
 // Assembly location: C:\Users\wamwo\Documents\GitHub\Sonic4Ep1-WP7-Decompilation\XAP\Sonic4 ep I.dll
 
-using System;
-using System.IO;
 using System.Runtime.InteropServices;
 
 namespace gs.backup
@@ -41,14 +39,14 @@ namespace gs.backup
             return stages[(int)index];
         }
 
-        public SStageSolo getStageSolo(SStage.EStage.Type index)
+        public SStageSolo getStageSolo(EStage.Type index)
         {
             return stages[(int)index];
         }
 
         public SStageSolo this[int index]
         {
-            get => stages[(int)index];
+            get => stages[index];
         }
 
         public static uint GetSize()

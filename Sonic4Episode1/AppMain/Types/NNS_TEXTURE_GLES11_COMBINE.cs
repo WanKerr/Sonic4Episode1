@@ -1,29 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
 
 public partial class AppMain
 {
@@ -43,11 +18,11 @@ public partial class AppMain
         public ushort Operand1Alpha;
         public ushort Source2Alpha;
         public ushort Operand2Alpha;
-        public AppMain.NNS_RGBA EnvColor;
+        public NNS_RGBA EnvColor;
 
-        public static AppMain.NNS_TEXTURE_GLES11_COMBINE Read(BinaryReader reader)
+        public static NNS_TEXTURE_GLES11_COMBINE Read(BinaryReader reader)
         {
-            return new AppMain.NNS_TEXTURE_GLES11_COMBINE()
+            return new NNS_TEXTURE_GLES11_COMBINE()
             {
                 CombineRGB = reader.ReadUInt16(),
                 Source0RGB = reader.ReadUInt16(),
@@ -72,8 +47,8 @@ public partial class AppMain
             };
         }
 
-        public AppMain.NNS_TEXTURE_GLES11_COMBINE Assign(
-          AppMain.NNS_TEXTURE_GLES11_COMBINE combine)
+        public NNS_TEXTURE_GLES11_COMBINE Assign(
+          NNS_TEXTURE_GLES11_COMBINE combine)
         {
             this.CombineRGB = combine.CombineRGB;
             this.Source0RGB = combine.Source0RGB;

@@ -1,56 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.Media;
 using mpp;
 
 public partial class AppMain
 {
     public void amIPhoneInitNN(PresentationParameters presParams)
     {
-        OpenGL.init(AppMain.m_game, AppMain.m_graphicsDevice);
+        OpenGL.init(m_game, m_graphicsDevice);
         OpenGL.glViewport(0, 0, presParams.BackBufferWidth, presParams.BackBufferHeight);
-        int num1 = 480;
-        int num2 = 320;
-        AppMain.amRenderInit();
-        AppMain.NNS_MATRIX mtx = AppMain.GlobalPool<AppMain.NNS_MATRIX>.Alloc();
-        AppMain.NNS_VECTOR nnsVector = new AppMain.NNS_VECTOR(0.0f, 0.0f, -1f);
-        AppMain.NNS_RGBA nnsRgba = new AppMain.NNS_RGBA(1f, 1f, 1f, 1f);
-        AppMain.NNS_CONFIG_GL config;
-        config.WindowWidth = num1;
-        config.WindowHeight = num2;
+        
+        // TODO: 360.0f
+        float num1 = 320.0f * ((float)presParams.BackBufferWidth / (presParams.BackBufferHeight));
+        float num2 = 320.0f;
+        amRenderInit();
+        NNS_MATRIX mtx = GlobalPool<NNS_MATRIX>.Alloc();
+        NNS_VECTOR nnsVector = new NNS_VECTOR(0.0f, 0.0f, -1f);
+        NNS_RGBA nnsRgba = new NNS_RGBA(1f, 1f, 1f, 1f);
+        NNS_CONFIG_GL config;
+        config.WindowWidth = (int)num1;
+        config.WindowHeight = (int)num2;
         this.nnConfigureSystemGL(config);
-        AppMain.nnMakePerspectiveMatrix(mtx, AppMain.NNM_DEGtoA32(45f), (float)num2 / (float)num1, 1f, 10000f);
-        AppMain._am_draw_video.draw_aspect = (float)num2 / (float)num1;
-        AppMain.nnSetProjection(mtx, 0);
-        AppMain._am_draw_video.draw_width = (float)num1;
-        AppMain._am_draw_video.draw_height = (float)num2;
-        AppMain._am_draw_video.disp_width = (float)num1;
-        AppMain._am_draw_video.disp_height = (float)num2;
-        AppMain._am_draw_video.width_2d = (float)num1;
-        AppMain._am_draw_video.height_2d = (float)num2;
-        AppMain._am_draw_video.scale_x_2d = 1f;
-        AppMain._am_draw_video.scale_y_2d = 1f;
-        AppMain._am_draw_video.base_x_2d = 0.0f;
-        AppMain._am_draw_video.base_y_2d = 0.0f;
-        AppMain._am_draw_video.wide_screen = true;
-        AppMain._am_draw_video.refresh_rate = 60f;
-        AppMain.amRenderInit();
-        AppMain.GlobalPool<AppMain.NNS_MATRIX>.Release(mtx);
+        nnMakePerspectiveMatrix(mtx, NNM_DEGtoA32(45f), num2 / (float)num1, 1f, 10000f);
+        _am_draw_video.draw_aspect = num2 / (float)num1;
+        nnSetProjection(mtx, 0);
+        _am_draw_video.draw_width = num1;
+        _am_draw_video.draw_height = num2;
+        _am_draw_video.disp_width = num1;
+        _am_draw_video.disp_height = num2;
+        _am_draw_video.width_2d = num1;
+        _am_draw_video.height_2d = num2;
+        _am_draw_video.scale_x_2d = 1f;
+        _am_draw_video.scale_y_2d = 1f;
+        _am_draw_video.base_x_2d = 0.0f;
+        _am_draw_video.base_y_2d = 0.0f;
+        _am_draw_video.wide_screen = false;
+        _am_draw_video.refresh_rate = 60f;
+        amRenderInit();
+        GlobalPool<NNS_MATRIX>.Release(mtx);
     }
 
     public static void amIPhoneExitNN()
     {
     }
 
-    public static void amIPhoneSetTextureAttribute(AppMain.AMS_PARAM_LOAD_TEXTURE param)
+    public static void amIPhoneSetTextureAttribute(AMS_PARAM_LOAD_TEXTURE param)
     {
     }
 
@@ -61,37 +58,37 @@ public partial class AppMain
 
     public static void amIPhoneAccelerate(ref Vector3 accel)
     {
-        AppMain.NNS_VECTOR core = AppMain._am_iphone_accel_data.core;
-        AppMain.NNS_VECTOR sensor = AppMain._am_iphone_accel_data.sensor;
+        NNS_VECTOR core = _am_iphone_accel_data.core;
+        NNS_VECTOR sensor = _am_iphone_accel_data.sensor;
         core.x = accel.X;
         core.y = accel.Y;
         core.z = accel.Z;
         sensor.x = -core.y;
         sensor.y = core.x;
         sensor.z = core.z;
-        AppMain._am_iphone_accel_data.rot_x = AppMain.nnArcTan2(-(double)sensor.z, -(double)sensor.y);
-        AppMain._am_iphone_accel_data.rot_z = AppMain.nnArcTan2((double)sensor.x, -(double)sensor.y);
+        _am_iphone_accel_data.rot_x = nnArcTan2(-sensor.z, -sensor.y);
+        _am_iphone_accel_data.rot_z = nnArcTan2(sensor.x, -sensor.y);
     }
 
-    private static void amIPhoneRequestTouch(AppMain.AMS_IPHONE_TP_DATA DispData, int TouchIndex)
+    private static void amIPhoneRequestTouch(AMS_IPHONE_TP_DATA DispData, int TouchIndex)
     {
-        DispData?.Assign(AppMain._am_iphone_tp_ctrl_data[TouchIndex].tpdata);
+        DispData?.Assign(_am_iphone_tp_ctrl_data[TouchIndex].tpdata);
     }
 
     public static void setBackKeyRequest(bool val)
     {
-        AppMain._am_is_back_key_pressed = val;
+        _am_is_back_key_pressed = val;
     }
 
     public static bool isBackKeyPressed()
     {
-        return AppMain._am_is_back_key_pressed;
+        return _am_is_back_key_pressed;
     }
 
     public static void amKeyGetData()
     {
-        AppMain._am_is_back_key_pressed = AppMain.back_key_is_pressed;
-        AppMain.back_key_is_pressed = false;
+        _am_is_back_key_pressed = back_key_is_pressed;
+        back_key_is_pressed = false;
     }
 
     static bool wasPressed = false;
@@ -103,15 +100,13 @@ public partial class AppMain
         {
             state.AddRange(TouchPanel.GetState());
         }
-        else
-        {
-            var mouseState = Mouse.GetState();
-            if (wasPressed)
-                state.Add(new TouchLocation(0, mouseState.LeftButton == ButtonState.Released ?
-                    (wasPressed ? TouchLocationState.Released : TouchLocationState.Moved) : TouchLocationState.Pressed,
-                    new Vector2(mouseState.X, mouseState.Y), TouchLocationState.Invalid, new Vector2()));
-            wasPressed = mouseState.LeftButton == ButtonState.Pressed;
-        }
+
+        var mouseState = Mouse.GetState();
+        if (wasPressed)
+            state.Add(new TouchLocation(0, mouseState.LeftButton == ButtonState.Released ?
+                (wasPressed ? TouchLocationState.Released : TouchLocationState.Moved) : TouchLocationState.Pressed,
+                new Vector2(mouseState.X, mouseState.Y), TouchLocationState.Invalid, new Vector2()));
+        wasPressed = mouseState.LeftButton == ButtonState.Pressed;
 
         for (int i = 0; i < 4; i++)
         {
@@ -166,32 +161,36 @@ public partial class AppMain
         }
     }
 
-    // Token: 0x06001858 RID: 6232 RVA: 0x000DB528 File Offset: 0x000D9728
     private static void screen2real(ref float X, ref float Y)
     {
+#if WINDOWSPHONE7_5
+        // nominal 480, 288
+        X = (X / 533) * 480;
+        Y = (Y / 320) * 288;
+        Y += 16;
+#else
         var bounds = m_game.Window.ClientBounds;
 
         // nominal 480, 288
-        X /= (float)bounds.Width;
+        X /= bounds.Width;
         X *= 480;
 
-        Y /= (float)(bounds.Height);
+        Y /= bounds.Height;
         Y *= 288;
         Y += 16;
-
-        // Debug.WriteLine($"{X}, {Y}");
+#endif
     }
 
     private static int amFindTouchIndex(int id)
     {
         for (int index = 0; index < 4; ++index)
         {
-            if (AppMain._am_iphone_tp_ctrl_data[index].tpdata.id == id)
+            if (_am_iphone_tp_ctrl_data[index].tpdata.id == id)
                 return index;
         }
         for (int index = 0; index < 4; ++index)
         {
-            if (!AppMain.touchMarked[index])
+            if (!touchMarked[index])
                 return index;
         }
         return 0;
@@ -199,41 +198,41 @@ public partial class AppMain
 
     private static void amIPhoneTouchBegan(ref Vector2 touch, int i, int id)
     {
-        AppMain.AMS_IPHONE_TP_DATA tpdata = AppMain._am_iphone_tp_ctrl_data[i].tpdata;
+        AMS_IPHONE_TP_DATA tpdata = _am_iphone_tp_ctrl_data[i].tpdata;
         tpdata.x = (ushort)touch.X;
         tpdata.y = (ushort)touch.Y;
         tpdata.id = id;
-        tpdata.touch = (ushort)1;
-        tpdata.validity = (ushort)1;
+        tpdata.touch = 1;
+        tpdata.validity = 1;
     }
 
     private static void amIPhoneTouchMoved(ref Vector2 touch, int i, int id)
     {
-        AppMain.AMS_IPHONE_TP_DATA tpdata = AppMain._am_iphone_tp_ctrl_data[i].tpdata;
+        AMS_IPHONE_TP_DATA tpdata = _am_iphone_tp_ctrl_data[i].tpdata;
         tpdata.x = (ushort)touch.X;
         tpdata.y = (ushort)touch.Y;
         tpdata.id = id;
-        tpdata.touch = (ushort)1;
-        tpdata.validity = (ushort)1;
+        tpdata.touch = 1;
+        tpdata.validity = 1;
     }
 
     private static void amIPhoneTouchCanceled()
     {
         for (int index = 0; index < 4; ++index)
         {
-            AppMain._am_iphone_tp_ctrl_data[index].tpdata.touch = (ushort)0;
-            AppMain._am_iphone_tp_ctrl_data[index].tpdata.validity = (ushort)0;
+            _am_iphone_tp_ctrl_data[index].tpdata.touch = 0;
+            _am_iphone_tp_ctrl_data[index].tpdata.validity = 0;
         }
     }
 
     private static void amIPhoneTouchCanceled(int i)
     {
-        AppMain._am_iphone_tp_ctrl_data[i].tpdata.touch = (ushort)0;
-        AppMain._am_iphone_tp_ctrl_data[i].tpdata.validity = (ushort)0;
+        _am_iphone_tp_ctrl_data[i].tpdata.touch = 0;
+        _am_iphone_tp_ctrl_data[i].tpdata.validity = 0;
     }
 
     private static void amIPhoneTouchEnded(int i)
     {
-        AppMain._am_iphone_tp_ctrl_data[i].tpdata.touch = (ushort)0;
+        _am_iphone_tp_ctrl_data[i].tpdata.touch = 0;
     }
 }

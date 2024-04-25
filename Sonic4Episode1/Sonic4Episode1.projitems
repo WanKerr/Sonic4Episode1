@@ -56,6 +56,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)AppMain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AppMain\Ao\AoPresence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AppMain\Delegates.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppMain\Gm\GMD_DWORK_NO.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)appmain\gm\GMD_GAME_FLAG.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppMain\Gm\GMD_PLF.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppMain\Gm\GMD_PLY_SEQ_STATE.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)appmain\gm\GMD_TASK_PRIO.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AppMain\Types\_nnDrawPrimitive2DCore.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AppMain\Types\_nnDrawPrimitive3DCore.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AppMain\Types\_nnMakeRotateMatrixQuaternion.cs" />
@@ -850,6 +855,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AppMain\Types\_nnCalcMotionRotate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CPadPolarHandle.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CPadVirtualPad.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GmPlayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)gs\SBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)gs\SDebug.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)gs\SRemaster.cs" />

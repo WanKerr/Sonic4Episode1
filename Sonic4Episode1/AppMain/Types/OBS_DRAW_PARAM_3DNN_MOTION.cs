@@ -1,54 +1,27 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
-
 public partial class AppMain
 {
-    private class OBS_DRAW_PARAM_3DNN_MOTION : AppMain.IClearable
+    private class OBS_DRAW_PARAM_3DNN_MOTION : IClearable
     {
-        public readonly AppMain.NNS_MATRIX mtx = new AppMain.NNS_MATRIX();
-        public readonly AppMain.AMS_DRAWSTATE draw_state = new AppMain.AMS_DRAWSTATE();
-        public readonly AppMain.AMS_PARAM_DRAW_MOTION_TRS param;
-        public AppMain.AMS_DRAWSTATE state;
-        public AppMain.MPP_VOID_OBJECT_DELEGATE user_func;
+        public readonly NNS_MATRIX mtx = new NNS_MATRIX();
+        public readonly AMS_DRAWSTATE draw_state = new AMS_DRAWSTATE();
+        public readonly AMS_PARAM_DRAW_MOTION_TRS param;
+        public AMS_DRAWSTATE state;
+        public MPP_VOID_OBJECT_DELEGATE user_func;
         public object user_param;
-        public AppMain.MPP_VOID_ARRAYNNSMATRIX_NNSOBJECT_OBJECT mplt_cb_func;
+        public MPP_VOID_ARRAYNNSMATRIX_NNSOBJECT_OBJECT mplt_cb_func;
         public object mplt_cb_param;
-        public AppMain.MPP_BOOL_NNSDRAWCALLBACKVAL_OBJECT_DELEGATE material_cb_func;
+        public MPP_BOOL_NNSDRAWCALLBACKVAL_OBJECT_DELEGATE material_cb_func;
         public object material_cb_param;
         public uint use_light_flag;
 
         public OBS_DRAW_PARAM_3DNN_MOTION()
         {
-            this.param = new AppMain.AMS_PARAM_DRAW_MOTION_TRS((object)this);
+            this.param = new AMS_PARAM_DRAW_MOTION_TRS(this);
         }
 
         public void Clear()
         {
-            AppMain.mppAssertNotImpl();
+            mppAssertNotImpl();
         }
     }
 }

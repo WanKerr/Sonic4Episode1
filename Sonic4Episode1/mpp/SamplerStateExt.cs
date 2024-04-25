@@ -8,20 +8,20 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace mpp
 {
-  internal static class SamplerStateExt
-  {
-    public static SamplerState clone(this SamplerState original)
+    internal static class SamplerStateExt
     {
-      return new SamplerState()
-      {
-        AddressU = original.AddressU,
-        AddressV = original.AddressV,
-        AddressW = original.AddressW,
-        Filter = original.Filter,
-        MaxAnisotropy = original.MaxAnisotropy,
-        MaxMipLevel = original.MaxMipLevel,
-        MipMapLevelOfDetailBias = original.MipMapLevelOfDetailBias
-      };
+        public static SamplerState clone(this SamplerState original)
+        {
+            return new SamplerState()
+            {
+                AddressU = original.AddressU,
+                AddressV = original.AddressV,
+                AddressW = original.AddressW,
+                Filter = original.Filter,
+                MaxAnisotropy = original.MaxAnisotropy,
+                MaxMipLevel = original.MaxMipLevel,
+                MipMapLevelOfDetailBias = original.MipMapLevelOfDetailBias
+            };
+        }
     }
-  }
 }

@@ -1,35 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
 
 public partial class AppMain
 {
     public class NNS_MESHSET
     {
-        public readonly AppMain.NNS_VECTOR Center = AppMain.GlobalPool<AppMain.NNS_VECTOR>.Alloc();
+        public readonly NNS_VECTOR Center = GlobalPool<NNS_VECTOR>.Alloc();
         public float Radius;
         public int iNode;
         public int iMatrix;
@@ -44,7 +19,7 @@ public partial class AppMain
         {
         }
 
-        public NNS_MESHSET(AppMain.NNS_MESHSET meshSet)
+        public NNS_MESHSET(NNS_MESHSET meshSet)
         {
             this.Center.Assign(meshSet.Center);
             this.Radius = meshSet.Radius;
@@ -58,7 +33,7 @@ public partial class AppMain
             this.Reserved0 = meshSet.Reserved0;
         }
 
-        public AppMain.NNS_MESHSET Assign(AppMain.NNS_MESHSET meshSet)
+        public NNS_MESHSET Assign(NNS_MESHSET meshSet)
         {
             if (this != meshSet)
             {
@@ -76,9 +51,9 @@ public partial class AppMain
             return this;
         }
 
-        public static AppMain.NNS_MESHSET Read(BinaryReader reader)
+        public static NNS_MESHSET Read(BinaryReader reader)
         {
-            return new AppMain.NNS_MESHSET()
+            return new NNS_MESHSET()
             {
                 Center = {
           x = reader.ReadSingle(),

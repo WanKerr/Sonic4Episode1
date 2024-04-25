@@ -8,19 +8,19 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace mpp
 {
-  internal static class RasterizerStateEx
-  {
-    public static RasterizerState clone(this RasterizerState original)
+    internal static class RasterizerStateEx
     {
-      return new RasterizerState()
-      {
-        CullMode = original.CullMode,
-        DepthBias = original.DepthBias,
-        FillMode = original.FillMode,
-        MultiSampleAntiAlias = original.MultiSampleAntiAlias,
-        ScissorTestEnable = original.ScissorTestEnable,
-        SlopeScaleDepthBias = original.SlopeScaleDepthBias
-      };
+        public static RasterizerState clone(this RasterizerState original)
+        {
+            return new RasterizerState()
+            {
+                CullMode = original.CullMode,
+                DepthBias = original.DepthBias,
+                FillMode = original.FillMode,
+                MultiSampleAntiAlias = original.MultiSampleAntiAlias,
+                ScissorTestEnable = original.ScissorTestEnable,
+                SlopeScaleDepthBias = original.SlopeScaleDepthBias
+            };
+        }
     }
-  }
 }

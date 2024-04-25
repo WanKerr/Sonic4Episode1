@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-
-public partial class AppMain
+﻿public partial class AppMain
 {
     public static void GmScoreCreateScore(
           int score,
@@ -22,14 +11,14 @@ public partial class AppMain
         int[] numArray2 = new int[5] { 10000, 1000, 100, 10, 1 };
         if (score <= 0)
             return;
-        AppMain.OBS_OBJECT_WORK parent_obj = AppMain.OBM_OBJECT_TASK_DETAIL_INIT((ushort)18432, (byte)5, (byte)0, (byte)0, (AppMain.TaskWorkFactoryDelegate)(() => (object)new AppMain.GMS_SCORE_DISP_WORK()), (string)null);
-        AppMain.GMS_SCORE_DISP_WORK gmsScoreDispWork = (AppMain.GMS_SCORE_DISP_WORK)parent_obj;
+        OBS_OBJECT_WORK parent_obj = OBM_OBJECT_TASK_DETAIL_INIT(18432, 5, 0, 0, () => new GMS_SCORE_DISP_WORK(), null);
+        GMS_SCORE_DISP_WORK gmsScoreDispWork = (GMS_SCORE_DISP_WORK)parent_obj;
         parent_obj.pos.x = pos_x;
         parent_obj.pos.y = pos_y - 65536;
         parent_obj.pos.z = 1179648;
         parent_obj.flag |= 18U;
         parent_obj.move_flag |= 256U;
-        parent_obj.ppFunc = new AppMain.MPP_VOID_OBS_OBJECT_WORK(AppMain.gmScoreMainFunc);
+        parent_obj.ppFunc = new MPP_VOID_OBS_OBJECT_WORK(gmScoreMainFunc);
         gmsScoreDispWork.vib_level = vib_level;
         gmsScoreDispWork.base_pos.Assign(parent_obj.pos);
         gmsScoreDispWork.scale = scale;
@@ -66,18 +55,18 @@ public partial class AppMain
         int index1 = 0;
         while (index1 < 5 && numArray1[index1] != -1)
         {
-            gmsScoreDispWork.efct_work[index1] = AppMain.GmEfctCmnEsCreate(parent_obj, 56 + numArray1[index1]);
+            gmsScoreDispWork.efct_work[index1] = GmEfctCmnEsCreate(parent_obj, 56 + numArray1[index1]);
             gmsScoreDispWork.efct_work[index1].efct_com.obj_work.scale.x = gmsScoreDispWork.efct_work[index1].efct_com.obj_work.scale.y = gmsScoreDispWork.efct_work[index1].efct_com.obj_work.scale.z = scale;
             gmsScoreDispWork.efct_work[index1].obj_3des.command_state = 10U;
-            AppMain.GmComEfctSetDispOffset(gmsScoreDispWork.efct_work[index1], ofst_x, 0, 0);
+            GmComEfctSetDispOffset(gmsScoreDispWork.efct_work[index1], ofst_x, 0, 0);
             ++index1;
             ofst_x += num3;
         }
     }
 
-    public static void gmScoreMainFunc(AppMain.OBS_OBJECT_WORK obj_work)
+    public static void gmScoreMainFunc(OBS_OBJECT_WORK obj_work)
     {
-        AppMain.GMS_SCORE_DISP_WORK gmsScoreDispWork = (AppMain.GMS_SCORE_DISP_WORK)obj_work;
+        GMS_SCORE_DISP_WORK gmsScoreDispWork = (GMS_SCORE_DISP_WORK)obj_work;
         gmsScoreDispWork.base_pos.y += gmsScoreDispWork.rise_spd;
         gmsScoreDispWork.rise_spd += gmsScoreDispWork.rise_dec;
         if (gmsScoreDispWork.rise_spd > 0)
@@ -85,12 +74,12 @@ public partial class AppMain
         obj_work.pos.Assign(gmsScoreDispWork.base_pos);
         if (gmsScoreDispWork.rise_spd != 0)
         {
-            gmsScoreDispWork.vib_timer = AppMain.ObjTimeCountUp(gmsScoreDispWork.vib_timer);
+            gmsScoreDispWork.vib_timer = ObjTimeCountUp(gmsScoreDispWork.vib_timer);
             int index = gmsScoreDispWork.vib_timer >> 12 & 7;
-            obj_work.pos.x += AppMain.FX_Mul(AppMain.gm_score_vib_tbl[index][0], AppMain.gm_score_vib_scale_tbl[gmsScoreDispWork.vib_level]);
-            obj_work.pos.y += AppMain.FX_Mul(AppMain.gm_score_vib_tbl[index][1], AppMain.gm_score_vib_scale_tbl[gmsScoreDispWork.vib_level]);
+            obj_work.pos.x += FX_Mul(gm_score_vib_tbl[index][0], gm_score_vib_scale_tbl[gmsScoreDispWork.vib_level]);
+            obj_work.pos.y += FX_Mul(gm_score_vib_tbl[index][1], gm_score_vib_scale_tbl[gmsScoreDispWork.vib_level]);
         }
-        gmsScoreDispWork.timer = AppMain.ObjTimeCountDown(gmsScoreDispWork.timer);
+        gmsScoreDispWork.timer = ObjTimeCountDown(gmsScoreDispWork.timer);
         if (gmsScoreDispWork.timer > 0)
             return;
         for (int index = 0; index < 5; ++index)

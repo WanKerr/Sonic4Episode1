@@ -1,27 +1,17 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
+﻿using System.Collections;
 using accel;
 using er;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
 
 public partial class AppMain
 {
-    public class CProc<TCrtpType> where TCrtpType : class, AppMain.IFunctor
+    public class CProc<TCrtpType> where TCrtpType : class, IFunctor
     {
-        private AppMain.CProc<TCrtpType>.FProc m_proc;
+        private FProc m_proc;
         private TCrtpType m_it;
 
         public virtual void operator_brackets()
         {
-            if ((object)this.m_it == null || this.IsNoneProc())
+            if (m_it == null || this.IsNoneProc())
                 return;
             this.m_proc();
         }
@@ -31,7 +21,7 @@ public partial class AppMain
             return this.m_proc == null;
         }
 
-        public bool IsProc(AppMain.CProc<TCrtpType>.FProc proc)
+        public bool IsProc(FProc proc)
         {
             return this.m_proc == proc;
         }
@@ -41,7 +31,7 @@ public partial class AppMain
             return this.IsNoneProc();
         }
 
-        public AppMain.CProc<TCrtpType>.FProc GetProc()
+        public FProc GetProc()
         {
             return this.m_proc;
         }
@@ -58,26 +48,26 @@ public partial class AppMain
             this.SetProc();
         }
 
-        public void SetProc(AppMain.CProc<TCrtpType>.FProc proc)
+        public void SetProc(FProc proc)
         {
             this.m_proc = proc;
         }
 
         public void SetProc()
         {
-            this.m_proc = (AppMain.CProc<TCrtpType>.FProc)null;
+            this.m_proc = null;
         }
 
         public CProc()
         {
             this.m_it = default(TCrtpType);
-            this.m_proc = (AppMain.CProc<TCrtpType>.FProc)null;
+            this.m_proc = null;
         }
 
         public CProc(TCrtpType it)
         {
             this.m_it = it;
-            this.m_proc = (AppMain.CProc<TCrtpType>.FProc)null;
+            this.m_proc = null;
         }
 
         ~CProc()
@@ -87,7 +77,7 @@ public partial class AppMain
         public delegate void FProc();
     }
 
-    public class CProcCount<TCrtpType> : AppMain.CProc<TCrtpType> where TCrtpType : class, AppMain.IFunctor
+    public class CProcCount<TCrtpType> : CProc<TCrtpType> where TCrtpType : class, IFunctor
     {
         private ulong m_counter;
 
@@ -102,7 +92,7 @@ public partial class AppMain
             return this.m_counter;
         }
 
-        public new void SetProc(AppMain.CProc<TCrtpType>.FProc proc)
+        public new void SetProc(FProc proc)
         {
             this.ResetCounter();
             base.SetProc(proc);
@@ -133,14 +123,14 @@ public partial class AppMain
         }
     }
 
-    public class CMainTask<TCrtpType> : AppMain.CProcCount<AppMain.CMain>, AppMain.IFunctor
+    public class CMainTask<TCrtpType> : CProcCount<CMain>, IFunctor
     {
-        public AppMain.ITaskLink m_pTaskLink;
+        public ITaskLink m_pTaskLink;
 
         public CMainTask()
         {
-            this.SetTarget((AppMain.CMain)(object)this);
-            this.m_pTaskLink = new AppMain.ITaskLink((AppMain.IFunctor)this);
+            this.SetTarget((CMain)(object)this);
+            this.m_pTaskLink = new ITaskLink(this);
         }
 
         ~CMainTask()
@@ -152,60 +142,60 @@ public partial class AppMain
             base.operator_brackets();
         }
     }
-    public class CMain : AppMain.CMainTask<AppMain.CMain>
+    public class CMain : CMainTask<CMain>
     {
         public static readonly int[] c_return_table = new int[2]
         {
       0,
       1
         };
-        private static AppMain.CMain.SLocalUnfoldTable[] c_local_unfold_table = new AppMain.CMain.SLocalUnfoldTable[6]
+        private static SLocalUnfoldTable[] c_local_unfold_table = new SLocalUnfoldTable[6]
         {
-      new AppMain.CMain.SLocalUnfoldTable(AppMain.CMain.EMemFile.Type.None, 0U),
-      new AppMain.CMain.SLocalUnfoldTable(AppMain.CMain.EMemFile.Type.None, 0U),
-      new AppMain.CMain.SLocalUnfoldTable(AppMain.CMain.EMemFile.Type.Global, 0U),
-      new AppMain.CMain.SLocalUnfoldTable(AppMain.CMain.EMemFile.Type.Global, 1U),
-      new AppMain.CMain.SLocalUnfoldTable(AppMain.CMain.EMemFile.Type.Lang, 0U),
-      new AppMain.CMain.SLocalUnfoldTable(AppMain.CMain.EMemFile.Type.Lang, 1U)
+      new SLocalUnfoldTable(EMemFile.Type.None, 0U),
+      new SLocalUnfoldTable(EMemFile.Type.None, 0U),
+      new SLocalUnfoldTable(EMemFile.Type.Global, 0U),
+      new SLocalUnfoldTable(EMemFile.Type.Global, 1U),
+      new SLocalUnfoldTable(EMemFile.Type.Lang, 0U),
+      new SLocalUnfoldTable(EMemFile.Type.Lang, 1U)
         };
-        public static readonly AppMain.CMain.SLocalCreateActionTable[] c_local_create_action_table = new AppMain.CMain.SLocalCreateActionTable[9]
+        public static readonly SLocalCreateActionTable[] c_local_create_action_table = new SLocalCreateActionTable[9]
         {
-      new AppMain.CMain.SLocalCreateActionTable(AppMain.CMain.EFile.EFileEnum.LangAma, AppMain.CMain.ETex.Type.Lang, 0),
-      new AppMain.CMain.SLocalCreateActionTable(AppMain.CMain.EFile.EFileEnum.GlobalAma, AppMain.CMain.ETex.Type.Global, 0),
-      new AppMain.CMain.SLocalCreateActionTable(AppMain.CMain.EFile.EFileEnum.GlobalAma, AppMain.CMain.ETex.Type.Global, 1),
-      new AppMain.CMain.SLocalCreateActionTable(AppMain.CMain.EFile.EFileEnum.GlobalAma, AppMain.CMain.ETex.Type.Global, 2),
-      new AppMain.CMain.SLocalCreateActionTable(AppMain.CMain.EFile.EFileEnum.GlobalAma, AppMain.CMain.ETex.Type.Global, 3),
-      new AppMain.CMain.SLocalCreateActionTable(AppMain.CMain.EFile.EFileEnum.GlobalAma, AppMain.CMain.ETex.Type.Global, 4),
-      new AppMain.CMain.SLocalCreateActionTable(AppMain.CMain.EFile.EFileEnum.GlobalAma, AppMain.CMain.ETex.Type.Global, 5),
-      new AppMain.CMain.SLocalCreateActionTable(AppMain.CMain.EFile.EFileEnum.LangAma, AppMain.CMain.ETex.Type.Lang, 1),
-      new AppMain.CMain.SLocalCreateActionTable(AppMain.CMain.EFile.EFileEnum.LangAma, AppMain.CMain.ETex.Type.Lang, 2)
+      new SLocalCreateActionTable(EFile.EFileEnum.LangAma, ETex.Type.Lang, 0),
+      new SLocalCreateActionTable(EFile.EFileEnum.GlobalAma, ETex.Type.Global, 0),
+      new SLocalCreateActionTable(EFile.EFileEnum.GlobalAma, ETex.Type.Global, 1),
+      new SLocalCreateActionTable(EFile.EFileEnum.GlobalAma, ETex.Type.Global, 2),
+      new SLocalCreateActionTable(EFile.EFileEnum.GlobalAma, ETex.Type.Global, 3),
+      new SLocalCreateActionTable(EFile.EFileEnum.GlobalAma, ETex.Type.Global, 4),
+      new SLocalCreateActionTable(EFile.EFileEnum.GlobalAma, ETex.Type.Global, 5),
+      new SLocalCreateActionTable(EFile.EFileEnum.LangAma, ETex.Type.Lang, 1),
+      new SLocalCreateActionTable(EFile.EFileEnum.LangAma, ETex.Type.Lang, 2)
         };
-        public static readonly AppMain.CMain.EAct.Type[] c_local_create_trg_table = new AppMain.CMain.EAct.Type[2]
+        public static readonly EAct.Type[] c_local_create_trg_table = new EAct.Type[2]
         {
-      AppMain.CMain.EAct.Type.BuyCenter,
-      AppMain.CMain.EAct.Type.CancelCenter
+      EAct.Type.BuyCenter,
+      EAct.Type.CancelCenter
         };
-        public static readonly AppMain.CMain.EAct.Type[][] c_btn_action_table = new AppMain.CMain.EAct.Type[2][]
+        public static readonly EAct.Type[][] c_btn_action_table = new EAct.Type[2][]
         {
-      new AppMain.CMain.EAct.Type[3]
+      new EAct.Type[3]
       {
-        AppMain.CMain.EAct.Type.BuyLeft,
-        AppMain.CMain.EAct.Type.BuyCenter,
-        AppMain.CMain.EAct.Type.BuyRight
+        EAct.Type.BuyLeft,
+        EAct.Type.BuyCenter,
+        EAct.Type.BuyRight
       },
-      new AppMain.CMain.EAct.Type[3]
+      new EAct.Type[3]
       {
-        AppMain.CMain.EAct.Type.CancelLeft,
-        AppMain.CMain.EAct.Type.CancelCenter,
-        AppMain.CMain.EAct.Type.CancelRight
+        EAct.Type.CancelLeft,
+        EAct.Type.CancelCenter,
+        EAct.Type.CancelRight
       }
         };
         private BitArray m_flag = new BitArray(8);
-        private readonly AppMain.AMS_FS[] m_fs = new AppMain.AMS_FS[2];
+        private readonly AMS_FS[] m_fs = new AMS_FS[2];
         private readonly object[] m_file = new object[6];
-        private AppMain.AOS_TEXTURE[] m_tex = AppMain.New<AppMain.AOS_TEXTURE>(2);
-        private AppMain.CMain.SAction[] m_act = AppMain.New<AppMain.CMain.SAction>(9);
-        private CTrgAoAction[] m_trg = AppMain.New<CTrgAoAction>(2);
+        private AOS_TEXTURE[] m_tex = New<AOS_TEXTURE>(2);
+        private SAction[] m_act = New<SAction>(9);
+        private CTrgAoAction[] m_trg = New<CTrgAoAction>(2);
         private int[] m_result;
 
         public override void operator_brackets()
@@ -232,7 +222,7 @@ public partial class AppMain
             if (this.m_flag[3])
             {
                 for (int index = 0; index < 2; ++index)
-                    this.m_file[index] = (object)null;
+                    this.m_file[index] = null;
                 this.m_flag[3] = false;
                 this.m_flag[4] = false;
             }
@@ -313,7 +303,7 @@ public partial class AppMain
 
         private void draw()
         {
-            if (!AppMain._am_sample_draw_enable || !this.m_flag[7] || this.m_flag[1])
+            if (!_am_sample_draw_enable || !this.m_flag[7] || this.m_flag[1])
                 return;
             for (int index = 0; index < 9; ++index)
                 this.m_act[index].Draw();
@@ -321,17 +311,17 @@ public partial class AppMain
 
         private void fileLoadingStart()
         {
-            this.m_fs[0] = AppMain.amFsReadBackground(AppMain.c_global);
-            int language = AppMain.GsEnvGetLanguage();
-            this.m_fs[1] = AppMain.amFsReadBackground(AppMain.c_lang[language]);
+            this.m_fs[0] = amFsReadBackground(c_global);
+            int language = GsEnvGetLanguage();
+            this.m_fs[1] = amFsReadBackground(c_lang[language]);
             this.m_flag[3] = true;
-            this.m_pTaskLink.AttachTask("dmBuyScreen::Load", AppMain.c_priority, AppMain.c_user, AppMain.c_attribute);
-            this.SetProc(new AppMain.CProc<AppMain.CMain>.FProc(this.fileLoading));
+            this.m_pTaskLink.AttachTask("dmBuyScreen::Load", c_priority, c_user, c_attribute);
+            this.SetProc(new FProc(this.fileLoading));
         }
 
         public static void fileLoadingS(object pArg)
         {
-            ((AppMain.CMain)pArg).fileLoading();
+            ((CMain)pArg).fileLoading();
         }
 
         private void fileLoading()
@@ -339,7 +329,7 @@ public partial class AppMain
             bool flag = true;
             for (int index = 0; index < 2; ++index)
             {
-                if (!AppMain.amFsIsComplete(this.m_fs[index]))
+                if (!amFsIsComplete(this.m_fs[index]))
                 {
                     flag = false;
                     break;
@@ -348,14 +338,14 @@ public partial class AppMain
             if (!flag)
                 return;
             for (int index = 0; index < 2; ++index)
-                this.m_file[index] = (object)this.m_fs[index];
+                this.m_file[index] = this.m_fs[index];
             for (uint index = 0; index < 6U; ++index)
             {
-                AppMain.CMain.SLocalUnfoldTable slocalUnfoldTable = AppMain.CMain.c_local_unfold_table[(int)index];
-                if (slocalUnfoldTable.file < AppMain.CMain.EMemFile.Type.Max)
+                var slocalUnfoldTable = c_local_unfold_table[(int)index];
+                if (slocalUnfoldTable.file < EMemFile.Type.Max)
                 {
-                    AppMain.AmbChunk buf = AppMain.amBindGet(this.m_fs[(int)slocalUnfoldTable.file], (int)slocalUnfoldTable.index, out string _);
-                    object obj = !AppMain.AoActIsAma(buf.array, buf.offset) ? (object)AppMain.readAMBFile(buf) : (object)AppMain.readAMAFile((object)buf);
+                    var buf = amBindGet(this.m_fs[(int)slocalUnfoldTable.file], (int)slocalUnfoldTable.index, out string _);
+                    object obj = !AoActIsAma(buf.array, buf.offset) ? readAMBFile(buf) : (object)readAMAFile(buf);
                     this.m_file[(int)index] = obj;
                 }
             }
@@ -365,24 +355,24 @@ public partial class AppMain
 
         private void creatingStart()
         {
-            AppMain.CMain.EFile.EFileEnum[] efileEnumArray = new AppMain.CMain.EFile.EFileEnum[2]
+            EFile.EFileEnum[] efileEnumArray = new EFile.EFileEnum[2]
             {
-        AppMain.CMain.EFile.EFileEnum.GlobalAmb,
-        AppMain.CMain.EFile.EFileEnum.LangAmb
+        EFile.EFileEnum.GlobalAmb,
+        EFile.EFileEnum.LangAmb
             };
             for (int index = 0; index < 2; ++index)
             {
-                AppMain.AoTexBuild(this.m_tex[index], (AppMain.AMS_AMB_HEADER)this.m_file[(int)efileEnumArray[index]]);
-                AppMain.AoTexLoad(this.m_tex[index]);
+                AoTexBuild(this.m_tex[index], (AMS_AMB_HEADER)this.m_file[(int)efileEnumArray[index]]);
+                AoTexLoad(this.m_tex[index]);
             }
             this.m_flag[5] = true;
-            this.m_pTaskLink.AttachTask("dmBuyScreen::Build", AppMain.c_priority, AppMain.c_user, AppMain.c_attribute);
-            this.SetProc(new AppMain.CProc<AppMain.CMain>.FProc(this.creating));
+            this.m_pTaskLink.AttachTask("dmBuyScreen::Build", c_priority, c_user, c_attribute);
+            this.SetProc(new FProc(this.creating));
         }
 
         public static void creatingS(object pArg)
         {
-            ((AppMain.CMain)pArg).creating();
+            ((CMain)pArg).creating();
         }
 
         public void creating()
@@ -390,7 +380,7 @@ public partial class AppMain
             bool flag = true;
             for (int index = 0; index < 2; ++index)
             {
-                if (!AppMain.AoTexIsLoaded(this.m_tex[index]))
+                if (!AoTexIsLoaded(this.m_tex[index]))
                 {
                     flag = false;
                     break;
@@ -404,47 +394,47 @@ public partial class AppMain
 
         private void fadeInStart()
         {
-            for (uint index = 0; (long)index < (long)AppMain.CMain.c_local_create_action_table.Length; ++index)
+            for (uint index = 0; index < c_local_create_action_table.Length; ++index)
             {
-                AppMain.CMain.SLocalCreateActionTable createActionTable = AppMain.CMain.c_local_create_action_table[(int)index];
-                AppMain.A2S_AMA_HEADER ama = AppMain.readAMAFile(this.m_file[(int)createActionTable.file]);
-                AppMain.CMain.SAction saction = this.m_act[(int)index];
-                saction.act = AppMain.AoActCreate(ama, (uint)createActionTable.idx);
+                var createActionTable = c_local_create_action_table[(int)index];
+                var ama = readAMAFile(this.m_file[(int)createActionTable.file]);
+                var saction = this.m_act[(int)index];
+                saction.act = AoActCreate(ama, (uint)createActionTable.idx);
                 saction.tex = this.m_tex[(int)(uint)createActionTable.tex];
                 saction.flag[0] = true;
                 saction.AcmInit();
             }
-            for (uint index = 0; (long)index < (long)AppMain.CMain.c_local_create_trg_table.Length; ++index)
+            for (uint index = 0; index < c_local_create_trg_table.Length; ++index)
             {
-                AppMain.CMain.SAction saction = this.m_act[(int)AppMain.CMain.c_local_create_trg_table[(int)index]];
+                var saction = this.m_act[(int)c_local_create_trg_table[(int)index]];
                 this.m_trg[(int)index].Create(saction.act);
             }
-            AppMain.IzFadeInitEasy(0U, 0U, 30f);
+            IzFadeInitEasy(0U, 0U, 30f);
             this.m_flag[7] = true;
-            this.m_pTaskLink.AttachTask("dmBuyScreen::Execute", AppMain.c_priority, AppMain.c_user, AppMain.c_attribute);
-            this.SetProc(new AppMain.CProc<AppMain.CMain>.FProc(this.fadeIn));
+            this.m_pTaskLink.AttachTask("dmBuyScreen::Execute", c_priority, c_user, c_attribute);
+            this.SetProc(new FProc(this.fadeIn));
         }
 
         private void fadeIn()
         {
-            if (!AppMain.IzFadeIsEnd())
+            if (!IzFadeIsEnd())
                 return;
-            AppMain.IzFadeExit();
+            IzFadeExit();
             this.waitStart();
         }
 
         private void waitStart()
         {
-            this.SetProc(new AppMain.CProc<AppMain.CMain>.FProc(this.wait));
+            this.SetProc(new FProc(this.wait));
         }
 
         private void wait()
         {
             bool flag = false;
             int index = 0;
-            for (int length = AppMain._am_tp_touch.Length; index < length; ++index)
+            for (int length = _am_tp_touch.Length; index < length; ++index)
             {
-                if (AppMain.amTpIsTouchOn(index))
+                if (amTpIsTouchOn(index))
                 {
                     flag = true;
                     break;
@@ -457,7 +447,7 @@ public partial class AppMain
 
         private void selectStart()
         {
-            this.SetProc(new AppMain.CProc<AppMain.CMain>.FProc(this.select));
+            this.SetProc(new FProc(this.select));
         }
 
         private void select()
@@ -465,7 +455,7 @@ public partial class AppMain
             int trg_idx = -1;
             for (int index1 = 0; index1 < 2; ++index1)
             {
-                CTrgAoAction ctrgAoAction = this.m_trg[index1];
+                var ctrgAoAction = this.m_trg[index1];
                 float frame;
                 if (ctrgAoAction.GetState(0U)[10] && ctrgAoAction.GetState(0U)[1])
                 {
@@ -474,22 +464,22 @@ public partial class AppMain
                 }
                 else
                     frame = !ctrgAoAction.GetState(0U)[0] ? 0.0f : 2f;
-                for (uint index2 = 0; (long)index2 < (long)AppMain.arrayof((Array)AppMain.CMain.c_btn_action_table[index1]); ++index2)
-                    AppMain.AoActSetFrame(this.m_act[(int)AppMain.CMain.c_btn_action_table[index1][(int)index2]].act, frame);
+                for (uint index2 = 0; index2 < arrayof(c_btn_action_table[index1]); ++index2)
+                    AoActSetFrame(this.m_act[(int)c_btn_action_table[index1][(int)index2]].act, frame);
             }
             if (-1 == trg_idx)
                 return;
-            AppMain.CMain.EAct.Type[] typeArray = AppMain.CMain.c_btn_action_table[trg_idx];
-            for (int index = (int)typeArray[0]; (AppMain.CMain.EAct.Type)index < typeArray[2] + 1; ++index)
+            EAct.Type[] typeArray = c_btn_action_table[trg_idx];
+            for (int index = (int)typeArray[0]; (EAct.Type)index < typeArray[2] + 1; ++index)
                 this.m_act[index].flag[0] = false;
-            AppMain.DmSoundPlaySE("Ok");
-            this.m_result[0] = AppMain.CMain.TrgIdxToReturnIdx(trg_idx);
+            DmSoundPlaySE("Ok");
+            this.m_result[0] = TrgIdxToReturnIdx(trg_idx);
             this.enterEfctStart();
         }
 
         private void enterEfctStart()
         {
-            this.SetProc(new AppMain.CProc<AppMain.CMain>.FProc(this.enterEfct));
+            this.SetProc(new FProc(this.enterEfct));
         }
 
         private void enterEfct()
@@ -508,16 +498,16 @@ public partial class AppMain
 
         private void fadeOutStart()
         {
-            AppMain.IzFadeInitEasy(0U, 1U, 30f);
-            this.SetProc(new AppMain.CProc<AppMain.CMain>.FProc(this.fadeOut));
+            IzFadeInitEasy(0U, 1U, 30f);
+            this.SetProc(new FProc(this.fadeOut));
         }
 
         private void fadeOut()
         {
-            if (!AppMain.IzFadeIsEnd())
+            if (!IzFadeIsEnd())
                 return;
             for (int index = 0; index < 9; ++index)
-                AppMain.AoActDelete(this.m_act[index].act);
+                AoActDelete(this.m_act[index].act);
             this.m_flag[7] = false;
             this.m_pTaskLink.DetachTask();
         }
@@ -525,14 +515,14 @@ public partial class AppMain
         private void releasingStart()
         {
             for (int index = 0; index < 2; ++index)
-                AppMain.AoTexRelease(this.m_tex[index]);
-            this.m_pTaskLink.AttachTask("dmBuyScreen::Flush", AppMain.c_priority, AppMain.c_user, AppMain.c_attribute);
-            this.SetProc(new AppMain.CProc<AppMain.CMain>.FProc(this.releasing));
+                AoTexRelease(this.m_tex[index]);
+            this.m_pTaskLink.AttachTask("dmBuyScreen::Flush", c_priority, c_user, c_attribute);
+            this.SetProc(new FProc(this.releasing));
         }
 
         public static void releasingS(object pArg)
         {
-            ((AppMain.CMain)pArg).releasing();
+            ((CMain)pArg).releasing();
         }
 
         private void releasing()
@@ -540,7 +530,7 @@ public partial class AppMain
             bool flag = true;
             for (int index = 0; index < 2; ++index)
             {
-                if (!AppMain.AoTexIsReleased(this.m_tex[index]))
+                if (!AoTexIsReleased(this.m_tex[index]))
                 {
                     flag = false;
                     break;
@@ -555,7 +545,7 @@ public partial class AppMain
 
         private static int TrgIdxToReturnIdx(int trg_idx)
         {
-            return AppMain.CMain.c_return_table[trg_idx];
+            return c_return_table[trg_idx];
         }
 
         private class BFlag
@@ -586,7 +576,7 @@ public partial class AppMain
             }
         }
 
-        public class EFile : AppMain.CMain.EMemFile
+        public class EFile : EMemFile
         {
             public enum EFileEnum
             {
@@ -642,15 +632,15 @@ public partial class AppMain
         public class SAction
         {
             public bool[] flag = new bool[3];
-            public AppMain.AOS_ACTION act;
-            public AppMain.AOS_TEXTURE tex;
+            public AOS_ACTION act;
+            public AOS_TEXTURE tex;
             public CArray2<float> scale;
             public CArray3<float> pos;
-            public AppMain.AOS_ACT_COL color;
+            public AOS_ACT_COL color;
 
             public void AcmInit()
             {
-                this.pos = accel.CArray3<float>.initializer(0.0f, 0.0f, 0.0f);
+                this.pos = CArray3<float>.initializer(0.0f, 0.0f, 0.0f);
                 this.scale = CArray2<float>.initializer(1f, 1f);
                 this.color.c = uint.MaxValue;
                 this.act.sprite.texlist = this.tex.texlist;
@@ -658,17 +648,17 @@ public partial class AppMain
 
             public void Update()
             {
-                AppMain.AoActAcmPush();
+                AoActAcmPush();
                 float frame = this.flag[0] ? 0.0f : 1f;
-                AppMain.AoActSetTexture(AppMain.AoTexGetTexList(this.tex));
+                AoActSetTexture(AoTexGetTexList(this.tex));
                 if (!CArray2<float>.initializer(1f, 1f).equals(this.scale))
-                    AppMain.AoActAcmApplyScale(this.scale.x, this.scale.y);
+                    AoActAcmApplyScale(this.scale.x, this.scale.y);
                 if (!CArray3<float>.initializer(0.0f, 0.0f, 0.0f).equals(this.pos))
-                    AppMain.AoActAcmApplyTrans(this.pos.x, this.pos.y, this.pos.z);
+                    AoActAcmApplyTrans(this.pos.x, this.pos.y, this.pos.z);
                 if (uint.MaxValue != this.color.c)
-                    AppMain.AoActAcmApplyColor(this.color);
-                AppMain.AoActUpdate(this.act, frame);
-                AppMain.AoActAcmPop();
+                    AoActAcmApplyColor(this.color);
+                AoActUpdate(this.act, frame);
+                AoActAcmPop();
             }
 
             public void Draw()
@@ -676,9 +666,9 @@ public partial class AppMain
                 if (this.flag[1])
                     return;
                 if (this.flag[2])
-                    AppMain.AoActSortRegAction(this.act);
+                    AoActSortRegAction(this.act);
                 else
-                    AppMain.AoActDraw(this.act);
+                    AoActDraw(this.act);
             }
 
             public class BFlag
@@ -696,10 +686,10 @@ public partial class AppMain
 
         private class SLocalUnfoldTable
         {
-            public AppMain.CMain.EMemFile.Type file;
+            public EMemFile.Type file;
             public uint index;
 
-            public SLocalUnfoldTable(AppMain.CMain.EMemFile.Type type, uint _index)
+            public SLocalUnfoldTable(EMemFile.Type type, uint _index)
             {
                 this.file = type;
                 this.index = _index;
@@ -708,13 +698,13 @@ public partial class AppMain
 
         public struct SLocalCreateActionTable
         {
-            public AppMain.CMain.EFile.EFileEnum file;
-            public AppMain.CMain.ETex.Type tex;
+            public EFile.EFileEnum file;
+            public ETex.Type tex;
             public int idx;
 
             public SLocalCreateActionTable(
-              AppMain.CMain.EFile.EFileEnum file,
-              AppMain.CMain.ETex.Type tex,
+              EFile.EFileEnum file,
+              ETex.Type tex,
               int idx)
             {
                 this.file = file;

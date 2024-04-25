@@ -1,7 +1,7 @@
 ﻿using System;
 
 [Flags]
-public enum ControllerConsts : int
+public enum ControllerConsts : ushort
 {
     UP = 1,
     DOWN = 2,
@@ -13,18 +13,18 @@ public enum ControllerConsts : int
     ALT_LEFT = 64,
     ALT_RIGHT = 128,
 
-    JUMP_BUTTON = 256,
-    SUPER_SONIC = 512,
-    START = 1024,
-    CONFIRM = 2048,
-    CANCEL = 4096,
+    A = 256,
+    B = 512,
+    X = 1024,
+    Y = 2048,
+    L = 4096,
+    R = 8192,
+    START = 16384,
 
-    A = 8192,
-    B = 16384,
-    X = 32768,
-    Y = 65536,
-    L = 131072,
-    R = 262144,
+    JUMP = A | B | X,
+    SUPER_SONIC = Y,
+    CONFIRM = A,
+    CANCEL = B
 }
 
 public struct ControllerReading
@@ -85,39 +85,43 @@ public abstract class Controller
 
         UpdateControllerReading(ref reading);
 
-        if (reading.alx < -16384)
+        switch (reading.alx)
         {
-            reading.direction |= ControllerConsts.LEFT;
-        }
-        else if (reading.alx > 16384)
-        {
-            reading.direction |= ControllerConsts.RIGHT;
-        }
-
-        if (reading.aly < -16384)
-        {
-            reading.direction |= ControllerConsts.DOWN;
-        }
-        else if (reading.aly > 16384)
-        {
-            reading.direction |= ControllerConsts.UP;
+            case < -16384:
+                reading.direction |= ControllerConsts.LEFT;
+                break;
+            case > 16384:
+                reading.direction |= ControllerConsts.RIGHT;
+                break;
         }
 
-        if (reading.arx < -16384)
+        switch (reading.aly)
         {
-            reading.direction |= ControllerConsts.ALT_LEFT;
+            case < -16384:
+                reading.direction |= ControllerConsts.DOWN;
+                break;
+            case > 16384:
+                reading.direction |= ControllerConsts.UP;
+                break;
         }
-        else if (reading.arx > 16384)
+
+        switch (reading.arx)
         {
-            reading.direction |= ControllerConsts.ALT_RIGHT;
+            case < -16384:
+                reading.direction |= ControllerConsts.ALT_LEFT;
+                break;
+            case > 16384:
+                reading.direction |= ControllerConsts.ALT_RIGHT;
+                break;
         }
-        if (reading.ary < -16384)
+        switch (reading.ary)
         {
-            reading.direction |= ControllerConsts.ALT_DOWN;
-        }
-        else if (reading.ary > 16384)
-        {
-            reading.direction |= ControllerConsts.ALT_UP;
+            case < -16384:
+                reading.direction |= ControllerConsts.ALT_DOWN;
+                break;
+            case > 16384:
+                reading.direction |= ControllerConsts.ALT_UP;
+                break;
         }
 
         ushort num4 = (ushort)(reading.adirect ^ (ushort)reading.direction);

@@ -1,33 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
-
 public partial class AppMain
 {
-    public class OBS_COL_CHK_DATA : AppMain.IClearable
+    public class OBS_COL_CHK_DATA : IClearable
     {
         public int pos_x;
         public int pos_y;
@@ -36,7 +9,7 @@ public partial class AppMain
         public ushort flag;
         public ushort vec;
 
-        public AppMain.OBS_COL_CHK_DATA Assign(AppMain.OBS_COL_CHK_DATA data)
+        public OBS_COL_CHK_DATA Assign(OBS_COL_CHK_DATA data)
         {
             if (this != data)
             {
@@ -56,10 +29,10 @@ public partial class AppMain
         {
             this.pos_x = 0;
             this.pos_y = 0;
-            this.dir = (ushort[])null;
-            this.attr = (uint[])null;
-            this.flag = (ushort)0;
-            this.vec = (ushort)0;
+            this.dir = null;
+            this.attr = null;
+            this.flag = 0;
+            this.vec = 0;
         }
     }
 }

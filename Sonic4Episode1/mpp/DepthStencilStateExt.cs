@@ -8,29 +8,29 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace mpp
 {
-  internal static class DepthStencilStateExt
-  {
-    public static DepthStencilState clone(this DepthStencilState original)
+    internal static class DepthStencilStateExt
     {
-      return new DepthStencilState()
-      {
-        CounterClockwiseStencilDepthBufferFail = original.CounterClockwiseStencilDepthBufferFail,
-        CounterClockwiseStencilFail = original.CounterClockwiseStencilFail,
-        CounterClockwiseStencilFunction = original.CounterClockwiseStencilFunction,
-        CounterClockwiseStencilPass = original.CounterClockwiseStencilPass,
-        DepthBufferEnable = original.DepthBufferEnable,
-        DepthBufferFunction = original.DepthBufferFunction,
-        DepthBufferWriteEnable = original.DepthBufferWriteEnable,
-        ReferenceStencil = original.ReferenceStencil,
-        StencilDepthBufferFail = original.StencilDepthBufferFail,
-        StencilEnable = original.StencilEnable,
-        StencilFail = original.StencilFail,
-        StencilFunction = original.StencilFunction,
-        StencilMask = original.StencilMask,
-        StencilPass = original.StencilPass,
-        StencilWriteMask = original.StencilWriteMask,
-        TwoSidedStencilMode = original.TwoSidedStencilMode
-      };
+        public static DepthStencilState clone(this DepthStencilState original)
+        {
+            return new DepthStencilState()
+            {
+                CounterClockwiseStencilDepthBufferFail = original.CounterClockwiseStencilDepthBufferFail,
+                CounterClockwiseStencilFail = original.CounterClockwiseStencilFail,
+                CounterClockwiseStencilFunction = original.CounterClockwiseStencilFunction,
+                CounterClockwiseStencilPass = original.CounterClockwiseStencilPass,
+                DepthBufferEnable = original.DepthBufferEnable,
+                DepthBufferFunction = original.DepthBufferFunction,
+                DepthBufferWriteEnable = original.DepthBufferWriteEnable,
+                ReferenceStencil = original.ReferenceStencil,
+                StencilDepthBufferFail = original.StencilDepthBufferFail,
+                StencilEnable = original.StencilEnable,
+                StencilFail = original.StencilFail,
+                StencilFunction = original.StencilFunction,
+                StencilMask = original.StencilMask,
+                StencilPass = original.StencilPass,
+                StencilWriteMask = original.StencilWriteMask,
+                TwoSidedStencilMode = original.TwoSidedStencilMode
+            };
+        }
     }
-  }
 }

@@ -6,11 +6,11 @@
 
 namespace setting
 {
-  public class main
-  {
-    public const uint c_draw_state = 4;
-    public const uint c_task_priority = 28928;
-    public const uint c_task_user = 0;
-    public const uint c_task_attribute = 0;
-  }
+    public class main
+    {
+        public const uint c_draw_state = 4;
+        public const uint c_task_priority = 28928;
+        public const uint c_task_user = 0;
+        public const uint c_task_attribute = 0;
+    }
 }

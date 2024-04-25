@@ -1,53 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using mpp;
 
 public partial class AppMain
 {
-    private static object amBindGet(AppMain.AMS_AMB_HEADER header, int index)
+    private static object amBindGet(AMS_AMB_HEADER header, int index)
     {
         string sPath;
-        AppMain.AmbChunk buf = AppMain.amBindGet(header, index, out sPath);
+        AmbChunk buf = amBindGet(header, index, out sPath);
         if (header.files[index].IndexOf(".amb", StringComparison.OrdinalIgnoreCase) == -1)
-            return (object)buf;
-        AppMain.AMS_AMB_HEADER amsAmbHeader = AppMain.readAMBFile(buf);
+            return buf;
+        AMS_AMB_HEADER amsAmbHeader = readAMBFile(buf);
         amsAmbHeader.dir = sPath;
-        return (object)amsAmbHeader;
+        return amsAmbHeader;
     }
 
-    private static AppMain.AmbChunk amBindGet(
-      AppMain.AMS_AMB_HEADER header,
+    private static AmbChunk amBindGet(
+      AMS_AMB_HEADER header,
       int index,
       out string sPath)
     {
-        sPath = (string)null;
-        AppMain.AmbChunk ambChunk = (AppMain.AmbChunk)null;
+        sPath = null;
+        AmbChunk ambChunk = null;
         if (index < header.file_num)
-            ambChunk = new AppMain.AmbChunk(header.data, header.offsets[index], header.lengths[index], header);
+            ambChunk = new AmbChunk(header.data, header.offsets[index], header.lengths[index], header);
         else
-            AppMain.mppAssertNotImpl();
+            mppAssertNotImpl();
         return ambChunk;
     }
 
-    private static AppMain.AmbChunk amBindGet(AppMain.AMS_FS header, int index)
+    private static AmbChunk amBindGet(AMS_FS header, int index)
     {
-        return AppMain.amBindGet(header, index, out string _);
+        return amBindGet(header, index, out string _);
     }
 
-    private static AppMain.AmbChunk amBindGet(
-      AppMain.AMS_FS header,
+    private static AmbChunk amBindGet(
+      AMS_FS header,
       int index,
       out string sPath)
     {
-        sPath = (string)null;
-        byte[] array = (byte[])null;
+        sPath = null;
+        byte[] array = null;
         int offset = -1;
         int length = 0;
         if (index < header.count)
@@ -56,39 +47,39 @@ public partial class AppMain
             offset = header.offsets[index];
             length = header.lengths[index];
         }
-        return new AppMain.AmbChunk(array, offset, length, header.amb_header);
+        return new AmbChunk(array, offset, length, header.amb_header);
     }
 
-    public static AppMain.AmbChunk amBindSearch(AppMain.AMS_AMB_HEADER header, string filename)
+    public static AmbChunk amBindSearch(AMS_AMB_HEADER header, string filename)
     {
         for (int index = 0; index < header.file_num; ++index)
         {
             if (header.files[index] == filename)
-                return new AppMain.AmbChunk(header.data, header.offsets[index], header.lengths[index], header);
+                return new AmbChunk(header.data, header.offsets[index], header.lengths[index], header);
         }
-        return (AppMain.AmbChunk)null;
+        return null;
     }
 
-    private static AppMain.AmbChunk amBindSearchEx(
-      AppMain.AMS_AMB_HEADER header,
+    private static AmbChunk amBindSearchEx(
+      AMS_AMB_HEADER header,
       string exname)
     {
-        AppMain.AmbChunk ambChunk = (AppMain.AmbChunk)null;
+        AmbChunk ambChunk = null;
         for (int index = 0; index < header.file_num; ++index)
         {
             if (header.files[index].IndexOf(exname, 0, StringComparison.OrdinalIgnoreCase) != -1)
             {
-                ambChunk = new AppMain.AmbChunk(header.data, header.offsets[index], header.lengths[index], header);
+                ambChunk = new AmbChunk(header.data, header.offsets[index], header.lengths[index], header);
                 break;
             }
         }
         return ambChunk;
     }
 
-    private byte[] amBindSearchID(ref AppMain.AMS_AMB_HEADER header, string file_id, byte[] top)
+    private byte[] amBindSearchID(ref AMS_AMB_HEADER header, string file_id, byte[] top)
     {
-        AppMain.mppAssertNotImpl();
-        return (byte[])null;
+        mppAssertNotImpl();
+        return null;
     }
 
 

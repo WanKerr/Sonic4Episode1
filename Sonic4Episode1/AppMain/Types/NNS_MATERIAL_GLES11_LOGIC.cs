@@ -1,29 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using mpp;
-using setting;
 
 public partial class AppMain
 {
@@ -38,9 +13,9 @@ public partial class AppMain
         public ushort DepthFunc;
         public float AlphaRef;
 
-        public static AppMain.NNS_MATERIAL_GLES11_LOGIC Read(BinaryReader reader)
+        public static NNS_MATERIAL_GLES11_LOGIC Read(BinaryReader reader)
         {
-            return new AppMain.NNS_MATERIAL_GLES11_LOGIC()
+            return new NNS_MATERIAL_GLES11_LOGIC()
             {
                 fFlag = reader.ReadUInt32(),
                 SrcFactor = reader.ReadUInt16(),
@@ -53,7 +28,7 @@ public partial class AppMain
             };
         }
 
-        public AppMain.NNS_MATERIAL_GLES11_LOGIC Assign(AppMain.NNS_MATERIAL_GLES11_LOGIC logic)
+        public NNS_MATERIAL_GLES11_LOGIC Assign(NNS_MATERIAL_GLES11_LOGIC logic)
         {
             this.fFlag = logic.fFlag;
             this.SrcFactor = logic.SrcFactor;

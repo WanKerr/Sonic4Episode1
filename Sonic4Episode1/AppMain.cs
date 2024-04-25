@@ -5,1275 +5,230 @@
 // Assembly location: C:\Users\wamwo\Documents\GitHub\Sonic4Ep1-WP7-Decompilation\XAP\Sonic4 ep I.dll
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
+using System.Runtime.CompilerServices;
 using accel;
-using dbg;
-using er;
-using er.web;
-using gs;
-using gs.backup;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using mpp;
-using setting;
 
 public partial class AppMain
 {
 
     #region data
-    public float[] nngSinCosTbl = new float[1025]
+
+    private byte[] g_gm_through_colattr = new byte[1] { 1 };
+    private readonly NNS_RGBA nngEffectorXColor = new NNS_RGBA(1f, 1f, 1f, 1f);
+    private readonly NNS_RGBA nngEffectorYColor = new NNS_RGBA(1f, 1f, 1f, 1f);
+    private readonly NNS_RGBA nngEffectorZColor = new NNS_RGBA(1f, 1f, 1f, 1f);
+    private readonly NNS_RGBA nngBoneDiffColor = new NNS_RGBA(1f, 1f, 1f, 1f);
+    private readonly NNS_RGB nngBoneAmbColor = new NNS_RGB(0.2f, 0.2f, 0.2f);
+    private readonly NNS_RGBA nngBoneWireColor = new NNS_RGBA(1f, 1f, 1f, 1f);
+    private readonly NNS_RGBA nngGridColor = new NNS_RGBA(1f, 1f, 1f, 0.3f);
+    private readonly NNS_RGBA nngAxisXColor = new NNS_RGBA(1f, 0.0f, 0.0f, 1f);
+    private readonly NNS_RGBA nngAxisYColor = new NNS_RGBA(0.0f, 1f, 0.0f, 1f);
+    private readonly NNS_RGBA nngAxisZColor = new NNS_RGBA(0.0f, 0.0f, 1f, 1f);
+    private readonly NNS_VECTOR[] nngCircumPoint = New<NNS_VECTOR>(120);
+    private NNS_RGBA nngObjCircumCol = new NNS_RGBA(1f, 1f, 1f, 0.3f);
+    private readonly NNS_RGBA[] nngNodeCircumCol = new NNS_RGBA[8]
     {
-    0.0f,
-    0.001534f,
-    0.003068f,
-    0.004602f,
-    0.006136f,
-    0.00767f,
-    0.009204f,
-    0.010738f,
-    0.012272f,
-    0.013805f,
-    0.015339f,
-    0.016873f,
-    0.018407f,
-    0.01994f,
-    0.021474f,
-    0.023008f,
-    0.024541f,
-    0.026075f,
-    0.027608f,
-    0.029142f,
-    0.030675f,
-    0.032208f,
-    0.033741f,
-    0.035274f,
-    0.036807f,
-    0.03834f,
-    0.039873f,
-    0.041406f,
-    0.042938f,
-    0.044471f,
-    0.046003f,
-    0.047535f,
-    0.049068f,
-    0.0506f,
-    0.052132f,
-    0.053664f,
-    0.055195f,
-    0.056727f,
-    0.058258f,
-    0.05979f,
-    0.061321f,
-    0.062852f,
-    0.064383f,
-    0.065913f,
-    0.067444f,
-    0.068974f,
-    0.070505f,
-    0.072035f,
-    0.073565f,
-    0.075094f,
-    0.076624f,
-    0.078153f,
-    0.079682f,
-    0.081211f,
-    0.08274f,
-    0.084269f,
-    0.085797f,
-    0.087326f,
-    0.088854f,
-    0.090381f,
-    0.091909f,
-    0.093436f,
-    0.094963f,
-    0.09649f,
-    0.098017f,
-    0.099544f,
-    0.10107f,
-    0.102596f,
-    0.104122f,
-    0.105647f,
-    0.107172f,
-    0.108697f,
-    0.110222f,
-    0.111747f,
-    0.113271f,
-    0.114795f,
-    0.116319f,
-    0.117842f,
-    0.119365f,
-    0.120888f,
-    0.122411f,
-    0.123933f,
-    0.125455f,
-    0.126977f,
-    0.128498f,
-    0.130019f,
-    0.13154f,
-    0.133061f,
-    0.134581f,
-    0.136101f,
-    0.13762f,
-    0.139139f,
-    0.140658f,
-    0.142177f,
-    0.143695f,
-    0.145213f,
-    0.14673f,
-    0.148248f,
-    0.149765f,
-    0.151281f,
-    0.152797f,
-    0.154313f,
-    0.155828f,
-    0.157343f,
-    0.158858f,
-    0.160372f,
-    0.161886f,
-    0.1634f,
-    20f * (float) Math.PI / 381f,
-    0.166426f,
-    0.167938f,
-    0.16945f,
-    0.170962f,
-    0.172473f,
-    0.173984f,
-    0.175494f,
-    0.177004f,
-    0.178514f,
-    0.180023f,
-    0.181532f,
-    0.18304f,
-    0.184548f,
-    0.186055f,
-    0.187562f,
-    0.189069f,
-    0.190575f,
-    0.19208f,
-    0.193586f,
-    0.19509f,
-    0.196595f,
-    0.198098f,
-    0.199602f,
-    0.201105f,
-    0.202607f,
-    0.204109f,
-    0.20561f,
-    0.207111f,
-    0.208612f,
-    0.210112f,
-    0.211611f,
-    0.21311f,
-    0.214609f,
-    0.216107f,
-    0.217604f,
-    0.219101f,
-    0.220598f,
-    0.222094f,
-    0.223589f,
-    0.225084f,
-    0.226578f,
-    0.228072f,
-    0.229565f,
-    0.231058f,
-    0.23255f,
-    0.234042f,
-    0.235533f,
-    0.237024f,
-    0.238514f,
-    0.240003f,
-    0.241492f,
-    0.24298f,
-    0.244468f,
-    0.245955f,
-    0.247442f,
-    0.248928f,
-    0.250413f,
-    0.251898f,
-    0.253382f,
-    0.254866f,
-    0.256349f,
-    0.257831f,
-    0.259313f,
-    0.260794f,
-    0.262275f,
-    0.263755f,
-    0.265234f,
-    0.266713f,
-    0.268191f,
-    0.269668f,
-    0.271145f,
-    0.272621f,
-    0.274097f,
-    0.275572f,
-    0.277046f,
-    0.27852f,
-    0.279993f,
-    0.281465f,
-    0.282937f,
-    0.284408f,
-    0.285878f,
-    0.287347f,
-    0.288816f,
-    0.290285f,
-    0.291752f,
-    0.293219f,
-    0.294685f,
-    0.296151f,
-    0.297616f,
-    0.29908f,
-    0.300543f,
-    0.302006f,
-    0.303468f,
-    0.304929f,
-    0.30639f,
-    0.30785f,
-    0.309309f,
-    0.310767f,
-    0.312225f,
-    0.313682f,
-    0.315138f,
-    0.316593f,
-    0.318048f,
-    0.319502f,
-    0.320955f,
-    0.322408f,
-    0.323859f,
-    0.32531f,
-    0.32676f,
-    0.32821f,
-    0.329658f,
-    0.331106f,
-    0.332553f,
-    0.334f,
-    0.335445f,
-    0.33689f,
-    0.338334f,
-    0.339777f,
-    0.341219f,
-    0.342661f,
-    0.344101f,
-    0.345541f,
-    0.34698f,
-    0.348419f,
-    0.349856f,
-    0.351293f,
-    0.352729f,
-    0.354164f,
-    0.355598f,
-    0.357031f,
-    0.358463f,
-    0.359895f,
-    0.361326f,
-    0.362756f,
-    0.364185f,
-    0.365613f,
-    0.36704f,
-    0.368467f,
-    0.369892f,
-    0.371317f,
-    0.372741f,
-    0.374164f,
-    0.375586f,
-    0.377007f,
-    0.378428f,
-    0.379847f,
-    0.381266f,
-    0.382683f,
-    0.3841f,
-    0.385516f,
-    0.386931f,
-    0.388345f,
-    0.389758f,
-    0.39117f,
-    0.392582f,
-    0.393992f,
-    0.395401f,
-    0.39681f,
-    0.398218f,
-    0.399624f,
-    0.40103f,
-    0.402435f,
-    0.403838f,
-    0.405241f,
-    0.406643f,
-    0.408044f,
-    0.409444f,
-    0.410843f,
-    0.412241f,
-    0.413638f,
-    0.415034f,
-    0.41643f,
-    0.417824f,
-    0.419217f,
-    0.420609f,
-    0.422f,
-    0.42339f,
-    0.42478f,
-    0.426168f,
-    0.427555f,
-    0.428941f,
-    0.430326f,
-    0.431711f,
-    0.433094f,
-    0.434476f,
-    0.435857f,
-    0.437237f,
-    0.438616f,
-    0.439994f,
-    0.441371f,
-    0.442747f,
-    0.444122f,
-    0.445496f,
-    0.446869f,
-    0.448241f,
-    0.449611f,
-    0.450981f,
-    0.45235f,
-    0.453717f,
-    0.455084f,
-    0.456449f,
-    0.457813f,
-    0.459177f,
-    0.460539f,
-    0.4619f,
-    0.46326f,
-    0.464619f,
-    0.465977f,
-    0.467333f,
-    0.468689f,
-    0.470043f,
-    0.471397f,
-    0.472749f,
-    0.4741f,
-    0.47545f,
-    0.476799f,
-    0.478147f,
-    0.479494f,
-    0.480839f,
-    0.482184f,
-    0.483527f,
-    0.484869f,
-    0.48621f,
-    0.48755f,
-    0.488889f,
-    0.490227f,
-    0.491563f,
-    0.492898f,
-    0.494232f,
-    0.495565f,
-    0.496897f,
-    0.498228f,
-    0.499557f,
-    0.500885f,
-    0.502212f,
-    0.503538f,
-    0.504863f,
-    0.506187f,
-    0.507509f,
-    0.50883f,
-    0.51015f,
-    0.511469f,
-    0.512786f,
-    0.514103f,
-    0.515418f,
-    0.516732f,
-    0.518044f,
-    0.519356f,
-    0.520666f,
-    0.521975f,
-    0.523283f,
-    0.52459f,
-    0.525895f,
-    0.527199f,
-    0.528502f,
-    0.529804f,
-    0.531104f,
-    0.532403f,
-    0.533701f,
-    0.534998f,
-    0.536293f,
-    0.537587f,
-    0.53888f,
-    0.540172f,
-    0.541462f,
-    0.542751f,
-    0.544039f,
-    0.545325f,
-    0.54661f,
-    0.547894f,
-    0.549177f,
-    0.550458f,
-    0.551738f,
-    0.553017f,
-    0.554294f,
-    0.55557f,
-    0.556845f,
-    0.558119f,
-    0.559391f,
-    0.560662f,
-    0.561931f,
-    0.563199f,
-    0.564466f,
-    0.565732f,
-    0.566996f,
-    0.568259f,
-    0.569521f,
-    0.570781f,
-    0.57204f,
-    0.573297f,
-    0.574553f,
-    0.575808f,
-    0.577062f,
-    0.578314f,
-    0.579565f,
-    0.580814f,
-    0.582062f,
-    0.583309f,
-    0.584554f,
-    0.585798f,
-    0.58704f,
-    0.588282f,
-    0.589521f,
-    0.59076f,
-    0.591997f,
-    0.593232f,
-    0.594467f,
-    0.595699f,
-    0.596931f,
-    0.598161f,
-    0.599389f,
-    0.600616f,
-    0.601842f,
-    0.603067f,
-    0.60429f,
-    0.605511f,
-    0.606731f,
-    0.60795f,
-    0.609167f,
-    0.610383f,
-    0.611597f,
-    0.61281f,
-    0.614022f,
-    0.615232f,
-    0.61644f,
-    0.617647f,
-    0.618853f,
-    0.620057f,
-    0.62126f,
-    0.622461f,
-    0.623661f,
-    0.62486f,
-    0.626056f,
-    0.627252f,
-    0.628446f,
-    0.629638f,
-    0.630829f,
-    0.632019f,
-    0.633207f,
-    0.634393f,
-    0.635578f,
-    0.636762f,
-    0.637944f,
-    0.639124f,
-    0.640303f,
-    0.641481f,
-    0.642657f,
-    0.643832f,
-    0.645005f,
-    0.646176f,
-    0.647346f,
-    0.648514f,
-    0.649681f,
-    0.650847f,
-    0.652011f,
-    0.653173f,
-    0.654334f,
-    0.655493f,
-    0.656651f,
-    0.657807f,
-    0.658961f,
-    0.660114f,
-    0.661266f,
-    0.662416f,
-    0.663564f,
-    0.664711f,
-    0.665856f,
-    0.667f,
-    0.668142f,
-    0.669283f,
-    0.670422f,
-    0.671559f,
-    0.672695f,
-    0.673829f,
-    0.674962f,
-    0.676093f,
-    0.677222f,
-    0.67835f,
-    0.679476f,
-    0.680601f,
-    0.681724f,
-    0.682846f,
-    0.683965f,
-    0.685084f,
-    0.6862f,
-    0.687315f,
-    0.688429f,
-    0.689541f,
-    0.690651f,
-    0.691759f,
-    0.692866f,
-    0.693971f,
-    0.695075f,
-    0.696177f,
-    0.697277f,
-    0.698376f,
-    0.699473f,
-    0.700569f,
-    0.701663f,
-    0.702755f,
-    0.703845f,
-    0.704934f,
-    0.706021f,
-    0.707107f,
-    0.708191f,
-    0.709273f,
-    0.710353f,
-    0.711432f,
-    0.712509f,
-    0.713585f,
-    0.714659f,
-    0.715731f,
-    0.716801f,
-    0.71787f,
-    0.718937f,
-    0.720003f,
-    0.721066f,
-    0.722128f,
-    0.723189f,
-    0.724247f,
-    0.725304f,
-    0.726359f,
-    0.727413f,
-    0.728464f,
-    0.729514f,
-    0.730563f,
-    0.731609f,
-    0.732654f,
-    0.733697f,
-    0.734739f,
-    0.735779f,
-    0.736817f,
-    0.737853f,
-    0.738887f,
-    0.73992f,
-    0.740951f,
-    0.74198f,
-    0.743008f,
-    0.744034f,
-    0.745058f,
-    0.74608f,
-    0.747101f,
-    0.748119f,
-    0.749136f,
-    0.750152f,
-    0.751165f,
-    0.752177f,
-    0.753187f,
-    0.754195f,
-    0.755201f,
-    0.756206f,
-    0.757209f,
-    0.75821f,
-    0.759209f,
-    0.760207f,
-    0.761202f,
-    0.762196f,
-    0.763188f,
-    0.764179f,
-    0.765167f,
-    0.766154f,
-    0.767139f,
-    0.768122f,
-    0.769103f,
-    0.770083f,
-    0.771061f,
-    0.772036f,
-    0.77301f,
-    0.773983f,
-    0.774953f,
-    0.775922f,
-    0.776888f,
-    0.777853f,
-    0.778817f,
-    0.779778f,
-    0.780737f,
-    0.781695f,
-    0.782651f,
-    0.783605f,
-    0.784557f,
-    0.785507f,
-    0.786455f,
-    0.787402f,
-    0.788346f,
-    0.789289f,
-    0.79023f,
-    0.791169f,
-    0.792107f,
-    0.793042f,
-    0.793975f,
-    0.794907f,
-    0.795837f,
-    0.796765f,
-    0.797691f,
-    0.798615f,
-    0.799537f,
-    0.800458f,
-    0.801376f,
-    0.802293f,
-    0.803208f,
-    0.80412f,
-    0.805031f,
-    0.80594f,
-    0.806848f,
-    0.807753f,
-    0.808656f,
-    0.809558f,
-    0.810457f,
-    0.811355f,
-    0.812251f,
-    0.813144f,
-    0.814036f,
-    0.814926f,
-    0.815814f,
-    0.816701f,
-    0.817585f,
-    0.818467f,
-    0.819348f,
-    0.820226f,
-    0.821102f,
-    0.821977f,
-    0.82285f,
-    0.823721f,
-    0.824589f,
-    0.825456f,
-    0.826321f,
-    0.827184f,
-    0.828045f,
-    0.828904f,
-    0.829761f,
-    0.830616f,
-    0.83147f,
-    0.832321f,
-    0.83317f,
-    0.834018f,
-    0.834863f,
-    0.835706f,
-    0.836548f,
-    0.837387f,
-    0.838225f,
-    0.83906f,
-    0.839894f,
-    0.840725f,
-    0.841555f,
-    0.842383f,
-    0.843208f,
-    0.844032f,
-    0.844854f,
-    0.845673f,
-    0.846491f,
-    0.847307f,
-    0.84812f,
-    0.848932f,
-    0.849742f,
-    0.85055f,
-    0.851355f,
-    0.852159f,
-    0.852961f,
-    0.85376f,
-    0.854558f,
-    0.855354f,
-    0.856147f,
-    0.856939f,
-    0.857729f,
-    0.858516f,
-    0.859302f,
-    0.860085f,
-    0.860867f,
-    0.861646f,
-    0.862424f,
-    0.863199f,
-    0.863973f,
-    0.864744f,
-    0.865514f,
-    0.866281f,
-    0.867046f,
-    0.867809f,
-    0.868571f,
-    0.86933f,
-    0.870087f,
-    0.870842f,
-    0.871595f,
-    0.872346f,
-    0.873095f,
-    0.873842f,
-    0.874587f,
-    0.875329f,
-    0.87607f,
-    0.876809f,
-    0.877545f,
-    0.87828f,
-    0.879012f,
-    0.879743f,
-    0.880471f,
-    0.881197f,
-    0.881921f,
-    0.882643f,
-    0.883363f,
-    0.884081f,
-    0.884797f,
-    0.885511f,
-    0.886223f,
-    0.886932f,
-    0.88764f,
-    0.888345f,
-    0.889048f,
-    0.88975f,
-    0.890449f,
-    0.891146f,
-    0.891841f,
-    0.892534f,
-    0.893224f,
-    0.893913f,
-    0.894599f,
-    0.895284f,
-    0.895966f,
-    0.896646f,
-    0.897325f,
-    0.898001f,
-    0.898674f,
-    0.899346f,
-    0.900016f,
-    0.900683f,
-    0.901349f,
-    0.902012f,
-    0.902673f,
-    0.903332f,
-    0.903989f,
-    0.904644f,
-    0.905297f,
-    0.905947f,
-    0.906596f,
-    0.907242f,
-    0.907886f,
-    0.908528f,
-    0.909168f,
-    0.909806f,
-    0.910441f,
-    0.911075f,
-    0.911706f,
-    0.912335f,
-    0.912962f,
-    0.913587f,
-    0.91421f,
-    0.91483f,
-    0.915449f,
-    0.916065f,
-    0.916679f,
-    0.917291f,
-    0.917901f,
-    0.918508f,
-    0.919114f,
-    0.919717f,
-    0.920318f,
-    0.920917f,
-    0.921514f,
-    0.922109f,
-    0.922701f,
-    0.923291f,
-    0.92388f,
-    0.924465f,
-    0.925049f,
-    0.925631f,
-    0.92621f,
-    0.926787f,
-    0.927363f,
-    0.927935f,
-    0.928506f,
-    0.929075f,
-    0.929641f,
-    0.930205f,
-    0.930767f,
-    0.931327f,
-    0.931884f,
-    0.93244f,
-    0.932993f,
-    0.933544f,
-    0.934093f,
-    0.934639f,
-    0.935184f,
-    0.935726f,
-    0.936266f,
-    0.936803f,
-    0.937339f,
-    0.937872f,
-    0.938404f,
-    0.938932f,
-    0.939459f,
-    0.939984f,
-    0.940506f,
-    0.941026f,
-    0.941544f,
-    0.94206f,
-    0.942573f,
-    0.943084f,
-    0.943593f,
-    0.9441f,
-    0.944605f,
-    0.945107f,
-    0.945607f,
-    0.946105f,
-    0.946601f,
-    0.947094f,
-    0.947586f,
-    0.948075f,
-    0.948561f,
-    0.949046f,
-    0.949528f,
-    0.950008f,
-    0.950486f,
-    0.950962f,
-    0.951435f,
-    0.951906f,
-    0.952375f,
-    0.952842f,
-    0.953306f,
-    0.953768f,
-    0.954228f,
-    0.954686f,
-    0.955141f,
-    0.955594f,
-    0.956045f,
-    0.956494f,
-    0.95694f,
-    0.957385f,
-    0.957826f,
-    0.958266f,
-    0.958703f,
-    0.959139f,
-    0.959571f,
-    0.960002f,
-    0.960431f,
-    0.960857f,
-    0.96128f,
-    0.961702f,
-    0.962121f,
-    0.962538f,
-    0.962953f,
-    0.963366f,
-    0.963776f,
-    0.964184f,
-    0.96459f,
-    0.964993f,
-    0.965394f,
-    0.965793f,
-    0.96619f,
-    0.966584f,
-    0.966976f,
-    0.967366f,
-    0.967754f,
-    0.968139f,
-    0.968522f,
-    0.968903f,
-    0.969281f,
-    0.969657f,
-    0.970031f,
-    0.970403f,
-    0.970772f,
-    0.971139f,
-    0.971504f,
-    0.971866f,
-    0.972227f,
-    0.972584f,
-    0.97294f,
-    0.973293f,
-    0.973644f,
-    0.973993f,
-    0.974339f,
-    0.974684f,
-    0.975025f,
-    0.975365f,
-    0.975702f,
-    0.976037f,
-    0.97637f,
-    0.9767f,
-    0.977028f,
-    0.977354f,
-    0.977677f,
-    0.977998f,
-    0.978317f,
-    0.978634f,
-    0.978948f,
-    0.97926f,
-    0.97957f,
-    0.979877f,
-    0.980182f,
-    0.980485f,
-    0.980785f,
-    0.981083f,
-    0.981379f,
-    0.981673f,
-    0.981964f,
-    0.982253f,
-    0.982539f,
-    0.982824f,
-    0.983105f,
-    0.983385f,
-    0.983662f,
-    0.983937f,
-    0.98421f,
-    0.98448f,
-    0.984748f,
-    0.985014f,
-    0.985278f,
-    0.985539f,
-    0.985798f,
-    0.986054f,
-    0.986308f,
-    0.98656f,
-    0.986809f,
-    0.987057f,
-    0.987301f,
-    0.987544f,
-    0.987784f,
-    0.988022f,
-    0.988258f,
-    0.988491f,
-    0.988722f,
-    0.98895f,
-    0.989177f,
-    0.9894f,
-    0.989622f,
-    0.989841f,
-    0.990058f,
-    0.990273f,
-    0.990485f,
-    0.990695f,
-    0.990903f,
-    0.991108f,
-    0.991311f,
-    0.991511f,
-    0.99171f,
-    0.991906f,
-    0.992099f,
-    0.992291f,
-    0.99248f,
-    0.992666f,
-    0.99285f,
-    0.993032f,
-    0.993212f,
-    0.993389f,
-    0.993564f,
-    0.993737f,
-    0.993907f,
-    0.994075f,
-    0.99424f,
-    0.994404f,
-    0.994565f,
-    0.994723f,
-    0.994879f,
-    0.995033f,
-    0.995185f,
-    0.995334f,
-    0.995481f,
-    0.995625f,
-    0.995767f,
-    0.995907f,
-    0.996045f,
-    0.99618f,
-    0.996313f,
-    0.996443f,
-    0.996571f,
-    0.996697f,
-    0.99682f,
-    0.996941f,
-    0.99706f,
-    0.997176f,
-    0.99729f,
-    0.997402f,
-    0.997511f,
-    0.997618f,
-    0.997723f,
-    0.997825f,
-    0.997925f,
-    0.998023f,
-    0.998118f,
-    0.998211f,
-    0.998302f,
-    0.99839f,
-    0.998476f,
-    0.998559f,
-    0.99864f,
-    0.998719f,
-    0.998795f,
-    0.99887f,
-    0.998941f,
-    0.999011f,
-    0.999078f,
-    0.999142f,
-    0.999205f,
-    0.999265f,
-    0.999322f,
-    0.999378f,
-    0.999431f,
-    0.999481f,
-    0.999529f,
-    0.999575f,
-    0.999619f,
-    0.99966f,
-    0.999699f,
-    0.999735f,
-    0.999769f,
-    0.999801f,
-    0.999831f,
-    0.999858f,
-    0.999882f,
-    0.999905f,
-    0.999925f,
-    0.999942f,
-    0.999958f,
-    0.999971f,
-    0.999981f,
-    0.999989f,
-    0.999995f,
-    0.999999f,
-    1f
-    };
-    private byte[] g_gm_through_colattr = new byte[1]
-    {
-    (byte) 1
-    };
-    private readonly AppMain.NNS_RGBA nngEffectorXColor = new AppMain.NNS_RGBA(1f, 1f, 1f, 1f);
-    private readonly AppMain.NNS_RGBA nngEffectorYColor = new AppMain.NNS_RGBA(1f, 1f, 1f, 1f);
-    private readonly AppMain.NNS_RGBA nngEffectorZColor = new AppMain.NNS_RGBA(1f, 1f, 1f, 1f);
-    private readonly AppMain.NNS_RGBA nngBoneDiffColor = new AppMain.NNS_RGBA(1f, 1f, 1f, 1f);
-    private readonly AppMain.NNS_RGB nngBoneAmbColor = new AppMain.NNS_RGB(0.2f, 0.2f, 0.2f);
-    private readonly AppMain.NNS_RGBA nngBoneWireColor = new AppMain.NNS_RGBA(1f, 1f, 1f, 1f);
-    private readonly AppMain.NNS_RGBA nngGridColor = new AppMain.NNS_RGBA(1f, 1f, 1f, 0.3f);
-    private readonly AppMain.NNS_RGBA nngAxisXColor = new AppMain.NNS_RGBA(1f, 0.0f, 0.0f, 1f);
-    private readonly AppMain.NNS_RGBA nngAxisYColor = new AppMain.NNS_RGBA(0.0f, 1f, 0.0f, 1f);
-    private readonly AppMain.NNS_RGBA nngAxisZColor = new AppMain.NNS_RGBA(0.0f, 0.0f, 1f, 1f);
-    private readonly AppMain.NNS_VECTOR[] nngCircumPoint = AppMain.New<AppMain.NNS_VECTOR>(120);
-    private AppMain.NNS_RGBA nngObjCircumCol = new AppMain.NNS_RGBA(1f, 1f, 1f, 0.3f);
-    private readonly AppMain.NNS_RGBA[] nngNodeCircumCol = new AppMain.NNS_RGBA[8]
-    {
-    new AppMain.NNS_RGBA(0.0f, 1f, 0.0f, 0.3f),
-    new AppMain.NNS_RGBA(1f, 0.0f, 1f, 0.3f),
-    new AppMain.NNS_RGBA(1f, 1f, 0.0f, 0.3f),
-    new AppMain.NNS_RGBA(1f, 1f, 1f, 0.3f),
-    new AppMain.NNS_RGBA(0.0f, 1f, 1f, 0.3f),
-    new AppMain.NNS_RGBA(1f, 0.0f, 0.0f, 0.3f),
-    new AppMain.NNS_RGBA(0.0f, 0.0f, 0.0f, 0.3f),
-    new AppMain.NNS_RGBA()
+        new NNS_RGBA(0.0f, 1f, 0.0f, 0.3f),
+        new NNS_RGBA(1f, 0.0f, 1f, 0.3f),
+        new NNS_RGBA(1f, 1f, 0.0f, 0.3f),
+        new NNS_RGBA(1f, 1f, 1f, 0.3f),
+        new NNS_RGBA(0.0f, 1f, 1f, 0.3f),
+        new NNS_RGBA(1f, 0.0f, 0.0f, 0.3f),
+        new NNS_RGBA(0.0f, 0.0f, 0.0f, 0.3f),
+        new NNS_RGBA()
     };
     private int test_dist = 786432;
     public readonly float[] dm_stgslct_act_tab_disp_y_pos_tbl = new float[5]
     {
-    AppMain.dm_stgslct_act_disp_y_pos_tbl[0] - 0.0f,
-    AppMain.dm_stgslct_act_disp_y_pos_tbl[0] - 120f,
-    AppMain.dm_stgslct_act_disp_y_pos_tbl[0] - 240f,
-    AppMain.dm_stgslct_act_disp_y_pos_tbl[0] - 360f,
-    AppMain.dm_stgslct_act_disp_y_pos_tbl[0] - 480f
+        dm_stgslct_act_disp_y_pos_tbl[0] - 0.0f,
+        dm_stgslct_act_disp_y_pos_tbl[0] - 120f,
+        dm_stgslct_act_disp_y_pos_tbl[0] - 240f,
+        dm_stgslct_act_disp_y_pos_tbl[0] - 360f,
+        dm_stgslct_act_disp_y_pos_tbl[0] - 480f
     };
     public readonly float[] dm_stgslct_act_crsr_disp_y_pos_tbl = new float[4]
     {
-    160f,
-    248f,
-    336f,
-    424f
+        160f,
+        248f,
+        336f,
+        424f
     };
     public readonly float[][] dm_stgslct_win_act_frm_tbl = new float[10][]
     {
-    new float[3]{ 2f, 0.0f, 1f },
-    new float[3]{ 3f, 0.0f, 0.0f },
-    new float[3]{ 1f, 1f, 0.0f },
-    new float[3]{ 1f, 2f, 0.0f },
-    new float[3]{ 1f, 3f, 0.0f },
-    new float[3]{ 1f, 4f, 0.0f },
-    new float[3]{ 1f, 5f, 0.0f },
-    new float[3]{ 1f, 6f, 0.0f },
-    new float[3]{ 1f, 7f, 0.0f },
-    new float[3]{ 1f, 7f, 0.0f }
+        new float[3]{ 2f, 0.0f, 1f },
+        new float[3]{ 3f, 0.0f, 0.0f },
+        new float[3]{ 1f, 1f, 0.0f },
+        new float[3]{ 1f, 2f, 0.0f },
+        new float[3]{ 1f, 3f, 0.0f },
+        new float[3]{ 1f, 4f, 0.0f },
+        new float[3]{ 1f, 5f, 0.0f },
+        new float[3]{ 1f, 6f, 0.0f },
+        new float[3]{ 1f, 7f, 0.0f },
+        new float[3]{ 1f, 7f, 0.0f }
     };
     public readonly float[][] dm_stgslct_win_disp_slct_frm_tbl = new float[2][]
     {
-    new float[2]{ 0.0f, 1f },
-    new float[2]{ 1f, 0.0f }
+        new float[2]{ 0.0f, 1f },
+        new float[2]{ 1f, 0.0f }
     };
     public readonly float[] dm_stgslct_vrtcl_disp_pos_y_tbl = new float[4]
     {
-    0.0f,
-    128f,
-    256f,
-    384f
+        0.0f,
+        128f,
+        256f,
+        384f
     };
     public readonly float[] dm_stgslct_back_text_length_tbl = new float[11]
     {
-    -39f,
-    -53f,
-    -69f,
-    -77f,
-    -70f,
-    -55f,
-    -53f,
-    -53f,
-    -53f,
-    -53f,
-    -53f
+        -39f,
+        -53f,
+        -69f,
+        -77f,
+        -70f,
+        -55f,
+        -53f,
+        -53f,
+        -53f,
+        -53f,
+        -53f
     };
     public readonly float[][] dm_stgslct_win_act_pos_tbl = new float[14][]
     {
-    new float[2]{ 522f, 280f },
-    new float[2]{ 758f, 224f },
-    new float[2]{ 344f, 400f },
-    new float[2]{ 390f, 400f },
-    new float[2]{ 480f, 360f },
-    new float[2]{ 480f, 248f },
-    new float[2]{ 480f, 360f },
-    new float[2]{ 480f, 344f },
-    new float[2]{ 480f, 404f },
-    new float[2]{ 400f, 274f },
-    new float[2]{ 778f, 224f },
-    new float[2]{ 480f, 420f },
-    new float[2]{ 304f, 420f },
-    new float[2]{ 656f, 420f }
+        new float[2]{ 522f, 280f },
+        new float[2]{ 758f, 224f },
+        new float[2]{ 344f, 400f },
+        new float[2]{ 390f, 400f },
+        new float[2]{ 480f, 360f },
+        new float[2]{ 480f, 248f },
+        new float[2]{ 480f, 360f },
+        new float[2]{ 480f, 344f },
+        new float[2]{ 480f, 404f },
+        new float[2]{ 400f, 274f },
+        new float[2]{ 778f, 224f },
+        new float[2]{ 480f, 420f },
+        new float[2]{ 304f, 420f },
+        new float[2]{ 656f, 420f }
     };
     public readonly float[] dm_stgslct_act_table_disp_id_tbl = new float[24]
     {
-    0.0f,
-    1f,
-    2f,
-    3f,
-    0.0f,
-    1f,
-    2f,
-    3f,
-    0.0f,
-    1f,
-    2f,
-    3f,
-    0.0f,
-    1f,
-    2f,
-    3f,
-    4f,
-    5f,
-    5f,
-    5f,
-    5f,
-    5f,
-    5f,
-    5f
+        0.0f,
+        1f,
+        2f,
+        3f,
+        0.0f,
+        1f,
+        2f,
+        3f,
+        0.0f,
+        1f,
+        2f,
+        3f,
+        0.0f,
+        1f,
+        2f,
+        3f,
+        4f,
+        5f,
+        5f,
+        5f,
+        5f,
+        5f,
+        5f,
+        5f
     };
     public readonly float[] dm_stgslct_disp_msg_id_table_tbl = new float[24]
     {
-    0.0f,
-    1f,
-    2f,
-    3f,
-    4f,
-    5f,
-    6f,
-    7f,
-    8f,
-    9f,
-    10f,
-    11f,
-    12f,
-    13f,
-    14f,
-    15f,
-    16f,
-    5f,
-    5f,
-    5f,
-    5f,
-    5f,
-    5f,
-    5f
+        0.0f,
+        1f,
+        2f,
+        3f,
+        4f,
+        5f,
+        6f,
+        7f,
+        8f,
+        9f,
+        10f,
+        11f,
+        12f,
+        13f,
+        14f,
+        15f,
+        16f,
+        5f,
+        5f,
+        5f,
+        5f,
+        5f,
+        5f,
+        5f
     };
     public readonly float[] dm_stgslct_act_disp_pos_y_tbl = new float[24]
     {
-    0.0f,
-    1f,
-    2f,
-    3f,
-    0.0f,
-    1f,
-    2f,
-    3f,
-    0.0f,
-    1f,
-    2f,
-    3f,
-    0.0f,
-    1f,
-    2f,
-    3f,
-    0.0f,
-    0.0f,
-    1f,
-    2f,
-    3f,
-    4f,
-    5f,
-    6f
+        0.0f,
+        1f,
+        2f,
+        3f,
+        0.0f,
+        1f,
+        2f,
+        3f,
+        0.0f,
+        1f,
+        2f,
+        3f,
+        0.0f,
+        1f,
+        2f,
+        3f,
+        0.0f,
+        0.0f,
+        1f,
+        2f,
+        3f,
+        4f,
+        5f,
+        6f
     };
     public readonly float[] dm_stgslct_act_num_disp_id_tbl = new float[24]
     {
-    0.0f,
-    1f,
-    2f,
-    0.0f,
-    0.0f,
-    1f,
-    2f,
-    0.0f,
-    0.0f,
-    1f,
-    2f,
-    0.0f,
-    0.0f,
-    1f,
-    2f,
-    0.0f,
-    0.0f,
-    0.0f,
-    1f,
-    2f,
-    3f,
-    4f,
-    5f,
-    6f
+        0.0f,
+        1f,
+        2f,
+        0.0f,
+        0.0f,
+        1f,
+        2f,
+        0.0f,
+        0.0f,
+        1f,
+        2f,
+        0.0f,
+        0.0f,
+        1f,
+        2f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1f,
+        2f,
+        3f,
+        4f,
+        5f,
+        6f
     };
-    private AppMain.DMS_LOGO_COM_LOAD_FILE_INFO[] dm_titleop_com_fileinfo_list = new AppMain.DMS_LOGO_COM_LOAD_FILE_INFO[2]
+    private DMS_LOGO_COM_LOAD_FILE_INFO[] dm_titleop_com_fileinfo_list = new DMS_LOGO_COM_LOAD_FILE_INFO[2]
     {
-    new AppMain.DMS_LOGO_COM_LOAD_FILE_INFO("G_ZONE1/MAPFAR/ZONE1_MAPFAR.AMB", new AppMain.post_func_Delegate(AppMain.dmTitleOpLoadPostFuncMapFar)),
-    new AppMain.DMS_LOGO_COM_LOAD_FILE_INFO("DEMO/TITLE/D_TITLEOP.AMB", new AppMain.post_func_Delegate(AppMain.dmTitleOpLoadPostFuncTitleLogo))
+        new DMS_LOGO_COM_LOAD_FILE_INFO("G_ZONE1/MAPFAR/ZONE1_MAPFAR.AMB", new post_func_Delegate(dmTitleOpLoadPostFuncMapFar)),
+        new DMS_LOGO_COM_LOAD_FILE_INFO("DEMO/TITLE/D_TITLEOP.AMB", new post_func_Delegate(dmTitleOpLoadPostFuncTitleLogo))
     };
     public const int GSD_TROPHY_ITEM_NUM = 16;
     public const int TROPHY_NONE = 0;
@@ -1281,6 +236,7 @@ public partial class AppMain
     public const int TROPHY_COMPLETE = 2;
     public const int OBD_MAP_BLOCK_SIZE = 16;
     public const int OBD_MAP_BLOCK_MASK = 15;
+
     public const uint NND_NODETYPE_UNIT_TRANSLATION = 1;
     public const uint NND_NODETYPE_UNIT_ROTATION = 2;
     public const uint NND_NODETYPE_UNIT_SCALING = 4;
@@ -1405,553 +361,12 @@ public partial class AppMain
     public const int NND_MOTIONFLAG_NONE = 0;
     public const int NND_MOTIONFLAG_XYZ = 1;
     public const int NND_MOTIONFLAG_QUAT = 2;
-    private const int AMTRE_STATE_DELETE = 32768;
-    private const int AMTRE_STATE_EFFECT = 16384;
-    private const int AMTRE_STATE_SSP_SET = 512;
-    private const int AMTRE_STATE_SSP_CALC = 256;
-    private const int AMTRE_STATE_TOP = 1;
-    private const int AMTRE_STATE_END = 2;
-    private const int AMTRE_STATE_TE_MASK = 3;
-    private const int AMTRE_FLAG_FXPOS = 1;
-    private const int AMTRE_MFLAG_PRAIMAL = 1;
-    private const int AMTRE_MFLAG_CHECK1 = 2;
-    private const int AMTRE_HANDLE_ACCELL = 1;
-    public const int GMD_PAUSE_FLAG_END = 1;
-    public const int GMD_PAUSE_FADEOUT_TIME = 20;
-    public const int GMD_PAUSE_FADEIN_TIME = 20;
-    private const int GME_PAD_VIB_TYPE_STOP = 0;
-    private const int GME_PAD_VIB_TYPE_NORMAL = 1;
-    private const int GME_PAD_VIB_TYPE_DEC = 2;
-    private const int GME_PAD_VIB_TYPE_ACC = 3;
-    private const int GME_PAD_VIB_TYPE_INT = 4;
-    private const int GME_PAD_VIB_TYPE_MAX = 5;
-    public const int GMD_PAD_VIB_DEF_INT_VIB_TIME = 122880;
-    public const int GMD_PAD_VIB_DEF_INT_STOP_TIME = 122880;
-    public const int GMD_PAD_VIB_LARGE_TYPE = 1;
-    public const float GMD_PAD_VIB_LARGE_TIME = 60f;
-    public const int GMD_PAD_VIB_LARGE_LEFT_VIB = 32768;
-    public const int GMD_PAD_VIB_LARGE_RIGHT_VIB = 32768;
-    public const float GMD_PAD_VIB_LARGE_ADD_DEC_TIME = 0.0f;
-    public const float GMD_PAD_VIB_LARGE_INT_VIB_TIME = 0.0f;
-    public const float GMD_PAD_VIB_LARGE_INT_STOP_TIME = 0.0f;
-    public const int GMD_PAD_VIB_LARGE_PRIO = 32768;
-    public const int GMD_PAD_VIB_MID_TYPE = 1;
-    public const float GMD_PAD_VIB_MID_TIME = 30f;
-    public const int GMD_PAD_VIB_MID_LEFT_VIB = 16384;
-    public const int GMD_PAD_VIB_MID_RIGHT_VIB = 16384;
-    public const float GMD_PAD_VIB_MID_ADD_DEC_TIME = 0.0f;
-    public const float GMD_PAD_VIB_MID_INT_VIB_TIME = 0.0f;
-    public const float GMD_PAD_VIB_MID_INT_STOP_TIME = 0.0f;
-    public const int GMD_PAD_VIB_MID_PRIO = 16384;
-    public const int GMD_PAD_VIB_SMALL_TYPE = 1;
-    public const float GMD_PAD_VIB_SMALL_TIME = 30f;
-    public const int GMD_PAD_VIB_SMALL_LEFT_VIB = 8192;
-    public const int GMD_PAD_VIB_SMALL_RIGHT_VIB = 8192;
-    public const float GMD_PAD_VIB_SMALL_ADD_DEC_TIME = 0.0f;
-    public const float GMD_PAD_VIB_SMALL_INT_VIB_TIME = 0.0f;
-    public const float GMD_PAD_VIB_SMALL_INT_STOP_TIME = 0.0f;
-    public const int GMD_PAD_VIB_SMALL_PRIO = 8192;
-    public const uint GMD_PAD_VIB_FLAG_INT_STOP = 1;
-    public const uint GMD_PAD_VIB_FLAG_PAUSE = 2;
-    private const int GME_GMK_TYPE_DUMMY = 0;
-    private const int SLOT_REEL_JP = 0;
-    private const int SLOT_REEL_EGG = 1;
-    private const int SLOT_REEL_SONIC = 2;
-    private const int SLOT_REEL_RING = 3;
-    private const int SLOT_REEL_BAR = 4;
-    private const int SLOT_REEL_NUM = 5;
-    private const int SLOT_REEL_B__ = 5;
-    private const int SLOT_REEL_BB_ = 6;
-    private const int SLOT_REEL_77_ = 7;
-    private const int SLOT_REEL_EE_ = 8;
-    private const int SLOT_REEL_MEOSHI_STOP = 9;
-    private const int GMD_GMK_SLOT_REEL_NUM = 3;
-    private const int SLOT_STEP_INIT = 0;
-    private const int SLOT_STEP_ROLL1 = 10;
-    private const int SLOT_STEP_ROLL2 = 20;
-    private const int SLOT_STEP_ROLL3 = 30;
-    private const int SLOT_STEP_STOP_NORM = 40;
-    private const int SLOT_STEP_STOP_HIT = 50;
-    private const int SLOT_STEP_STOP_EGG = 60;
-    private const int SLOT_STEP_EGG_STOP = 69;
-    private const int SLOT_STEP_STOP_STOP = 70;
-    private const int SLOT_STEP_STOP_STOP_FORCE = 80;
-    private const int SLOT_STEP_MAX = 81;
-    private const int GMD_GMK_SLOT_STOP1_TIME = 10;
-    private const int GMD_GMK_SLOT_STOP1_TIME_ADJ = 1;
-    private const int GMD_GMK_SLOT_STOP2_TIME = 0;
-    private const int GMD_GMK_SLOT_STOP2_TIME_ADJ = 1;
-    private const int GMD_GMK_SLOT_STOP3_TIME = 0;
-    private const int GMD_GMK_SLOT_STOP3_TIME_ADJ = 1;
-    private const int GMD_GMK_SLOT_STOP3_FEABER_TIME = 30;
-    private const int GMD_SZ_TBL_DAM_OFST = 8;
-    private const int GMD_GMK_BUMPER_MODE_WAIT = 0;
-    private const int GMD_GMK_BUMPER_MODE_ACTIVE = 1;
-    private const int GMD_GMK_BUMPER_MODE_NUM = 2;
-    private const int GMD_GMK_BUMPER_TYPE_TRI_I_TOP = 0;
-    private const int GMD_GMK_BUMPER_TYPE_TRI_I_BOTTOM = 1;
-    private const int GMD_GMK_BUMPER_TYPE_TRI_I_LEFT = 2;
-    private const int GMD_GMK_BUMPER_TYPE_TRI_I_RIGHT = 3;
-    private const int GMD_GMK_BUMPER_TYPE_TRI_R_LT = 4;
-    private const int GMD_GMK_BUMPER_TYPE_TRI_R_LB = 5;
-    private const int GMD_GMK_BUMPER_TYPE_TRI_R_RT = 6;
-    private const int GMD_GMK_BUMPER_TYPE_TRI_R_RB = 7;
-    private const int GMD_GMK_BUMPER_TYPE_HEX_W = 8;
-    private const int GMD_GMK_BUMPER_TYPE_HEX_H = 9;
-    private const int GMD_GMK_BUMPER_TYPE_NUM = 10;
-    private const int GMD_GMK_BUMPER_RECT_MARGIN_PLAYER_X = 32768;
-    private const int GMD_GMK_BUMPER_RECT_MARGIN_PLAYER_Y = 32768;
-    private const int GMD_GMK_BUMPER_RECT_OFFSET_PLAYER_Y = -12288;
-    private const int GMD_GMK_BUMPER_POS_Z = -122880;
-    private const uint GMD_GMK_BUMPER_OFFSET_RADIUS = 65536;
-    private const uint GMD_GMK_BUMPER_SPEED_MIN = 8192;
-    private const int GMD_GMK_BUMPER_SPEED_X = 16384;
-    private const int GMD_GMK_BUMPER_SPEED_Y = 24576;
-    private const int GMD_GMK_BUMPER_SPEED_OFFSET_TRI_I = 12288;
-    private const int GMD_GMK_BUMPER_SPEED_OFFSET_TRI_R = 20480;
-    private const int GMD_GMK_BUMPER_NO_MOVE_TIME_UD = 5;
-    private const int GMD_GMK_BUMPER_NO_MOVE_TIME_LR = 15;
-    private const int GMD_GMK_BUMPER_FLAG_NO_RECOVER_HOMING = 1;
-    public const int GMD_EVE_SEARCH_PROC_FLAG_NONE = 0;
-    public const int GMD_EVE_SEARCH_PROC_FLAG_RECT_CREATE = 1;
-    public const int GMD_EVE_SEARCH_PROC_FLAG_RECT_LCD_OFF = 2;
-    public const int GMD_EVE_SEARCH_PROC_FLAG_ONLY_ENFORCE = 4;
-    public const byte GMD_EVE_RECORD_CMD_SKIP = 255;
-    public const int GMD_EVE_EVE_CREATE_SIZE = 256;
-    public const int GMD_EVE_DEC_CREATE_SIZE = 256;
-    public const int GMD_EVE_BIRTH_WIDTH = 32;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_USER_MASK = 255;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_SYSFLAG_MASK = 65280;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CLIP = 2048;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CLIP_EASE_SHIFT = 11;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_EASE = 4096;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_EASE_SHIFT = 12;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_NORMAL = 8192;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_NORMAL_SHIFT = 13;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_HARD = 16384;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_HARD_SHIFT = 14;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_CREATE_ENFORCE = 32768;
-    public const int GMD_EVE_RECORD_EVENT_FLAG_CREATE_ENFORCE_SHIFT = 15;
-    public const int GMD_EVE_TYPE_EVENT = 0;
-    public const int GMD_EVE_TYPE_RING = 1;
-    public const int GMD_EVE_TYPE_DECO = 2;
-    public const int GMD_EVE_TYPE_MAX = 3;
-    public const int GMD_EVE_LOCAL_EVT_OBJ_MAX = 64;
-    public const int GMD_EVE_LOCAL_EVT_USE_FLAG_WORK_NUM = 2;
-    public const int GMD_EVE_LOCAL_DECO_OBJ_MAX = 64;
-    public const int GMD_EVE_LOCAL_DECO_USE_FLAG_WORK_NUM = 2;
-    public const int GMD_EVE_LOCAL_RING_OBJ_MAX = 64;
-    public const int GMD_EVE_LOCAL_RING_USE_FLAG_WORK_NUM = 2;
-    public const int GMD_EVE_DATA_BLOCK_SIZE = 256;
-    public const int GMD_EVE_BLOCK_SIZE_SHIFT = 8;
-    public const int GMD_ENEMY_RECT_DEF = 0;
-    public const int GMD_ENEMY_RECT_ATK = 1;
-    public const int GMD_ENEMY_RECT_BODY = 2;
-    public const int GMD_ENEMY_RECT_NUM = 3;
-    public const uint GMD_ENEMY_FLAG_USER1 = 1;
-    public const uint GMD_ENEMY_FLAG_USER2 = 2;
-    public const uint GMD_ENEMY_FLAG_USER3 = 4;
-    public const uint GMD_ENEMY_FLAG_USER4 = 8;
-    public const uint GMD_ENEMY_FLAG_NOPRESSDIE = 16384;
-    public const uint GMD_ENEMY_FLAG_NOHOMING = 32768;
-    public const uint GMD_ENEMY_FLAG_DIE = 65536;
-    public const uint GMD_ENEMY_FLAG_NOANIMAL = 131072;
-    public const uint GMD_ENEMY_FLAG_ROOM = 262144;
-    public const int GMD_ENEMY_COMBO_SCORE_OFST_Y = -65536;
-    private const int GME_EFCT_CMN_IDX_AURA_00 = 0;
-    private const int GME_EFCT_CMN_IDX_AURA_01 = 1;
-    private const int GME_EFCT_CMN_IDX_AURA_02 = 2;
-    private const int GME_EFCT_CMN_IDX_AURA_03 = 3;
-    private const int GME_EFCT_CMN_IDX_BARRIER = 4;
-    private const int GME_EFCT_CMN_IDX_BARRIER_01 = 5;
-    private const int GME_EFCT_CMN_IDX_BARRIER_LOST = 6;
-    private const int GME_EFCT_CMN_IDX_BOMB = 7;
-    private const int GME_EFCT_CMN_IDX_BOMB_BIG = 8;
-    private const int GME_EFCT_CMN_IDX_BOMB_KAMA = 9;
-    private const int GME_EFCT_CMN_IDX_BOMB_SMOKE = 10;
-    private const int GME_EFCT_CMN_IDX_BRAKE = 11;
-    private const int GME_EFCT_CMN_IDX_BRAKE_S = 12;
-    private const int GME_EFCT_CMN_IDX_BUBBLE = 13;
-    private const int GME_EFCT_CMN_IDX_BULLET = 14;
-    private const int GME_EFCT_CMN_IDX_BULLET_CORE = 15;
-    private const int GME_EFCT_CMN_IDX_BUMPER = 16;
-    private const int GME_EFCT_CMN_IDX_BUMPER_1 = 17;
-    private const int GME_EFCT_CMN_IDX_BUMPER_2 = 18;
-    private const int GME_EFCT_CMN_IDX_BUMPER_LOST = 19;
-    private const int GME_EFCT_CMN_IDX_CANON = 20;
-    private const int GME_EFCT_CMN_IDX_CAP_KEY1 = 21;
-    private const int GME_EFCT_CMN_IDX_CAP_KEY2 = 22;
-    private const int GME_EFCT_CMN_IDX_CAP_OPEN = 23;
-    private const int GME_EFCT_CMN_IDX_COUNT0 = 24;
-    private const int GME_EFCT_CMN_IDX_COUNT1 = 25;
-    private const int GME_EFCT_CMN_IDX_COUNT2 = 26;
-    private const int GME_EFCT_CMN_IDX_COUNT3 = 27;
-    private const int GME_EFCT_CMN_IDX_COUNT4 = 28;
-    private const int GME_EFCT_CMN_IDX_COUNT5 = 29;
-    private const int GME_EFCT_CMN_IDX_DASH = 30;
-    private const int GME_EFCT_CMN_IDX_DEATH = 31;
-    private const int GME_EFCT_CMN_IDX_GOAL = 32;
-    private const int GME_EFCT_CMN_IDX_H_ATTACK_00 = 33;
-    private const int GME_EFCT_CMN_IDX_H_ATTACK_01 = 34;
-    private const int GME_EFCT_CMN_IDX_H_ATTACK_02 = 35;
-    private const int GME_EFCT_CMN_IDX_H_ATTACK_03 = 36;
-    private const int GME_EFCT_CMN_IDX_HIT_E = 37;
-    private const int GME_EFCT_CMN_IDX_HIT_S = 38;
-    private const int GME_EFCT_CMN_IDX_ITEM = 39;
-    private const int GME_EFCT_CMN_IDX_ITEM_01 = 40;
-    private const int GME_EFCT_CMN_IDX_JUMP = 41;
-    private const int GME_EFCT_CMN_IDX_MUTEKI = 42;
-    private const int GME_EFCT_CMN_IDX_MUTEKI2 = 43;
-    private const int GME_EFCT_CMN_IDX_PILLAR_F_01 = 44;
-    private const int GME_EFCT_CMN_IDX_PILLAR_F_02 = 45;
-    private const int GME_EFCT_CMN_IDX_PILLAR_F_03 = 46;
-    private const int GME_EFCT_CMN_IDX_PILLAR_F_HIT = 47;
-    private const int GME_EFCT_CMN_IDX_PISTON = 48;
-    private const int GME_EFCT_CMN_IDX_POINT = 49;
-    private const int GME_EFCT_CMN_IDX_RING = 50;
-    private const int GME_EFCT_CMN_IDX_ROLLDASH = 51;
-    private const int GME_EFCT_CMN_IDX_ROLLDASH_L = 52;
-    private const int GME_EFCT_CMN_IDX_ROLLDASH_R = 53;
-    private const int GME_EFCT_CMN_IDX_ROLLDASH_S = 54;
-    private const int GME_EFCT_CMN_IDX_RUN = 55;
-    private const int GME_EFCT_CMN_IDX_SCORE_0 = 56;
-    private const int GME_EFCT_CMN_IDX_SCORE_1 = 57;
-    private const int GME_EFCT_CMN_IDX_SCORE_2 = 58;
-    private const int GME_EFCT_CMN_IDX_SCORE_3 = 59;
-    private const int GME_EFCT_CMN_IDX_SCORE_4 = 60;
-    private const int GME_EFCT_CMN_IDX_SCORE_5 = 61;
-    private const int GME_EFCT_CMN_IDX_SCORE_6 = 62;
-    private const int GME_EFCT_CMN_IDX_SCORE_7 = 63;
-    private const int GME_EFCT_CMN_IDX_SCORE_8 = 64;
-    private const int GME_EFCT_CMN_IDX_SCORE_9 = 65;
-    private const int GME_EFCT_CMN_IDX_SMORK_B_Z2 = 66;
-    private const int GME_EFCT_CMN_IDX_SMORK_B_Z4 = 67;
-    private const int GME_EFCT_CMN_IDX_SMORK_S_Z2 = 68;
-    private const int GME_EFCT_CMN_IDX_SMORK_S_Z4 = 69;
-    private const int GME_EFCT_CMN_IDX_SPIN = 70;
-    private const int GME_EFCT_CMN_IDX_SPIN_00 = 71;
-    private const int GME_EFCT_CMN_IDX_SPIN_01 = 72;
-    private const int GME_EFCT_CMN_IDX_SPIN_D = 73;
-    private const int GME_EFCT_CMN_IDX_SPIN_D_B = 74;
-    private const int GME_EFCT_CMN_IDX_SPIN_START = 75;
-    private const int GME_EFCT_CMN_IDX_SPRAY = 76;
-    private const int GME_EFCT_CMN_IDX_SPRING = 77;
-    private const int GME_EFCT_CMN_IDX_SPRING_00 = 78;
-    private const int GME_EFCT_CMN_IDX_SPRING_01 = 79;
-    private const int GME_EFCT_CMN_IDX_SS_END = 80;
-    private const int GME_EFCT_CMN_IDX_SS_SPIN = 81;
-    private const int GME_EFCT_CMN_IDX_SS_SPIN_D = 82;
-    private const int GME_EFCT_CMN_IDX_SS_SPIN_D_B = 83;
-    private const int GME_EFCT_CMN_IDX_SS_SPIN_START = 84;
-    private const int GME_EFCT_CMN_IDX_SS_START = 85;
-    private const int GME_EFCT_CMN_IDX_STEAM = 86;
-    private const int GME_EFCT_CMN_IDX_STEAM_L = 87;
-    private const int GME_EFCT_CMN_IDX_STEAM_M = 88;
-    private const int GME_EFCT_CMN_IDX_STEAM_S = 89;
-    private const int GME_EFCT_CMN_IDX_STEAM_SET = 90;
-    private const int GME_EFCT_CMN_IDX_STEAM_SET_SS = 91;
-    private const int GME_EFCT_CMN_IDX_STEAM_SHOT = 92;
-    private const int GME_EFCT_CMN_IDX_SWEAT = 93;
-    private const int GME_EFCT_CMN_IDX_TARGET_E = 94;
-    private const int GME_EFCT_CMN_IDX_TARGET_S = 95;
-    private const int GME_EFCT_CMN_IDX_TOGEBALL = 96;
-    private const int GME_EFCT_CMN_IDX_MAX = 97;
-    private const int GME_EFCT_CMN_IDX_NONE = -1;
-    private const int GMD_EFCT_CMN_BUILD_REG_ALLOWANCE_NUM = 64;
-    private const int GMD_EFCT_CMN_FLUSH_REG_ALLOWANCE_NUM = 16;
-    private const int GMD_EFCT_CMN_INVINCIBLE_MAIN_ANGLE_RATE = 1820;
-    private const int GMD_EFCT_CMN_INVINCIBLE_SUB_ANGLE_RATE = 1820;
-    private const int GMD_EFCT_CMN_INVINCIBLE_SUB_DIST_TO_SPD_FACTOR = 204;
-    private const int GMD_EFCT_CMN_INVINCIBLE_SUB_PLYSPD_TO_SPD_FACTOR = 1024;
-    private const int GME_EFCT_CMN_PROCESS_STATE_NOP = 0;
-    private const int GME_EFCT_CMN_PROCESS_STATE_WAIT_START = 1;
-    private const int GME_EFCT_CMN_PROCESS_STATE_WAIT_COMPLETE = 2;
-    private const int GME_EFCT_CMN_PROCESS_STATE_MAX = 3;
-    public const uint GMD_BOSS5_EFCT_GENERAL_FLAG_FADING = 1;
-    public const uint GMD_BOSS5_EFCT_LEAKAGE_USRFLAG_IS_BODYPART = 1;
-    public const uint GMD_BOSS5_EFCT_LEAKAGE_USRFLAG_SE_RESPONSIBLE = 2;
-    public const uint GMD_BOSS5_EFCT_LEAKAGE_PART_NUM = 8;
-    public const int GMD_BOSS5_EFCT_LEAKAGE_OFST_Z = 262144;
-    public const int GMD_BOSS5_EFCT_LEAKAGE_BODYPART_OFST_Z = 327680;
-    public const int GMD_BOSS5_EFCT_LEAKAGE_VANISH_PART_NUM = 2;
-    public const int GMD_BOSS5_EFCT_LEAKAGE_VANISH_OFST_Z = 327680;
-    public const int GMD_BOSS5_EFCT_PRELIM_LEAKAGE_OFST_Z = 327680;
-    public const int GMD_BOSS5_EFCT_WALK_STEP_SMOKE_OFST_Z = 65536;
-    public const int GMD_BOSS5_EFCT_RUN_STEP_SMOKE_OFST_Z = 65536;
-    public const int GMD_BOSS5_EFCT_CRASH_LANDING_SMOKE_OFST_Z = 262144;
-    public const int GMD_BOSS5_EFCT_BREAKING_GLASS_OFST_Y = -131072;
-    public const int GMD_BOSS5_EFCT_BREAKING_GLASS_OFST_Z = 262144;
-    public const short GMD_BOSS5_EFCT_JET_VIEWOUT_OFST = 16;
-    public const uint GMD_BOSS5_EFCT_JET_ATK_ACTIVATE_TIMING_FRAME = 65;
-    public const short GMD_BOSS5_EFCT_JET_ATK_RECT_SIZE_LEFT = -8;
-    public const short GMD_BOSS5_EFCT_JET_ATK_RECT_SIZE_TOP = 0;
-    public const short GMD_BOSS5_EFCT_JET_ATK_RECT_SIZE_RIGHT = 8;
-    public const short GMD_BOSS5_EFCT_JET_ATK_RECT_SIZE_BOTTOM = 88;
-    public const int GMD_BOSS5_EFCT_ROCKET_LEAKAGE_OFST_Z = 262144;
-    public const float GMD_BOSS5_EFCT_ROCKET_LEAKAGE_STUCK_ND_OFST_X = -7f;
-    public const int GMD_BOSS5_EFCT_ROCKET_LAUNCH_OFST_Z = 65536;
-    public const float GMD_BOSS5_EFCT_ROCKET_LAUNCH_STUCK_ND_OFST_X = -7f;
-    public const int GMD_BOSS5_EFCT_ROCKET_DOCK_OFST_Z = 65536;
-    public const float GMD_BOSS5_EFCT_ROCKET_DOCK_STUCK_ND_OFST_X = 2f;
-    public const int GMD_BOSS5_EFCT_ROCKET_JET_USRFLAG_IS_REVERSE = 1;
-    public const int GMD_BOSS5_EFCT_ROCKET_JET_OFST_Z = 32768;
-    public const float GMD_BOSS5_EFCT_ROCKET_JET_STUCK_ND_OFST_X = -6f;
-    public const float GMD_BOSS5_EFCT_ROCKET_JET_REV_STUCK_ND_OFST_X = 4f;
-    public const int GMD_BOSS5_EFCT_ROCKET_LANDING_SW_OFST_Z = 65536;
-    public const int GMD_BOSS5_EFCT_LANDING_SW_OFST_Z = 262144;
-    public const short GMD_BOSS5_EFCT_LANDING_SW_VIEWOUT_OFST = 128;
-    public const int GMD_BOSS5_EFCT_LANDING_SW_ATK_RECT_ACTIVE_TIME = 8;
-    public const int GMD_BOSS5_EFCT_LANDING_SW_ATK_RECT_SIZE_LEFT = -88;
-    public const int GMD_BOSS5_EFCT_LANDING_SW_ATK_RECT_SIZE_TOP = -32;
-    public const int GMD_BOSS5_EFCT_LANDING_SW_ATK_RECT_SIZE_RIGHT = 88;
-    public const int GMD_BOSS5_EFCT_LANDING_SW_ATK_RECT_SIZE_BOTTOM = 32;
-    public const int GMD_BOSS5_EFCT_STRIKE_SW_OFST_Z = 262144;
-    public const short GMD_BOSS5_EFCT_STRIKE_SW_VIEWOUT_OFST = 64;
-    public const int GMD_BOSS5_EFCT_STRIKE_SW_ATK_RECT_ACTIVE_TIME = 15;
-    public const int GMD_BOSS5_EFCT_STRIKE_SW_ATK_RECT_SIZE_LEFT = -64;
-    public const int GMD_BOSS5_EFCT_STRIKE_SW_ATK_RECT_SIZE_TOP = -64;
-    public const int GMD_BOSS5_EFCT_STRIKE_SW_ATK_RECT_SIZE_RIGHT = 64;
-    public const int GMD_BOSS5_EFCT_STRIKE_SW_ATK_RECT_SIZE_BOTTOM = 32;
-    public const float GMD_BOSS5_EFCT_TARGETCURSOR_DISP_OFST_Z = 32f;
-    public const int GMD_BOSS5_EFCT_CURSOR_START_DURATION_TIME = 120;
-    public const float GMD_BOSS5_EFCT_CURSOR_START_INIT_UPDATE_SPD = 0.5f;
-    public const float GMD_BOSS5_EFCT_CURSOR_START_DEST_UPDATE_SPD = 1f;
-    public const int GMD_BOSS5_EFCT_CURSOR_START_FLICKER_OFF_TIME = 10;
-    public const int GMD_BOSS5_EFCT_CURSOR_START_FLICKER_ON_TIME = 10;
-    public const float GMD_BOSS5_EFCT_CURSOR_LOOP_INIT_UPDATE_SPD = 0.8f;
-    public const float GMD_BOSS5_EFCT_CURSOR_LOOP_UPDATE_SPD_ADD = 0.005f;
-    public const float GMD_BOSS5_EFCT_CURSOR_LOOP_DEST_UPDATE_SPD = 1.5f;
-    public const int GMD_BOSS5_EFCT_CURSOR_LOOP_FLICKER_OFF_TIME = 10;
-    public const int GMD_BOSS5_EFCT_CURSOR_LOOP_FLICKER_ON_TIME = 10;
-    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_OFST_Y_FROM_GROUND = -131072;
-    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_FLICKER_OFF_TIME = 10;
-    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_FLICKER_ON_TIME = 10;
-    public const float GMD_BOSS5_EFCT_CRASH_CURSOR_MOVE_RATIO_CURVE_RANGE_FACTOR = 0.9f;
-    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_MOVE_LEFT_EDGE_OFST = -1048576;
-    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_MOVE_RIGHT_EDGE_OFST = 1048576;
-    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_MOVE_WIDTH = 2097152;
-    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_MOVE_DISTANCE = 13631488;
-    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_VIEWOUT_OFST = 16;
-    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_OFST_Z = 262144;
-    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_ATK_RECT_SIZE_LEFT = -8;
-    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_ATK_RECT_SIZE_TOP = -8;
-    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_ATK_RECT_SIZE_RIGHT = 8;
-    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_ATK_RECT_SIZE_BOTTOM = 8;
-    public const int GMD_BOSS5_EFCT_DAMAGE_OFST_Z = 262144;
-    public const int GMD_BOSS5_EFCT_BREAKDOWN_SMOKES_NUM = 2;
-    public const int GMD_BOSS5_EFCT_BODY_SMALL_SMOKES_NUM = 3;
-    public const int GMD_BOSS5_EFCT_BODY_SMALL_SMOKE_LOOP_TIME_MAX = 240;
-    public const int GMD_BOSS5_EFCT_BODY_SMALL_SMOKE_LOOP_TIME_MIN = 120;
-    public const int GMD_BOSS5_EFCT_BODY_SMALL_SMOKE_IDLE_TIME_MAX = 120;
-    public const int GMD_BOSS5_EFCT_BODY_SMALL_SMOKE_IDLE_TIME_MIN = 60;
-    public const int GMD_BOSS5_EFCT_BERSERK_STEAM_NUM = 2;
-    public const int GMD_BOSS5_EFCT_BERSERK_STEAM_BLAST_TIME = 6;
-    public const int GMD_BOSS5_EFCT_BERSERK_STEAM_IDLE_TIME = 0;
-    public const float GMD_BOSS5_EFCT_EGG_SWEAT_DISP_OFST_Y = 56f;
-    public const float GMD_BOSS5_EFCT_EGG_SWEAT_DISP_OFST_Z = -8f;
-    public const int GMD_BOSS5_EFCT_ROCKET_ROLLING_SPARK_OFST_Z = 131072;
-    public const int GMD_BOSS5_EFCT_SE_JET_START_WAIT_TIME = 50;
-    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_00 = 0;
-    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_01 = 1;
-    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_02 = 2;
-    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_03 = 3;
-    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_C_00 = 4;
-    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_C_01 = 5;
-    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_C_02 = 6;
-    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_START = 7;
-    private const int GME_BOSS5_EFCT_IDX_FB_SMORK00 = 8;
-    private const int GME_BOSS5_EFCT_IDX_FB_SMORK01 = 9;
-    private const int GME_BOSS5_EFCT_IDX_FB_SMORK02 = 10;
-    private const int GME_BOSS5_EFCT_IDX_GLASS = 11;
-    private const int GME_BOSS5_EFCT_IDX_JET_FB = 12;
-    private const int GME_BOSS5_EFCT_IDX_JET_FB_SMORK = 13;
-    private const int GME_BOSS5_EFCT_IDX_ROCKET_BLITZ = 14;
-    private const int GME_BOSS5_EFCT_IDX_ROCKET_E = 15;
-    private const int GME_BOSS5_EFCT_IDX_ROCKET_JET = 16;
-    private const int GME_BOSS5_EFCT_IDX_ROCKET_S = 17;
-    private const int GME_BOSS5_EFCT_IDX_ROCKET_SMORK = 18;
-    private const int GME_BOSS5_EFCT_IDX_SHOCK = 19;
-    private const int GME_BOSS5_EFCT_IDX_SHOCK_ATK = 20;
-    private const int GME_BOSS5_EFCT_IDX_TARGET_FB = 21;
-    private const int GME_BOSS5_EFCT_IDX_TARGET_FB_E = 22;
-    private const int GME_BOSS5_EFCT_IDX_TARGET_FB_S = 23;
-    private const int GME_BOSS5_EFCT_IDX_TARGET_FB_W = 24;
-    private const int GME_BOSS5_EFCT_IDX_TARGET_FB_W_E = 25;
-    private const int GME_BOSS5_EFCT_IDX_TARGET_FB_W_S = 26;
-    private const int GME_BOSS5_EFCT_IDX_MAX = 27;
-    public const int OBD_MOVE_SPDX_MAX = 11;
-    public const int OBD_MOVE_SPDY_MAX = 14;
-    public const int OBD_HIT_VEC_FRONT = 1;
-    public const int OBD_HIT_VEC_BACK = 2;
-    public const int OBD_CAMERA_NUM = 8;
-    public const uint OBD_CAMERA_FIX = 1;
-    public const uint OBD_CAMERA_SHIFT = 2;
-    public const uint OBD_CAMERA_STOP = 4;
-    public const uint OBD_CAMERA_REVERSE = 8;
-    public const uint OBD_CAMERA_3D = 16;
-    public const uint OBD_CAMERA_LIMITCHECK = 32;
-    public const uint OBD_CAMERA_ROT_OFF = 1073741824;
-    public const uint OBD_CAMERA_ROT_EX = 2147483648;
-    private const ushort OBD_CAMERA_PRIORITY = 61438;
     public const float NND_BONE_YS = 0.25f;
     public const float NND_BONE_ZS = 0.125f;
     public const float NND_EFFECTOR_SIZE = 1f;
     public const int NNE_MATCTRLMODE_OFF = -1;
     public const int NNE_MATCTRL_BLEND_OFF = -1;
     public const int NNE_MATCTRL_TEXCOORDSRC_OFF = -1;
-
-
-    private const int GME_GMK_TYPE_STOPPER_NORM = 0;
-    private const int GME_GMK_TYPE_STOPPER_SLOT = 1;
-    private const int GMD_GMK_STOPPER_V_MARGIN = 4;
-    private const int GMD_GMK_STOPPER_V_HIT_MARGIN = 4;
-    private const int GME_GMK_TYPE_SPCTPLT_0 = 0;
-    private const int GME_GMK_TYPE_SPCTPLT_45 = 1;
-    private const int GME_GMK_TYPE_SPCTPLT_315 = 2;
-    private const int GME_GMK_TYPE_MAX = 3;
-    private const short GMD_GMK_SPCTPLT_0_RECT_W = 4;
-    private const short GMD_GMK_SPCTPLT_0_RECT_H = 16;
-    private const short GMD_GMK_SPCTPLT_0_RECT_X = -2;
-    private const short GMD_GMK_SPCTPLT_0_RECT_Y = -64;
-    private const short GMD_GMK_SPCTPLT_45_RECT_W = 16;
-    private const short GMD_GMK_SPCTPLT_45_RECT_H = 16;
-    private const short GMD_GMK_SPCTPLT_45_RECT_X = 29;
-    private const short GMD_GMK_SPCTPLT_45_RECT_Y = -45;
-    private const short GMD_GMK_SPCTPLT_315_RECT_W = 16;
-    private const short GMD_GMK_SPCTPLT_315_RECT_H = 16;
-    private const short GMD_GMK_SPCTPLT_315_RECT_X = -45;
-    private const short GMD_GMK_SPCTPLT_315_RECT_Y = -45;
-    private const short GMD_GMK_SPCTPLT_HEIGHT = 78;
-    private const short GMD_GMK_SPCTPLT_SHRINK = 36;
-    private const short GMD_GMK_SPCTPLT_LENGTH = 42;
-    public const int GMD_GMK_BELTCONV_SPEED = 2;
-    public const int GMD_GMK_BELTCONV_COL_HEIGHT = 8;
-    public const int GMD_GMK_BELTCONV_COL_OFST_Y = -16;
-    public const float GMD_GMK_BELTCBELT_TEX_WIDTH = 512f;
-    public const int GMD_GMK_BELTCONV_ROLL_OFF_Z = 65536;
-    public const int GMD_GMK_BELTCONV_CONV_OFF_Z = 69632;
-    public const int GMD_GMK_BELTCONV_BELT_OFF_Z = 73728;
-    public const int GMD_GMK_BELTCONV_SPD_MASK = 15;
-    public const int GMD_GMK_BELTCONV_COL_EX_L = 16;
-    public const int GMD_GMK_BELTCONV_COL_EX_R = 32;
-    public const int GMD_GMK_BELTCONV_COL_EX_LEN = 16;
-    public const float GMD_GMK_BELTCONV_UV_CHECK = 0.125f;
-    public const int GMD_ENE_HARO_LIGHT_NODE = 2;
-    public const int GMD_ENE_HARO_NODE_NO_MAX = 16;
-    public const int GMD_ENE_HARO_NEAR_PLAYER = 100;
-    public const int GMD_ENE_HARO_CHECK_ACT_TIME = 120;
-    public const int GMD_ENE_HARO_SEARCH_PLAYER = 100;
-    public const float GMD_ENE_HARO_ANGLE_ADD_SPD = 0.03f;
-    public const float GMD_ENE_HARO_ANGLE_ADD_SPD_LIMIT = 0.35f;
-    public const float GMD_ENE_HARO_ANGLE_SPD_LIMIT = 1.3f;
-    public const float GMD_ENE_HARD_FUNC_INERTIA = 0.96f;
-    public const float GMD_ENE_HARD_SPEED = 1.5f;
-    public const double GMD_ENE_HARD_INERTIA_VOLUME = 0.025;
-    private const int GME_EFCT_ENE_IDX_E02_JET_S = 0;
-    private const int GME_EFCT_ENE_IDX_E02_JET_S_SMORK = 1;
-    private const int GME_EFCT_ENE_IDX_E04_DUMMY1 = 2;
-    private const int GME_EFCT_ENE_IDX_E04_DUMMY2 = 3;
-    private const int GME_EFCT_ENE_IDX_E04_MEREON_MISS = 4;
-    private const int GME_EFCT_ENE_IDX_E05_GUARD = 5;
-    private const int GME_EFCT_ENE_IDX_E06_HARO = 6;
-    private const int GME_EFCT_ENE_IDX_E07_MOGU_E = 7;
-    private const int GME_EFCT_ENE_IDX_E07_MOGU_W = 8;
-    private const int GME_EFCT_ENE_IDX_E10_BUKUBUKU = 9;
-    private const int GME_EFCT_ENE_IDX_E13_CROW = 10;
-    private const int GME_EFCT_ENE_IDX_E13_T_STAR = 11;
-    private const int GME_EFCT_ENE_IDX_E14_JET_H = 12;
-    private const int GME_EFCT_ENE_IDX_MAX = 13;
-    public const int GMD_BOSS4_EFF_BOMB_OFST_Z = 131072;
-    public const int GME_BOSS4_EFF_BOMB_TYPE_SMALL = 0;
-    public const int GME_BOSS4_EFF_BOMB_TYPE_CAPSULE = 1;
-    public const int GME_BOSS4_EFF_BOMB_TYPE_CHIBI_01 = 2;
-    public const int GME_BOSS4_EFF_BOMB_TYPE_CHIBI_02 = 3;
-    public const int GME_BOSS4_EFF_BOMB_TYPE_CHIBI_03 = 4;
-    public const int GME_BOSS4_EFF_BOMB_TYPE_PARTS = 5;
-    public const int GME_BOSS4_EFF_BOMB_TYPE_MAX = 6;
-    public const int GMD_BOSS4_EFF_DAMAGE_OFST_Z = 131072;
-    public const float GMD_BOSS4_EFF_SWEAT_DISP_OFST_Y = 32f;
-    public const int DMD_LOGO_COM_FILE_PATH_LENGTH_MAX = 256;
-    public const int DMD_LOGO_COM_LOAD_CONTEXT_MAX = 10;
-    public const int DMD_LOGO_COM_TASK_PRIO_DATA_LOAD = 4096;
-    public const int DMD_LOGO_COM_TASK_GROUP_DATA_LOAD = 0;
-    public const uint GSD_SND_SYS_MAIN_FLAG_USE_SYSTEM_CNT_VOL = 1;
-    public const uint GSD_SND_SYS_MAIN_FLAG_SYSTEM_CNT_VOL_FADING = 2;
-    public const uint GSD_SND_SYS_MAIN_FLAG_ENTER_HBM_FADING = 4;
-    public const uint GSD_SND_SYS_MAIN_FLAG_LEAVE_HBM_FADING = 8;
-    public const uint GSD_SND_SYS_MAIN_FLAG_HBM_FADING_MASK = 12;
-    public const uint GSD_SND_SYS_MAIN_FLAG_RESET_CLEAR_MASK = 2;
-    public const uint GSD_SND_SCB_FLAG_INITIALIZED = 1;
-    public const uint GSD_SND_SCB_FLAG_IS_STOP = 2;
-    public const uint GSD_SND_SCB_FLAG_IS_PAUSE = 4;
-    public const uint GSD_SND_SCB_FLAG_STOP_ON_HBM = 1073741824;
-    public const uint GSD_SND_SCB_FLAG_MUTE_ON_USER_BGM = 2147483648;
-    public const int GSD_SND_SCB_MAX = 8;
-    public const int GSD_SND_SCB_PAUSE_LEVEL_EACH = 2147483647;
-    public const int GSD_SND_SCB_PAUSE_LEVEL_ALL_DEF = 128;
-    public const int GSD_SND_SCB_PAUSE_LEVEL_GAME = 128;
-    public const int GSD_SND_SCB_PAUSE_LEVEL_HBM = 64;
-    public const int GSD_SND_SCB_PAUSE_LEVEL_NONE = 0;
-    public const int GSE_SND_FADE_STATE_NORMAL = 0;
-    public const int GSE_SND_FADE_STATE_FADING_IN = 1;
-    public const int GSE_SND_FADE_STATE_FADING_OUT_TO_STOP = 2;
-    public const int GSE_SND_FADE_STATE_FADING_OUT_TO_PAUSE = 3;
-    public const int GSE_SND_FADE_STATE_END = 4;
-    public const int GSE_SND_FADE_STATE_MAX = 5;
-    public const int GSD_SND_SE_HANDLE_MAX = 16;
-    private const int GSE_SND_TYPE_BGM = 0;
-    private const int GSE_SND_TYPE_SE = 1;
-    private const int GSE_SND_TYPE_MAX = 2;
-    public const int GSE_SND_DATA_TYPE_CRIAUDIO = 0;
-    public const int GSE_SND_DATA_TYPE_NW4R = 1;
-    public const int GSE_SND_DATA_TYPE_MAX = 2;
-    public const int GSD_SND_SE_HANDLE_PAUSE_LEVEL_EACH = 2147483647;
-    public const int GSD_SND_SE_HANDLE_PAUSE_LEVEL_ALL_DEF = 128;
-    public const int GSD_SND_SE_HANDLE_PAUSE_LEVEL_GAME = 128;
-    public const int GSD_SND_SE_HANDLE_PAUSE_LEVEL_HBM = 64;
-    public const int GSD_SND_SE_HANDLE_PAUSE_LEVEL_NONE = 0;
-    public const uint GSD_SND_SE_HANDLE_FLAG_INITIALIZED = 1;
-    public const uint GSD_SND_SE_HANDLE_FLAG_PLAY_STARTED = 2;
-    public const uint GSD_SND_SE_HANDLE_FLAG_IS_STOP = 4;
-    public const uint GSD_SND_SE_HANDLE_FLAG_IS_PAUSE = 8;
-    public const uint GSD_SND_SE_HANDLE_FLAG_FREE_ON_STOP = 16;
-    public const uint GSD_SND_SE_HANDLE_FLAG_STOP_ON_HBM = 1073741824;
-    public const uint GSD_SND_SE_HANDLE_FLAG_NO_AUTOCLEAR = 2147483648;
-    public const int GSD_SND_SE_PLAY_LIMIT_NUM = 8;
-    public const int GSD_SND_SUSPEND_WAIT_COUNT = 8;
-    public const int GSD_SND_NOPLAY_ERROR_STATE_RESTART_LIMIT = 90;
-    public const int GSD_SND_NOPLAY_ERROR_CLEAR_SE_CRI_RESTART_LIMIT = 1000;
-    private const int SOUND_TYPE_FX = 0;
-    private const int SOUND_TYPE_BGM = 1;
-    private const int AISAC_TYPE_VOLUME = 0;
-    private const int AISAC_TYPE_PITCH = 1;
-    public const ushort BG_SC_CHAR_NO_MASK = 1023;
-    public const ushort BG_SC_H_FLIP = 1024;
-    public const ushort BG_SC_V_FLIP = 2048;
-    public const int OBD_MAP_CHAR_SIZE_X = 8;
-    public const int OBD_MAP_CHAR_SIZE_Y = 8;
-    public const int OBD_MAP_BLOCK_CHAR_NUM_X = 8;
-    public const int OBD_MAP_BLOCK_CHAR_NUM_Y = 8;
-    public const int OBD_BLOCK_DATA_SIZE = 128;
-    public const int OBD_MAP_CL_CHAR_DATA_SIZE = 8;
-    public const int OBD_MAP_CL_DIFF_DATA_SIZE = 8;
-    public const int MTD_X = 0;
-    public const int MTD_Y = 1;
-    public const int MTD_Z = 2;
-    public const int MTD_W = 3;
-    public const int MTD_XY = 2;
-    public const int MTD_XYZ = 3;
-    public const int MTD_XYZW = 4;
-    public const int MTD_LEFT = 0;
-    public const int MTD_TOP = 1;
-    public const int MTD_RIGHT = 2;
-    public const int MTD_BOTTOM = 3;
-    public const int MTD_RECT = 4;
-    public const int MTD_WIDTH = 0;
-    public const int MTD_HEIGHT = 1;
-    public const int MTD_DEPTH = 2;
-    public const int MTD_WH = 2;
-    public const int MTD_WHD = 3;
     public const float NND_PI = 3.141593f;
     public const float NND_FLOAT_LARGE_VALUE = 1E+12f;
     private const int NNE_FALSE = 0;
@@ -2131,6 +546,843 @@ public partial class AppMain
     public const uint NND_CHUNK_NOF0_GLES11 = 809914190;
     public const uint NND_CHUNK_NEND_GLES11 = 1145980238;
     public const uint NND_CHUNK_NFN0_GLES11 = 810436174;
+    public const uint NND_CLIP_NONE = 0;
+    public const uint NND_CLIP_NORMAL = 0;
+    public const uint NND_CLIP_INSIDE = 2;
+    public const uint NND_CLIP_CROSSNEAR = 4;
+    public const uint NND_CLIP_CROSSFAR = 8;
+    public const uint NND_CLIP_OUTSIDE = 16;
+    public const uint NND_CLIP_PS2_GSINSIDE = 32;
+    public const uint NND_CLIPOBJECT_MASK = 3;
+    public const uint NND_CLIP_STAT_MASK = 62;
+    private const int NNE_PROJECTION_TYPE_PERSPECTIVE = 0;
+    private const int NNE_PROJECTION_TYPE_ORTHO = 1;
+    private const uint NND_MATSTATUS_NONE = 0;
+    private const uint NND_MATSTATUS_HIDE = 1;
+    private const int NNE_MATCTRLMODE_NONE = 0;
+    private const int NNE_MATCTRLMODE_REPLACE = 1;
+    private const int NNE_MATCTRLMODE_ADD = 2;
+    private const int NNE_MATCTRLMODE_MODULATE = 3;
+    private const int NNE_MATCTRL_TEXCOORDSRC_POSITION = 0;
+    private const int NNE_MATCTRL_TEXCOORDSRC_NORMAL = 1;
+    private const int NNE_MATCTRL_BLEND_ALPHA = 0;
+    private const int NNE_MATCTRL_BLEND_ADD = 1;
+    private const int NNE_MATCTRL_BLEND_SUBTRACT = 2;
+    public const int NND_MAG_NEAREST = 0;
+    public const int NND_MAG_LINEAR = 1;
+    public const int NND_MAG_ANISOTROPIC = 2;
+    public const int NND_MIN_NEAREST = 0;
+    public const int NND_MIN_LINEAR = 1;
+    public const int NND_MIN_NEAREST_MIPMAP_NEAREST = 2;
+    public const int NND_MIN_NEAREST_MIPMAP_LINEAR = 3;
+    public const int NND_MIN_LINEAR_MIPMAP_NEAREST = 4;
+    public const int NND_MIN_LINEAR_MIPMAP_LINEAR = 5;
+    public const int NND_MIN_ANISOTROPIC = 6;
+    public const int NND_MIN_ANISOTROPIC_MIPMAP_NEAREST = 7;
+    public const int NND_MIN_ANISOTROPIC_MIPMAP_LINEAR = 8;
+    public const int NND_MIN_ANISOTROPIC2 = 6;
+    public const int NND_MIN_ANISOTROPIC2_MIPMAP_NEAREST = 7;
+    public const int NND_MIN_ANISOTROPIC2_MIPMAP_LINEAR = 8;
+    public const int NND_MIN_ANISOTROPIC4 = 9;
+    public const int NND_MIN_ANISOTROPIC4_MIPMAP_NEAREST = 10;
+    public const int NND_MIN_ANISOTROPIC4_MIPMAP_LINEAR = 11;
+    public const int NND_MIN_ANISOTROPIC8 = 12;
+    public const int NND_MIN_ANISOTROPIC8_MIPMAP_NEAREST = 13;
+    public const int NND_MIN_ANISOTROPIC8_MIPMAP_LINEAR = 14;
+    public const uint NND_TEXFTYPE_TEXTYPE_MASK = 255;
+    public const uint NND_TEXFTYPE_GVRTEX = 0;
+    public const uint NND_TEXFTYPE_SVRTEX = 1;
+    public const uint NND_TEXFTYPE_XVRTEX = 2;
+    public const uint NND_TEXFTYPE_NO_FILENAME = 256;
+    public const uint NND_TEXFTYPE_NO_FILTER = 512;
+    public const uint NND_TEXFTYPE_LISTGLBIDX = 1024;
+    public const uint NND_TEXFTYPE_LISTBANK = 2048;
+    public const uint NND_CAMERATYPE_MEMBER_USER = 1;
+    public const uint NND_CAMERATYPE_MEMBER_FOVY = 2;
+    public const uint NND_CAMERATYPE_MEMBER_ASPECT = 4;
+    public const uint NND_CAMERATYPE_MEMBER_ZNEAR = 8;
+    public const uint NND_CAMERATYPE_MEMBER_ZFAR = 16;
+    public const uint NND_CAMERATYPE_MEMBER_POSITION = 32;
+    public const uint NND_CAMERATYPE_MEMBER_TARGET = 64;
+    public const uint NND_CAMERATYPE_MEMBER_ROLL = 128;
+    public const uint NND_CAMERATYPE_MEMBER_UPVECTOR = 256;
+    public const uint NND_CAMERATYPE_MEMBER_UPTARGET = 512;
+    public const uint NND_CAMERATYPE_MEMBER_ROTTYPE = 1024;
+    public const uint NND_CAMERATYPE_MEMBER_ROTATION = 2048;
+    public const uint NND_CAMERATYPE_MEMBER_COMMON = 63;
+    public const uint NND_CAMERATYPE_ROTATION = 3135;
+    public const uint NND_CAMERATYPE_TARGET_ROLL = 255;
+    public const uint NND_CAMERATYPE_TARGET_UPVECTOR = 383;
+    public const uint NND_CAMERATYPE_TARGET_UPTARGET = 639;
+    public const uint NND_TEXFLAG_ALLOCATE = 1;
+    private const int NNE_TEXSLOT_0 = 0;
+    private const int NNE_TEXSLOT_1 = 1;
+    private const int NNE_TEXSLOT_2 = 2;
+    private const int NNE_TEXSLOT_3 = 3;
+    private const int NNE_TEXSLOT_4 = 4;
+    private const int NNE_TEXSLOT_5 = 5;
+    private const int NNE_TEXSLOT_6 = 6;
+    private const int NNE_TEXSLOT_7 = 7;
+    private const int NNE_TEXSLOT_MAX = 8;
+    public const uint NND_VTXTYPE_GL_VERTEXDESC = 1;
+    public const uint NND_VTXTYPE_GL_VERTEXDESC_MORPH_TARGET = 2;
+    public const uint NND_VTXTYPE_GL_VERTEXDESC_MORPH_TARGET_NULL = 4;
+    public const uint NND_VTXTYPE_GL_BOUNDBUFFER = 16;
+    public const uint NND_VTXARRAYTYPE_GL_POS = 1;
+    public const uint NND_VTXARRAYTYPE_GL_WGT = 2;
+    public const uint NND_VTXARRAYTYPE_GL_MTXIDX = 4;
+    public const uint NND_VTXARRAYTYPE_GL_NRM = 8;
+    public const uint NND_VTXARRAYTYPE_GL_COL = 16;
+    public const uint NND_VTXARRAYTYPE_GL_TEX0 = 256;
+    public const uint NND_VTXARRAYTYPE_GL_TEX1 = 512;
+    public const uint NND_VTXARRAYTYPE_INTERLEAVED = 65536;
+    public const uint NND_VTXARRAYTYPE_REVERSE_NORMAL = 134217728;
+    public const uint NND_VTXARRAYTYPE_REVERSE_TANGENT = 268435456;
+    public const uint NND_VTXARRAYTYPE_REVERSE_BINORMAL = 536870912;
+    public const uint NND_VTXARRAYTYPE_OBJECT_SPACE_NORMAL = 1073741824;
+    public const uint NND_VTXARRAYTYPE_MORPH_TARGET_DIFF = 2147483648;
+    public const int NND_DATATYPE_GL_BYTE = 5120;
+    public const int NND_DATATYPE_GL_UNSIGNED_BYTE = 5121;
+    public const int NND_DATATYPE_GL_SHORT = 5122;
+    public const int NND_DATATYPE_GL_UNSIGNED_SHORT = 5123;
+    public const int NND_DATATYPE_GL_INT = 5124;
+    public const int NND_DATATYPE_GL_UNSIGNED_INT = 5125;
+    public const int NND_DATATYPE_GL_FLOAT = 5126;
+    public const int NND_DATATYPE_GL_DOUBLE = 5130;
+    public const int NND_DATATYPE_GL_FIXED_OES = 5132;
+    public const uint NND_PRIMTYPE_GL_PRIMITIVEDESC = 1;
+    public const uint NND_PRIMTYPE_GL_BOUNDBUFFER = 2;
+    public const int NND_PRIMMODE_GL_POINTS = 0;
+    public const int NND_PRIMMODE_GL_LINES = 1;
+    public const int NND_PRIMMODE_GL_LINE_LOOP = 2;
+    public const int NND_PRIMMODE_GL_LINE_STRIP = 3;
+    public const int NND_PRIMMODE_GL_TRIANGLES = 4;
+    public const int NND_PRIMMODE_GL_TRIANGLE_STRIP = 5;
+    public const int NND_PRIMMODE_GL_TRIANGLE_FAN = 6;
+    public const int NND_PRIMMODE_GL_QUADS = 7;
+    public const int NND_PRIMMODE_GL_QUAD_STRIP = 8;
+    public const int NND_PRIMMODE_GL_POLYGON = 9;
+    public const uint NND_SMOTTYPE_FRAME_FLOAT = 1;
+    public const uint NND_SMOTTYPE_FRAME_SINT16 = 2;
+    public const uint NND_SMOTTYPE_FRAME_MASK = 3;
+    public const uint NND_SMOTTYPE_ANGLE_RADIAN = 4;
+    public const uint NND_SMOTTYPE_ANGLE_ANGLE32 = 8;
+    public const uint NND_SMOTTYPE_ANGLE_ANGLE16 = 16;
+    public const uint NND_SMOTTYPE_ANGLE_MASK = 28;
+    public const uint NND_SMOTTYPE_TRANSLATION_X = 256;
+    public const uint NND_SMOTTYPE_TRANSLATION_Y = 512;
+    public const uint NND_SMOTTYPE_TRANSLATION_Z = 1024;
+    public const uint NND_SMOTTYPE_ROTATION_X = 2048;
+    public const uint NND_SMOTTYPE_ROTATION_Y = 4096;
+    public const uint NND_SMOTTYPE_ROTATION_Z = 8192;
+    public const uint NND_SMOTTYPE_QUATERNION = 16384;
+    public const uint NND_SMOTTYPE_SCALING_X = 32768;
+    public const uint NND_SMOTTYPE_SCALING_Y = 65536;
+    public const uint NND_SMOTTYPE_SCALING_Z = 131072;
+    public const uint NND_SMOTTYPE_USER_UINT32 = 262144;
+    public const uint NND_SMOTTYPE_USER_FLOAT = 524288;
+    public const uint NND_SMOTTYPE_NODEHIDE = 1048576;
+    public const uint NND_SMOTTYPE_TARGET_X = 262144;
+    public const uint NND_SMOTTYPE_TARGET_Y = 524288;
+    public const uint NND_SMOTTYPE_TARGET_Z = 1048576;
+    public const uint NND_SMOTTYPE_MORPH_WEIGHT = 16777216;
+    public const uint NND_SMOTTYPE_ROLL = 2097152;
+    public const uint NND_SMOTTYPE_UPTARGET_X = 4194304;
+    public const uint NND_SMOTTYPE_UPTARGET_Y = 8388608;
+    public const uint NND_SMOTTYPE_UPTARGET_Z = 16777216;
+    public const uint NND_SMOTTYPE_UPVECTOR_X = 33554432;
+    public const uint NND_SMOTTYPE_UPVECTOR_Y = 67108864;
+    public const uint NND_SMOTTYPE_UPVECTOR_Z = 134217728;
+    public const uint NND_SMOTTYPE_FOVY = 268435456;
+    public const uint NND_SMOTTYPE_ZNEAR = 536870912;
+    public const uint NND_SMOTTYPE_ZFAR = 1073741824;
+    public const uint NND_SMOTTYPE_ASPECT = 2147483648;
+    public const uint NND_SMOTTYPE_HIDE = 256;
+    public const uint NND_SMOTTYPE_DIFFUSE_R = 512;
+    public const uint NND_SMOTTYPE_DIFFUSE_G = 1024;
+    public const uint NND_SMOTTYPE_DIFFUSE_B = 2048;
+    public const uint NND_SMOTTYPE_ALPHA = 4096;
+    public const uint NND_SMOTTYPE_SPECULAR_R = 8192;
+    public const uint NND_SMOTTYPE_SPECULAR_G = 16384;
+    public const uint NND_SMOTTYPE_SPECULAR_B = 32768;
+    public const uint NND_SMOTTYPE_SPECULAR_LEVEL = 65536;
+    public const uint NND_SMOTTYPE_SPECULAR_GLOSS = 131072;
+    public const uint NND_SMOTTYPE_AMBIENT_R = 262144;
+    public const uint NND_SMOTTYPE_AMBIENT_G = 524288;
+    public const uint NND_SMOTTYPE_AMBIENT_B = 1048576;
+    public const uint NND_SMOTTYPE_TEXTURE_INDEX = 2097152;
+    public const uint NND_SMOTTYPE_TEXTURE_BLEND = 4194304;
+    public const uint NND_SMOTTYPE_OFFSET_U = 8388608;
+    public const uint NND_SMOTTYPE_OFFSET_V = 16777216;
+    public const uint NND_SMOTTYPE_MATCLBK_USER = 33554432;
+    public const uint NND_SMOTTYPE_LIGHT_COLOR_R = 2097152;
+    public const uint NND_SMOTTYPE_LIGHT_COLOR_G = 4194304;
+    public const uint NND_SMOTTYPE_LIGHT_COLOR_B = 8388608;
+    public const uint NND_SMOTTYPE_LIGHT_ALPHA = 16777216;
+    public const uint NND_SMOTTYPE_LIGHT_INTENSITY = 33554432;
+    public const uint NND_SMOTTYPE_FALLOFF_START = 67108864;
+    public const uint NND_SMOTTYPE_FALLOFF_END = 134217728;
+    public const uint NND_SMOTTYPE_INNER_ANGLE = 268435456;
+    public const uint NND_SMOTTYPE_OUTER_ANGLE = 536870912;
+    public const uint NND_SMOTTYPE_INNER_RANGE = 1073741824;
+    public const uint NND_SMOTTYPE_OUTER_RANGE = 2147483648;
+    public const uint NND_SMOTTYPE_TRANSLATION_XYZ = 1792;
+    public const uint NND_SMOTTYPE_ROTATION_XYZ = 14336;
+    public const uint NND_SMOTTYPE_SCALING_XYZ = 229376;
+    public const uint NND_SMOTTYPE_TARGET_XYZ = 1835008;
+    public const uint NND_SMOTTYPE_UPTARGET_XYZ = 29360128;
+    public const uint NND_SMOTTYPE_UPVECTOR_XYZ = 234881024;
+    public const uint NND_SMOTTYPE_DIFFUSE_RGB = 3584;
+    public const uint NND_SMOTTYPE_SPECULAR_RGB = 57344;
+    public const uint NND_SMOTTYPE_AMBIENT_RGB = 1835008;
+    public const uint NND_SMOTTYPE_OFFSET_UV = 25165824;
+    public const uint NND_SMOTTYPE_LIGHT_COLOR_RGB = 14680064;
+    public const uint NND_SMOTTYPE_TRANSLATION_MASK = 1792;
+    public const uint NND_SMOTTYPE_ROTATION_MASK = 30720;
+    public const uint NND_SMOTTYPE_SCALING_MASK = 229376;
+    public const uint NND_SMOTTYPE_TARGET_MASK = 1835008;
+    public const uint NND_SMOTTYPE_UPTARGET_MASK = 29360128;
+    public const uint NND_SMOTTYPE_UPVECTOR_MASK = 234881024;
+    public const uint NND_SMOTTYPE_DIFFUSE_MASK = 3584;
+    public const uint NND_SMOTTYPE_SPECULAR_MASK = 57344;
+    public const uint NND_SMOTTYPE_AMBIENT_MASK = 1835008;
+    public const uint NND_SMOTTYPE_OFFSET_MASK = 25165824;
+    public const uint NND_SMOTTYPE_USER_MASK = 786432;
+    public const uint NND_SMOTTYPE_TEXTURE_MASK = 31457280;
+    public const uint NND_SMOTTYPE_LIGHT_COLOR_MASK = 14680064;
+    public const uint NND_SMOTTYPE_VALUETYPE_MASK = 4294967040;
+    public const uint NND_SMOTIPTYPE_SPLINE = 1;
+    public const uint NND_SMOTIPTYPE_LINEAR = 2;
+    public const uint NND_SMOTIPTYPE_CONSTANT = 4;
+    public const uint NND_SMOTIPTYPE_BEZIER = 16;
+    public const uint NND_SMOTIPTYPE_SI_SPLINE = 32;
+    public const uint NND_SMOTIPTYPE_TRIGGER = 64;
+    public const uint NND_SMOTIPTYPE_QUAT_LERP = 512;
+    public const uint NND_SMOTIPTYPE_QUAT_SLERP = 1024;
+    public const uint NND_SMOTIPTYPE_QUAT_SQUAD = 2048;
+    public const uint NND_SMOTIPTYPE_IP_MASK = 3703;
+    public const uint NND_SMOTIPTYPE_NOREPEAT = 65536;
+    public const uint NND_SMOTIPTYPE_CONSTREPEAT = 131072;
+    public const uint NND_SMOTIPTYPE_REPEAT = 262144;
+    public const uint NND_SMOTIPTYPE_MIRROR = 524288;
+    public const uint NND_SMOTIPTYPE_OFFSET = 1048576;
+    public const uint NND_SMOTIPTYPE_REPEAT_MASK = 2031616;
+    public const uint NND_MOTIONTYPE_NODE = 1;
+    public const uint NND_MOTIONTYPE_CAMERA = 2;
+    public const uint NND_MOTIONTYPE_LIGHT = 4;
+    public const uint NND_MOTIONTYPE_MORPH = 8;
+    public const uint NND_MOTIONTYPE_MATERIAL = 16;
+    public const uint NND_MOTIONTYPE_CATEGORY_MASK = 31;
+    public const uint NND_MOTIONTYPE_NOREPEAT = 65536;
+    public const uint NND_MOTIONTYPE_CONSTREPEAT = 131072;
+    public const uint NND_MOTIONTYPE_REPEAT = 262144;
+    public const uint NND_MOTIONTYPE_MIRROR = 524288;
+    public const uint NND_MOTIONTYPE_OFFSET = 1048576;
+    public const uint NND_MOTIONTYPE_TRIGGER = 64;
+    public const uint NND_MOTIONTYPE_VERSION2 = 268435456;
+    public const uint NND_MOTIONTYPE_REPEAT_MASK = 2031680;
+    public const uint NND_LIGHTTYPE_STANDARD_GL = 65536;
+    public const uint NND_LIGHTTYPE_MASK = 65599;
+    private const int NNE_ROTATETYPE_XYZ = 0;
+    private const int NNE_ROTATETYPE_XZY = 1;
+    private const int NNE_ROTATETYPE_YXZ = 2;
+    private const int NNE_ROTATETYPE_YZX = 3;
+    private const int NNE_ROTATETYPE_ZXY = 4;
+    private const int NNE_ROTATETYPE_ZYX = 5;
+    public const uint NND_LIGHTTYPE_PARALLEL = 1;
+    public const uint NND_LIGHTTYPE_POINT = 2;
+    public const uint NND_LIGHTTYPE_TARGET_SPOT = 4;
+    public const uint NND_LIGHTTYPE_ROTATION_SPOT = 8;
+    public const uint NND_LIGHTTYPE_TARGET_DIRECTIONAL = 16;
+    public const uint NND_LIGHTTYPE_ROTATION_DIRECTIONAL = 32;
+    public const uint NND_LIGHTTYPE_COMMON_MASK = 63;
+    public const int NND_BZR_MAX_NEWTON_LOOP_COUNT = 0;
+    public const float NND_BZR_EPSILON = 1.525879E-05f;
+    public const float NND_BZR_EPSILON2 = 2.328306E-10f;
+    public const int NND_BZR_BISECTION_LOOP_COUNT = 16;
+    private const int NND_CIRCLE_N = 20;
+    private const int NND_CIRCLE_PN = 120;
+    private const uint NND_DRAWCS_CALCCLIP = 2147483648;
+    public const int NNE_TEXCOORD_NONE = 0;
+    public const int NNE_TEXCOORD_0 = 0;
+    public const int NNE_TEXCOORD_1 = 1;
+    public const int NNE_TEXCOORD_3 = 3;
+    public const int NNE_TEXCOORD_2 = 2;
+    public const int NNE_TEXCOORD_NRM = -1;
+    public const int NNE_TEXCOORD_POS = -2;
+    public const int NNE_TEXCOORD_SPHERE_MAP = -1;
+    public const int NNE_TEXCOORD_PROJECTION_MAP = -2;
+    public const int NNE_TEXCOORD_DUALPARABOLOID_MAP = -3;
+    public const int NNE_TEXCOORD_MAX = 3;
+    public const int NNE_TEXCOORD_MIN = -3;
+    public const int NND_FRAGPARALIGHT_MAX = 3;
+    public const int NND_FRAGPOINTLIGHT_MAX = 3;
+    public const int NND_MAX_USER_PROFILE = 63;
+    public const int NND_MAX_USER_PROFILE_DRAWOBJ = 255;
+    public const int NND_MAX_NUM_USER_UNIFORM = 256;
+    private const int NNE_PRIM3D_POINT_FMT_P = 0;
+    private const int NNE_PRIM3D_POINT_FMT_PC = 1;
+    private const int NNE_PRIM_ALPHABLEND_OFF = 0;
+    private const int NNE_PRIM_ALPHABLEND_ON = 1;
+    private const int NNE_PRIM_TEXBLEND_MODULATE = 0;
+    private const int NNE_PRIM_TEXBLEND_REPLACE = 1;
+    private const int NNE_PRIM_TEXWRAP_REPEAT = 0;
+    private const int NNE_PRIM_TEXWRAP_CLAMP = 1;
+    private const int NNE_PRIM_TEXWRAP_REGION_REPEAT = 2;
+    private const int NNE_PRIM_TEXWRAP_REGION_CLAMP = 3;
+    private const int NNE_PRIM_TEXCOORD_UV = 0;
+    private const int NNE_PRIM_TEXCOORD_ENVIRONMENT = 1;
+    private const int NNE_PRIM2D_FMT_P = 0;
+    private const int NNE_PRIM2D_FMT_PC = 1;
+    private const int NNE_PRIM2D_FMT_PCT = 2;
+    private const int NNE_PRIM2D_POINT_FMT_P = 0;
+    private const int NNE_PRIM2D_POINT_FMT_PC = 1;
+    private const int NNE_PRIM3D_FMT_P = 0;
+    private const int NNE_PRIM3D_FMT_PN = 1;
+    private const int NNE_PRIM3D_FMT_PC = 2;
+    private const int NNE_PRIM3D_FMT_PNT = 3;
+    private const int NNE_PRIM3D_FMT_PCT = 4;
+    private const int NNE_PRIM_LIGHT_DISABLE = 0;
+    private const int NNE_PRIM_LIGHT_ENABLE = 1;
+    private const int NNE_PRIM_LIGHT_SPECULAR = 2;
+    private const int NNE_PRIM_BLEND_ADD = 0;
+    private const int NNE_PRIM_BLEND_BLEND = 1;
+    private const int NNE_PRIM_BLEND_PS2_CUSTOM = 2;
+    private const int NNE_PRIM_BLEND_PSP_CUSTOM = 3;
+    private const int NNE_PRIM_CULL_NONE = 0;
+    private const int NNE_PRIM_CULL_R = 1;
+    private const int NNE_PRIM_CULL_L = 2;
+    public const int NNE_PRIM_TRIANGLE_LIST = 0;
+    public const int NNE_PRIM_TRIANGLE_STRIP = 1;
+    public const uint NND_CLIP_NEAR = 256;
+    public const uint NND_CLIP_FAR = 512;
+    public const uint NND_CLIP_RIGHT = 4096;
+    public const uint NND_CLIP_LEFT = 8192;
+    public const uint NND_CLIP_TOP = 16384;
+    public const uint NND_CLIP_BOTTOM = 32768;
+    public const uint NND_CLIP_GS_RIGHT = 65536;
+    public const uint NND_CLIP_GS_LEFT = 131072;
+    public const uint NND_CLIP_GS_TOP = 262144;
+    public const uint NND_CLIP_GS_BOTTOM = 524288;
+    public const uint NND_CLIP_GS_MASK = 983040;
+    public const int NND_DRAWOBJ_SHADER_USER_PROFILE_TOON = 0;
+    public const uint NND_NODESTATUS_NONE = 0;
+    public const uint NND_NODESTATUS_HIDE = 1;
+    public const uint NND_NODESTATUS_INSIDE = 2;
+    public const uint NND_NODESTATUS_CROSSNEAR = 4;
+    public const uint NND_NODESTATUS_CROSSFAR = 8;
+    public const uint NND_NODESTATUS_OUTSIDE = 16;
+    public const uint NND_NODESTATUS_PS2_GSINSIDE = 32;
+    public const uint NND_NODESTATUS_CLIP_MASK = 62;
+    public const uint NND_NODESTATUS_WIRE = 1024;
+    public const uint NND_SETNODESTATUS_CLIP_HIDE = 1;
+    public const uint NND_SETNODESTATUS_CLIP_WIRE = 2;
+    public const uint NND_SETNODESTATUS_CLIP_BRANCH = 8;
+    public const uint NND_SETNODESTATUS_CLIP_SCALE = 16;
+    public const uint NND_SETNODESTATUS_CLIP_SPHERE = 32;
+    public const uint NND_SETNODESTATUS_CLIP_MASK = 59;
+    public const uint NND_SETNODESTATUS_HIDE = 4;
+    public const uint NND_DRAWCS_OBJECT = 256;
+    public const uint NND_DRAWCS_NODE = 512;
+    public const uint NND_DRAWCS_MESHSET = 1024;
+    public const uint NND_DRAWCS_SPHERE = 32768;
+    public const uint NND_DRAWCS_HIDE = 65536;
+    public const uint NND_DRAWSIIKBONE_WIRE = 1;
+    public const uint NND_DRAWSIIKBONE_POLY = 2;
+    public const uint NND_DRAWNODETREE_WIRE = 1;
+    public const uint NND_DRAWNODETREE_POLY = 2;
+    public const uint NND_DRAWNODETREE_ALLNODE = 4;
+    public const uint NND_DRAWNODETREE_DRAWNODE = 8;
+    public const uint NND_DRAWNODETREE_STRATPOINT = 16;
+    public const uint NND_DRAWNODETREE_DRAWTYPEMASK = 1;
+    public const uint NND_BINDOBJ_EXCLUDE_PLIABLE_VERTICES = 1;
+    public const uint NND_BINDOBJ_DETACHED_ARRAY = 2;
+    public const int NND_WEIGHT_LOCATION = 1;
+    public const int NND_MTXIDX_LOCATION = 5;
+    public const int NND_TANGENT_LOCATION = 6;
+    public const int NND_BINORMAL_LOCATION = 7;
+    private const int NNE_TEXCOORDSRC_DISABLE = 0;
+    private const int NNE_TEXCOORDSRC_TEXCOORD0 = 1;
+    private const int NNE_TEXCOORDSRC_TEXCOORD1 = 2;
+    private const int NNE_TEXCOORDSRC_NORMAL = 3;
+    private const int NNE_TEXCOORDSRC_POSITION = 4;
+    public const int NND_CLIP_DBGPRINT = 0;
+    public const int NND_BBCLIP_DBGPRINT = 0;
+    public const uint NND_OBJECTSTATUS_HIDE = 1;
+    public const uint NND_OBJECTSTATUS_INSIDE = 2;
+    public const uint NND_DRAWOBJ_HIDE = 1;
+    public const uint NND_DRAWOBJ_INSIDE = 2;
+    public const uint NND_DRAWOBJ_MESHSETCLIP = 16;
+    public const uint NND_DRAWOBJ_DOUBLESIDE = 32;
+    public const uint NND_DRAWOBJ_BACKSIDE = 64;
+    public const uint NND_DRAWOBJ_FRONTSIDE = 96;
+    public const uint NND_DRAWOBJ_CULLING_MASK = 96;
+    public const uint NND_DRAWOBJ_DISABLE_LIGHTING = 128;
+    public const uint NND_DRAWOBJ_LIGHTING_MASK = 128;
+    public const uint NND_DRAWOBJ_NORM = 256;
+    public const uint NND_DRAWOBJ_NORMAL = 256;
+    public const uint NND_DRAWOBJ_TANGENTSPACE = 512;
+    public const uint NND_DRAWOBJ_VECTORMASK = 768;
+    public const uint NND_DRAWOBJ_IGNOREMATSPEC = 1024;
+    public const uint NND_DRAWOBJ_IGNORETEXTURE = 2048;
+    public const uint NND_DRAWOBJ_IGNOREMATMASK = 3072;
+    public const uint NND_DRAWOBJ_WIRE = 4096;
+    public const uint NND_DRAWOBJ_COLORNTEXTURE = 8192;
+    public const uint NND_DRAWOBJ_COLORSTRIP = 12288;
+    public const uint NND_DRAWOBJ_COLORMESHSET = 16384;
+    public const uint NND_DRAWOBJ_COLORMATERIAL = 20480;
+    public const uint NND_DRAWOBJ_COLORNWEIGHT = 24576;
+    public const uint NND_DRAWOBJ_COLORSHADER = 28672;
+    public const uint NND_DRAWOBJ_SURFACE_MASK = 28672;
+    public const uint NND_DRAWOBJ_FRAGPARALIGHT1 = 65536;
+    public const uint NND_DRAWOBJ_FRAGPARALIGHT2 = 131072;
+    public const uint NND_DRAWOBJ_FRAGPARALIGHT3 = 196608;
+    public const uint NND_DRAWOBJ_FRAGPARALIGHT_MASK = 196608;
+    public const uint NND_DRAWOBJ_FRAGPOINTLIGHT1 = 262144;
+    public const uint NND_DRAWOBJ_FRAGPOINTLIGHT2 = 524288;
+    public const uint NND_DRAWOBJ_FRAGPOINTLIGHT3 = 786432;
+    public const uint NND_DRAWOBJ_FRAGPOINTLIGHT_MASK = 786432;
+    public const uint NND_DRAWOBJ_FRAGLIGHT_MASK = 983040;
+    public const uint NND_DRAWOBJ_DEPTH_ONLY = 2147483648;
+    public const uint NND_DRAWOBJ_DISABLE_ALPHATEST = 1;
+    public const uint NND_DRAWOBJ_SHADER_VERTEXBLEND = 2;
+    public const uint NND_DRAWOBJ_DISABLE_NORMALMAP = 1024;
+    public const uint NND_DRAWOBJ_DISABLE_SPECULARMAP = 2048;
+    public const uint NND_DRAWOBJ_DISABLE_SHININESSMAP = 4096;
+    public const uint NND_DRAWOBJ_DISABLE_DUALPARABOLOIDMAP = 8192;
+    public const uint NND_DRAWOBJ_DISABLE_ENVMASKMAP = 16384;
+    public const uint NND_DRAWOBJ_DISABLE_MODULATEMAP = 32768;
+    public const uint NND_DRAWOBJ_DISABLE_ADDMAP = 65536;
+    public const uint NND_DRAWOBJ_DISABLE_OPACITYMAP = 131072;
+    public const uint NND_DRAWOBJ_DISABLE_USER1MAP = 262144;
+    public const uint NND_DRAWOBJ_DISABLE_USER2MAP = 524288;
+    public const uint NND_DRAWOBJ_DISABLE_USER3MAP = 1048576;
+    public const uint NND_DRAWOBJ_DISABLE_USER4MAP = 2097152;
+    public const uint NND_DRAWOBJ_DISABLE_USER5MAP = 4194304;
+    public const uint NND_DRAWOBJ_DISABLE_USER6MAP = 8388608;
+    public const uint NND_DRAWOBJ_DISABLE_USER7MAP = 16777216;
+    public const uint NND_DRAWOBJ_DISABLE_USER8MAP = 33554432;
+    public const uint NND_DRAWOBJ_DISABLE_MAPMASK = 67107840;
+    public const uint NND_DRAWOBJ_MATCTRL_DIFFUSE = 1048576;
+    public const uint NND_DRAWOBJ_MATCTRL_AMBIENT = 2097152;
+    public const uint NND_DRAWOBJ_MATCTRL_SPECULAR = 4194304;
+    public const uint NND_DRAWOBJ_MATCTRL_ALPHA = 8388608;
+    public const uint NND_DRAWOBJ_MATCTRL_ENVTEXMTX = 16777216;
+    public const uint NND_DRAWOBJ_MATCTRL_BLEND = 33554432;
+    public const uint NND_DRAWOBJ_MATCTRL_TEXOFFSET = 268435456;
+    public const uint NND_DRAWOBJ_MATCTRL_USERSAMPLERCUBE1 = 1073741824;
+    public const uint NND_DRAWOBJ_MATCTRL_USERSAMPLERCUBE2 = 2147483648;
+    public const uint NND_DRAWOBJ_MATCTRL_USERSAMPLERCUBE_MASK = 3221225472;
+    public const uint NND_DRAWOBJ_MATCTRL_MASK = 334495744;
+    public const uint NND_CALCPLIABLE_PLIABILITY_ALL = 1;
+    public const uint NND_CALCPLIABLE_GL_BINDBUFFER = 2;
+    public const uint NND_CALCPLIABLE_PS3_BINDBUFFER = 2;
+    public const uint NND_CALCPLIABLE_PS2_SINGLEBUFFER = 4;
+    public const uint NND_CALCPLIABLE_USE_NODESTATUS = 8;
+    public const uint NND_CALCPLIABLE_DX_OBJECTBUFFER = 16;
+    public const uint NND_CALCPLIABLE_DX_PRINODEOBJCT = 32;
+    public const uint NND_CALCPLIABLE_DX_NOINDEX = 64;
+
+    private const int AMTRE_STATE_DELETE = 32768;
+    private const int AMTRE_STATE_EFFECT = 16384;
+    private const int AMTRE_STATE_SSP_SET = 512;
+    private const int AMTRE_STATE_SSP_CALC = 256;
+    private const int AMTRE_STATE_TOP = 1;
+    private const int AMTRE_STATE_END = 2;
+    private const int AMTRE_STATE_TE_MASK = 3;
+    private const int AMTRE_FLAG_FXPOS = 1;
+    private const int AMTRE_MFLAG_PRAIMAL = 1;
+    private const int AMTRE_MFLAG_CHECK1 = 2;
+    private const int AMTRE_HANDLE_ACCELL = 1;
+    public const int GMD_PAUSE_FLAG_END = 1;
+    public const int GMD_PAUSE_FADEOUT_TIME = 20;
+    public const int GMD_PAUSE_FADEIN_TIME = 20;
+
+    private const int GME_GMK_TYPE_DUMMY = 0;
+    private const int SLOT_REEL_JP = 0;
+    private const int SLOT_REEL_EGG = 1;
+    private const int SLOT_REEL_SONIC = 2;
+    private const int SLOT_REEL_RING = 3;
+    private const int SLOT_REEL_BAR = 4;
+    private const int SLOT_REEL_NUM = 5;
+    private const int SLOT_REEL_B__ = 5;
+    private const int SLOT_REEL_BB_ = 6;
+    private const int SLOT_REEL_77_ = 7;
+    private const int SLOT_REEL_EE_ = 8;
+    private const int SLOT_REEL_MEOSHI_STOP = 9;
+    private const int GMD_GMK_SLOT_REEL_NUM = 3;
+    private const int SLOT_STEP_INIT = 0;
+    private const int SLOT_STEP_ROLL1 = 10;
+    private const int SLOT_STEP_ROLL2 = 20;
+    private const int SLOT_STEP_ROLL3 = 30;
+    private const int SLOT_STEP_STOP_NORM = 40;
+    private const int SLOT_STEP_STOP_HIT = 50;
+    private const int SLOT_STEP_STOP_EGG = 60;
+    private const int SLOT_STEP_EGG_STOP = 69;
+    private const int SLOT_STEP_STOP_STOP = 70;
+    private const int SLOT_STEP_STOP_STOP_FORCE = 80;
+    private const int SLOT_STEP_MAX = 81;
+    private const int GMD_GMK_SLOT_STOP1_TIME = 10;
+    private const int GMD_GMK_SLOT_STOP1_TIME_ADJ = 1;
+    private const int GMD_GMK_SLOT_STOP2_TIME = 0;
+    private const int GMD_GMK_SLOT_STOP2_TIME_ADJ = 1;
+    private const int GMD_GMK_SLOT_STOP3_TIME = 0;
+    private const int GMD_GMK_SLOT_STOP3_TIME_ADJ = 1;
+    private const int GMD_GMK_SLOT_STOP3_FEABER_TIME = 30;
+    private const int GMD_SZ_TBL_DAM_OFST = 8;
+    private const int GMD_GMK_BUMPER_MODE_WAIT = 0;
+    private const int GMD_GMK_BUMPER_MODE_ACTIVE = 1;
+    private const int GMD_GMK_BUMPER_MODE_NUM = 2;
+    private const int GMD_GMK_BUMPER_TYPE_TRI_I_TOP = 0;
+    private const int GMD_GMK_BUMPER_TYPE_TRI_I_BOTTOM = 1;
+    private const int GMD_GMK_BUMPER_TYPE_TRI_I_LEFT = 2;
+    private const int GMD_GMK_BUMPER_TYPE_TRI_I_RIGHT = 3;
+    private const int GMD_GMK_BUMPER_TYPE_TRI_R_LT = 4;
+    private const int GMD_GMK_BUMPER_TYPE_TRI_R_LB = 5;
+    private const int GMD_GMK_BUMPER_TYPE_TRI_R_RT = 6;
+    private const int GMD_GMK_BUMPER_TYPE_TRI_R_RB = 7;
+    private const int GMD_GMK_BUMPER_TYPE_HEX_W = 8;
+    private const int GMD_GMK_BUMPER_TYPE_HEX_H = 9;
+    private const int GMD_GMK_BUMPER_TYPE_NUM = 10;
+    private const int GMD_GMK_BUMPER_RECT_MARGIN_PLAYER_X = 32768;
+    private const int GMD_GMK_BUMPER_RECT_MARGIN_PLAYER_Y = 32768;
+    private const int GMD_GMK_BUMPER_RECT_OFFSET_PLAYER_Y = -12288;
+    private const int GMD_GMK_BUMPER_POS_Z = -122880;
+    private const uint GMD_GMK_BUMPER_OFFSET_RADIUS = 65536;
+    private const uint GMD_GMK_BUMPER_SPEED_MIN = 8192;
+    private const int GMD_GMK_BUMPER_SPEED_X = 16384;
+    private const int GMD_GMK_BUMPER_SPEED_Y = 24576;
+    private const int GMD_GMK_BUMPER_SPEED_OFFSET_TRI_I = 12288;
+    private const int GMD_GMK_BUMPER_SPEED_OFFSET_TRI_R = 20480;
+    private const int GMD_GMK_BUMPER_NO_MOVE_TIME_UD = 5;
+    private const int GMD_GMK_BUMPER_NO_MOVE_TIME_LR = 15;
+    private const int GMD_GMK_BUMPER_FLAG_NO_RECOVER_HOMING = 1;
+    public const int GMD_EVE_SEARCH_PROC_FLAG_NONE = 0;
+    public const int GMD_EVE_SEARCH_PROC_FLAG_RECT_CREATE = 1;
+    public const int GMD_EVE_SEARCH_PROC_FLAG_RECT_LCD_OFF = 2;
+    public const int GMD_EVE_SEARCH_PROC_FLAG_ONLY_ENFORCE = 4;
+    public const byte GMD_EVE_RECORD_CMD_SKIP = 255;
+    public const int GMD_EVE_EVE_CREATE_SIZE = 256;
+    public const int GMD_EVE_DEC_CREATE_SIZE = 256;
+    public const int GMD_EVE_BIRTH_WIDTH = 32;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_USER_MASK = 255;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_SYSFLAG_MASK = 65280;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CLIP = 2048;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CLIP_EASE_SHIFT = 11;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_EASE = 4096;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_EASE_SHIFT = 12;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_NORMAL = 8192;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_NORMAL_SHIFT = 13;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_HARD = 16384;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_NO_CREATE_HARD_SHIFT = 14;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_CREATE_ENFORCE = 32768;
+    public const int GMD_EVE_RECORD_EVENT_FLAG_CREATE_ENFORCE_SHIFT = 15;
+    public const int GMD_EVE_TYPE_EVENT = 0;
+    public const int GMD_EVE_TYPE_RING = 1;
+    public const int GMD_EVE_TYPE_DECO = 2;
+    public const int GMD_EVE_TYPE_MAX = 3;
+    public const int GMD_EVE_LOCAL_EVT_OBJ_MAX = 64;
+    public const int GMD_EVE_LOCAL_EVT_USE_FLAG_WORK_NUM = 2;
+    public const int GMD_EVE_LOCAL_DECO_OBJ_MAX = 64;
+    public const int GMD_EVE_LOCAL_DECO_USE_FLAG_WORK_NUM = 2;
+    public const int GMD_EVE_LOCAL_RING_OBJ_MAX = 64;
+    public const int GMD_EVE_LOCAL_RING_USE_FLAG_WORK_NUM = 2;
+    public const int GMD_EVE_DATA_BLOCK_SIZE = 256;
+    public const int GMD_EVE_BLOCK_SIZE_SHIFT = 8;
+    public const int GMD_ENEMY_RECT_DEF = 0;
+    public const int GMD_ENEMY_RECT_ATK = 1;
+    public const int GMD_ENEMY_RECT_BODY = 2;
+    public const int GMD_ENEMY_RECT_NUM = 3;
+    public const uint GMD_ENEMY_FLAG_USER1 = 1;
+    public const uint GMD_ENEMY_FLAG_USER2 = 2;
+    public const uint GMD_ENEMY_FLAG_USER3 = 4;
+    public const uint GMD_ENEMY_FLAG_USER4 = 8;
+    public const uint GMD_ENEMY_FLAG_NOPRESSDIE = 16384;
+    public const uint GMD_ENEMY_FLAG_NOHOMING = 32768;
+    public const uint GMD_ENEMY_FLAG_DIE = 65536;
+    public const uint GMD_ENEMY_FLAG_NOANIMAL = 131072;
+    public const uint GMD_ENEMY_FLAG_ROOM = 262144;
+    public const int GMD_ENEMY_COMBO_SCORE_OFST_Y = -65536;
+
+    public const uint GMD_BOSS5_EFCT_GENERAL_FLAG_FADING = 1;
+    public const uint GMD_BOSS5_EFCT_LEAKAGE_USRFLAG_IS_BODYPART = 1;
+    public const uint GMD_BOSS5_EFCT_LEAKAGE_USRFLAG_SE_RESPONSIBLE = 2;
+    public const uint GMD_BOSS5_EFCT_LEAKAGE_PART_NUM = 8;
+    public const int GMD_BOSS5_EFCT_LEAKAGE_OFST_Z = 262144;
+    public const int GMD_BOSS5_EFCT_LEAKAGE_BODYPART_OFST_Z = 327680;
+    public const int GMD_BOSS5_EFCT_LEAKAGE_VANISH_PART_NUM = 2;
+    public const int GMD_BOSS5_EFCT_LEAKAGE_VANISH_OFST_Z = 327680;
+    public const int GMD_BOSS5_EFCT_PRELIM_LEAKAGE_OFST_Z = 327680;
+    public const int GMD_BOSS5_EFCT_WALK_STEP_SMOKE_OFST_Z = 65536;
+    public const int GMD_BOSS5_EFCT_RUN_STEP_SMOKE_OFST_Z = 65536;
+    public const int GMD_BOSS5_EFCT_CRASH_LANDING_SMOKE_OFST_Z = 262144;
+    public const int GMD_BOSS5_EFCT_BREAKING_GLASS_OFST_Y = -131072;
+    public const int GMD_BOSS5_EFCT_BREAKING_GLASS_OFST_Z = 262144;
+    public const short GMD_BOSS5_EFCT_JET_VIEWOUT_OFST = 16;
+    public const uint GMD_BOSS5_EFCT_JET_ATK_ACTIVATE_TIMING_FRAME = 65;
+    public const short GMD_BOSS5_EFCT_JET_ATK_RECT_SIZE_LEFT = -8;
+    public const short GMD_BOSS5_EFCT_JET_ATK_RECT_SIZE_TOP = 0;
+    public const short GMD_BOSS5_EFCT_JET_ATK_RECT_SIZE_RIGHT = 8;
+    public const short GMD_BOSS5_EFCT_JET_ATK_RECT_SIZE_BOTTOM = 88;
+    public const int GMD_BOSS5_EFCT_ROCKET_LEAKAGE_OFST_Z = 262144;
+    public const float GMD_BOSS5_EFCT_ROCKET_LEAKAGE_STUCK_ND_OFST_X = -7f;
+    public const int GMD_BOSS5_EFCT_ROCKET_LAUNCH_OFST_Z = 65536;
+    public const float GMD_BOSS5_EFCT_ROCKET_LAUNCH_STUCK_ND_OFST_X = -7f;
+    public const int GMD_BOSS5_EFCT_ROCKET_DOCK_OFST_Z = 65536;
+    public const float GMD_BOSS5_EFCT_ROCKET_DOCK_STUCK_ND_OFST_X = 2f;
+    public const int GMD_BOSS5_EFCT_ROCKET_JET_USRFLAG_IS_REVERSE = 1;
+    public const int GMD_BOSS5_EFCT_ROCKET_JET_OFST_Z = 32768;
+    public const float GMD_BOSS5_EFCT_ROCKET_JET_STUCK_ND_OFST_X = -6f;
+    public const float GMD_BOSS5_EFCT_ROCKET_JET_REV_STUCK_ND_OFST_X = 4f;
+    public const int GMD_BOSS5_EFCT_ROCKET_LANDING_SW_OFST_Z = 65536;
+    public const int GMD_BOSS5_EFCT_LANDING_SW_OFST_Z = 262144;
+    public const short GMD_BOSS5_EFCT_LANDING_SW_VIEWOUT_OFST = 128;
+    public const int GMD_BOSS5_EFCT_LANDING_SW_ATK_RECT_ACTIVE_TIME = 8;
+    public const int GMD_BOSS5_EFCT_LANDING_SW_ATK_RECT_SIZE_LEFT = -88;
+    public const int GMD_BOSS5_EFCT_LANDING_SW_ATK_RECT_SIZE_TOP = -32;
+    public const int GMD_BOSS5_EFCT_LANDING_SW_ATK_RECT_SIZE_RIGHT = 88;
+    public const int GMD_BOSS5_EFCT_LANDING_SW_ATK_RECT_SIZE_BOTTOM = 32;
+    public const int GMD_BOSS5_EFCT_STRIKE_SW_OFST_Z = 262144;
+    public const short GMD_BOSS5_EFCT_STRIKE_SW_VIEWOUT_OFST = 64;
+    public const int GMD_BOSS5_EFCT_STRIKE_SW_ATK_RECT_ACTIVE_TIME = 15;
+    public const int GMD_BOSS5_EFCT_STRIKE_SW_ATK_RECT_SIZE_LEFT = -64;
+    public const int GMD_BOSS5_EFCT_STRIKE_SW_ATK_RECT_SIZE_TOP = -64;
+    public const int GMD_BOSS5_EFCT_STRIKE_SW_ATK_RECT_SIZE_RIGHT = 64;
+    public const int GMD_BOSS5_EFCT_STRIKE_SW_ATK_RECT_SIZE_BOTTOM = 32;
+    public const float GMD_BOSS5_EFCT_TARGETCURSOR_DISP_OFST_Z = 32f;
+    public const int GMD_BOSS5_EFCT_CURSOR_START_DURATION_TIME = 120;
+    public const float GMD_BOSS5_EFCT_CURSOR_START_INIT_UPDATE_SPD = 0.5f;
+    public const float GMD_BOSS5_EFCT_CURSOR_START_DEST_UPDATE_SPD = 1f;
+    public const int GMD_BOSS5_EFCT_CURSOR_START_FLICKER_OFF_TIME = 10;
+    public const int GMD_BOSS5_EFCT_CURSOR_START_FLICKER_ON_TIME = 10;
+    public const float GMD_BOSS5_EFCT_CURSOR_LOOP_INIT_UPDATE_SPD = 0.8f;
+    public const float GMD_BOSS5_EFCT_CURSOR_LOOP_UPDATE_SPD_ADD = 0.005f;
+    public const float GMD_BOSS5_EFCT_CURSOR_LOOP_DEST_UPDATE_SPD = 1.5f;
+    public const int GMD_BOSS5_EFCT_CURSOR_LOOP_FLICKER_OFF_TIME = 10;
+    public const int GMD_BOSS5_EFCT_CURSOR_LOOP_FLICKER_ON_TIME = 10;
+    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_OFST_Y_FROM_GROUND = -131072;
+    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_FLICKER_OFF_TIME = 10;
+    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_FLICKER_ON_TIME = 10;
+    public const float GMD_BOSS5_EFCT_CRASH_CURSOR_MOVE_RATIO_CURVE_RANGE_FACTOR = 0.9f;
+    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_MOVE_LEFT_EDGE_OFST = -1048576;
+    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_MOVE_RIGHT_EDGE_OFST = 1048576;
+    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_MOVE_WIDTH = 2097152;
+    public const int GMD_BOSS5_EFCT_CRASH_CURSOR_MOVE_DISTANCE = 13631488;
+    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_VIEWOUT_OFST = 16;
+    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_OFST_Z = 262144;
+    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_ATK_RECT_SIZE_LEFT = -8;
+    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_ATK_RECT_SIZE_TOP = -8;
+    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_ATK_RECT_SIZE_RIGHT = 8;
+    public const int GMD_BOSS5_EFCT_VULCAN_BULLET_ATK_RECT_SIZE_BOTTOM = 8;
+    public const int GMD_BOSS5_EFCT_DAMAGE_OFST_Z = 262144;
+    public const int GMD_BOSS5_EFCT_BREAKDOWN_SMOKES_NUM = 2;
+    public const int GMD_BOSS5_EFCT_BODY_SMALL_SMOKES_NUM = 3;
+    public const int GMD_BOSS5_EFCT_BODY_SMALL_SMOKE_LOOP_TIME_MAX = 240;
+    public const int GMD_BOSS5_EFCT_BODY_SMALL_SMOKE_LOOP_TIME_MIN = 120;
+    public const int GMD_BOSS5_EFCT_BODY_SMALL_SMOKE_IDLE_TIME_MAX = 120;
+    public const int GMD_BOSS5_EFCT_BODY_SMALL_SMOKE_IDLE_TIME_MIN = 60;
+    public const int GMD_BOSS5_EFCT_BERSERK_STEAM_NUM = 2;
+    public const int GMD_BOSS5_EFCT_BERSERK_STEAM_BLAST_TIME = 6;
+    public const int GMD_BOSS5_EFCT_BERSERK_STEAM_IDLE_TIME = 0;
+    public const float GMD_BOSS5_EFCT_EGG_SWEAT_DISP_OFST_Y = 56f;
+    public const float GMD_BOSS5_EFCT_EGG_SWEAT_DISP_OFST_Z = -8f;
+    public const int GMD_BOSS5_EFCT_ROCKET_ROLLING_SPARK_OFST_Z = 131072;
+    public const int GMD_BOSS5_EFCT_SE_JET_START_WAIT_TIME = 50;
+    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_00 = 0;
+    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_01 = 1;
+    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_02 = 2;
+    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_03 = 3;
+    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_C_00 = 4;
+    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_C_01 = 5;
+    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_C_02 = 6;
+    private const int GME_BOSS5_EFCT_IDX_BLITZ_FB_START = 7;
+    private const int GME_BOSS5_EFCT_IDX_FB_SMORK00 = 8;
+    private const int GME_BOSS5_EFCT_IDX_FB_SMORK01 = 9;
+    private const int GME_BOSS5_EFCT_IDX_FB_SMORK02 = 10;
+    private const int GME_BOSS5_EFCT_IDX_GLASS = 11;
+    private const int GME_BOSS5_EFCT_IDX_JET_FB = 12;
+    private const int GME_BOSS5_EFCT_IDX_JET_FB_SMORK = 13;
+    private const int GME_BOSS5_EFCT_IDX_ROCKET_BLITZ = 14;
+    private const int GME_BOSS5_EFCT_IDX_ROCKET_E = 15;
+    private const int GME_BOSS5_EFCT_IDX_ROCKET_JET = 16;
+    private const int GME_BOSS5_EFCT_IDX_ROCKET_S = 17;
+    private const int GME_BOSS5_EFCT_IDX_ROCKET_SMORK = 18;
+    private const int GME_BOSS5_EFCT_IDX_SHOCK = 19;
+    private const int GME_BOSS5_EFCT_IDX_SHOCK_ATK = 20;
+    private const int GME_BOSS5_EFCT_IDX_TARGET_FB = 21;
+    private const int GME_BOSS5_EFCT_IDX_TARGET_FB_E = 22;
+    private const int GME_BOSS5_EFCT_IDX_TARGET_FB_S = 23;
+    private const int GME_BOSS5_EFCT_IDX_TARGET_FB_W = 24;
+    private const int GME_BOSS5_EFCT_IDX_TARGET_FB_W_E = 25;
+    private const int GME_BOSS5_EFCT_IDX_TARGET_FB_W_S = 26;
+    private const int GME_BOSS5_EFCT_IDX_MAX = 27;
+    public const int OBD_MOVE_SPDX_MAX = 11;
+    public const int OBD_MOVE_SPDY_MAX = 14;
+    public const int OBD_HIT_VEC_FRONT = 1;
+    public const int OBD_HIT_VEC_BACK = 2;
+    public const int OBD_CAMERA_NUM = 8;
+    public const uint OBD_CAMERA_FIX = 1;
+    public const uint OBD_CAMERA_SHIFT = 2;
+    public const uint OBD_CAMERA_STOP = 4;
+    public const uint OBD_CAMERA_REVERSE = 8;
+    public const uint OBD_CAMERA_3D = 16;
+    public const uint OBD_CAMERA_LIMITCHECK = 32;
+    public const uint OBD_CAMERA_ROT_OFF = 1073741824;
+    public const uint OBD_CAMERA_ROT_EX = 2147483648;
+    private const ushort OBD_CAMERA_PRIORITY = 61438;
+
+
+    private const int GME_GMK_TYPE_STOPPER_NORM = 0;
+    private const int GME_GMK_TYPE_STOPPER_SLOT = 1;
+    private const int GMD_GMK_STOPPER_V_MARGIN = 4;
+    private const int GMD_GMK_STOPPER_V_HIT_MARGIN = 4;
+    private const int GME_GMK_TYPE_SPCTPLT_0 = 0;
+    private const int GME_GMK_TYPE_SPCTPLT_45 = 1;
+    private const int GME_GMK_TYPE_SPCTPLT_315 = 2;
+    private const int GME_GMK_TYPE_MAX = 3;
+    private const short GMD_GMK_SPCTPLT_0_RECT_W = 4;
+    private const short GMD_GMK_SPCTPLT_0_RECT_H = 16;
+    private const short GMD_GMK_SPCTPLT_0_RECT_X = -2;
+    private const short GMD_GMK_SPCTPLT_0_RECT_Y = -64;
+    private const short GMD_GMK_SPCTPLT_45_RECT_W = 16;
+    private const short GMD_GMK_SPCTPLT_45_RECT_H = 16;
+    private const short GMD_GMK_SPCTPLT_45_RECT_X = 29;
+    private const short GMD_GMK_SPCTPLT_45_RECT_Y = -45;
+    private const short GMD_GMK_SPCTPLT_315_RECT_W = 16;
+    private const short GMD_GMK_SPCTPLT_315_RECT_H = 16;
+    private const short GMD_GMK_SPCTPLT_315_RECT_X = -45;
+    private const short GMD_GMK_SPCTPLT_315_RECT_Y = -45;
+    private const short GMD_GMK_SPCTPLT_HEIGHT = 78;
+    private const short GMD_GMK_SPCTPLT_SHRINK = 36;
+    private const short GMD_GMK_SPCTPLT_LENGTH = 42;
+    public const int GMD_GMK_BELTCONV_SPEED = 2;
+    public const int GMD_GMK_BELTCONV_COL_HEIGHT = 8;
+    public const int GMD_GMK_BELTCONV_COL_OFST_Y = -16;
+    public const float GMD_GMK_BELTCBELT_TEX_WIDTH = 512f;
+    public const int GMD_GMK_BELTCONV_ROLL_OFF_Z = 65536;
+    public const int GMD_GMK_BELTCONV_CONV_OFF_Z = 69632;
+    public const int GMD_GMK_BELTCONV_BELT_OFF_Z = 73728;
+    public const int GMD_GMK_BELTCONV_SPD_MASK = 15;
+    public const int GMD_GMK_BELTCONV_COL_EX_L = 16;
+    public const int GMD_GMK_BELTCONV_COL_EX_R = 32;
+    public const int GMD_GMK_BELTCONV_COL_EX_LEN = 16;
+    public const float GMD_GMK_BELTCONV_UV_CHECK = 0.125f;
+    public const int GMD_ENE_HARO_LIGHT_NODE = 2;
+    public const int GMD_ENE_HARO_NODE_NO_MAX = 16;
+    public const int GMD_ENE_HARO_NEAR_PLAYER = 100;
+    public const int GMD_ENE_HARO_CHECK_ACT_TIME = 120;
+    public const int GMD_ENE_HARO_SEARCH_PLAYER = 100;
+    public const float GMD_ENE_HARO_ANGLE_ADD_SPD = 0.03f;
+    public const float GMD_ENE_HARO_ANGLE_ADD_SPD_LIMIT = 0.35f;
+    public const float GMD_ENE_HARO_ANGLE_SPD_LIMIT = 1.3f;
+    public const float GMD_ENE_HARD_FUNC_INERTIA = 0.96f;
+    public const float GMD_ENE_HARD_SPEED = 1.5f;
+    public const double GMD_ENE_HARD_INERTIA_VOLUME = 0.025;
+    private const int GME_EFCT_ENE_IDX_E02_JET_S = 0;
+    private const int GME_EFCT_ENE_IDX_E02_JET_S_SMORK = 1;
+    private const int GME_EFCT_ENE_IDX_E04_DUMMY1 = 2;
+    private const int GME_EFCT_ENE_IDX_E04_DUMMY2 = 3;
+    private const int GME_EFCT_ENE_IDX_E04_MEREON_MISS = 4;
+    private const int GME_EFCT_ENE_IDX_E05_GUARD = 5;
+    private const int GME_EFCT_ENE_IDX_E06_HARO = 6;
+    private const int GME_EFCT_ENE_IDX_E07_MOGU_E = 7;
+    private const int GME_EFCT_ENE_IDX_E07_MOGU_W = 8;
+    private const int GME_EFCT_ENE_IDX_E10_BUKUBUKU = 9;
+    private const int GME_EFCT_ENE_IDX_E13_CROW = 10;
+    private const int GME_EFCT_ENE_IDX_E13_T_STAR = 11;
+    private const int GME_EFCT_ENE_IDX_E14_JET_H = 12;
+    private const int GME_EFCT_ENE_IDX_MAX = 13;
+    public const int GMD_BOSS4_EFF_BOMB_OFST_Z = 131072;
+    public const int GME_BOSS4_EFF_BOMB_TYPE_SMALL = 0;
+    public const int GME_BOSS4_EFF_BOMB_TYPE_CAPSULE = 1;
+    public const int GME_BOSS4_EFF_BOMB_TYPE_CHIBI_01 = 2;
+    public const int GME_BOSS4_EFF_BOMB_TYPE_CHIBI_02 = 3;
+    public const int GME_BOSS4_EFF_BOMB_TYPE_CHIBI_03 = 4;
+    public const int GME_BOSS4_EFF_BOMB_TYPE_PARTS = 5;
+    public const int GME_BOSS4_EFF_BOMB_TYPE_MAX = 6;
+    public const int GMD_BOSS4_EFF_DAMAGE_OFST_Z = 131072;
+    public const float GMD_BOSS4_EFF_SWEAT_DISP_OFST_Y = 32f;
+    public const int DMD_LOGO_COM_FILE_PATH_LENGTH_MAX = 256;
+    public const int DMD_LOGO_COM_LOAD_CONTEXT_MAX = 10;
+    public const int DMD_LOGO_COM_TASK_PRIO_DATA_LOAD = 4096;
+    public const int DMD_LOGO_COM_TASK_GROUP_DATA_LOAD = 0;
+    public const uint GSD_SND_SYS_MAIN_FLAG_USE_SYSTEM_CNT_VOL = 1;
+    public const uint GSD_SND_SYS_MAIN_FLAG_SYSTEM_CNT_VOL_FADING = 2;
+    public const uint GSD_SND_SYS_MAIN_FLAG_ENTER_HBM_FADING = 4;
+    public const uint GSD_SND_SYS_MAIN_FLAG_LEAVE_HBM_FADING = 8;
+    public const uint GSD_SND_SYS_MAIN_FLAG_HBM_FADING_MASK = 12;
+    public const uint GSD_SND_SYS_MAIN_FLAG_RESET_CLEAR_MASK = 2;
+    public const uint GSD_SND_SCB_FLAG_INITIALIZED = 1;
+    public const uint GSD_SND_SCB_FLAG_IS_STOP = 2;
+    public const uint GSD_SND_SCB_FLAG_IS_PAUSE = 4;
+    public const uint GSD_SND_SCB_FLAG_STOP_ON_HBM = 1073741824;
+    public const uint GSD_SND_SCB_FLAG_MUTE_ON_USER_BGM = 2147483648;
+    public const int GSD_SND_SCB_MAX = 8;
+    public const int GSD_SND_SCB_PAUSE_LEVEL_EACH = 2147483647;
+    public const int GSD_SND_SCB_PAUSE_LEVEL_ALL_DEF = 128;
+    public const int GSD_SND_SCB_PAUSE_LEVEL_GAME = 128;
+    public const int GSD_SND_SCB_PAUSE_LEVEL_HBM = 64;
+    public const int GSD_SND_SCB_PAUSE_LEVEL_NONE = 0;
+    public const int GSE_SND_FADE_STATE_NORMAL = 0;
+    public const int GSE_SND_FADE_STATE_FADING_IN = 1;
+    public const int GSE_SND_FADE_STATE_FADING_OUT_TO_STOP = 2;
+    public const int GSE_SND_FADE_STATE_FADING_OUT_TO_PAUSE = 3;
+    public const int GSE_SND_FADE_STATE_END = 4;
+    public const int GSE_SND_FADE_STATE_MAX = 5;
+    public const int GSD_SND_SE_HANDLE_MAX = 16;
+    private const int GSE_SND_TYPE_BGM = 0;
+    private const int GSE_SND_TYPE_SE = 1;
+    private const int GSE_SND_TYPE_MAX = 2;
+    public const int GSE_SND_DATA_TYPE_CRIAUDIO = 0;
+    public const int GSE_SND_DATA_TYPE_NW4R = 1;
+    public const int GSE_SND_DATA_TYPE_MAX = 2;
+    public const int GSD_SND_SE_HANDLE_PAUSE_LEVEL_EACH = 2147483647;
+    public const int GSD_SND_SE_HANDLE_PAUSE_LEVEL_ALL_DEF = 128;
+    public const int GSD_SND_SE_HANDLE_PAUSE_LEVEL_GAME = 128;
+    public const int GSD_SND_SE_HANDLE_PAUSE_LEVEL_HBM = 64;
+    public const int GSD_SND_SE_HANDLE_PAUSE_LEVEL_NONE = 0;
+    public const uint GSD_SND_SE_HANDLE_FLAG_INITIALIZED = 1;
+    public const uint GSD_SND_SE_HANDLE_FLAG_PLAY_STARTED = 2;
+    public const uint GSD_SND_SE_HANDLE_FLAG_IS_STOP = 4;
+    public const uint GSD_SND_SE_HANDLE_FLAG_IS_PAUSE = 8;
+    public const uint GSD_SND_SE_HANDLE_FLAG_FREE_ON_STOP = 16;
+    public const uint GSD_SND_SE_HANDLE_FLAG_STOP_ON_HBM = 1073741824;
+    public const uint GSD_SND_SE_HANDLE_FLAG_NO_AUTOCLEAR = 2147483648;
+    public const int GSD_SND_SE_PLAY_LIMIT_NUM = 8;
+    public const int GSD_SND_SUSPEND_WAIT_COUNT = 8;
+    public const int GSD_SND_NOPLAY_ERROR_STATE_RESTART_LIMIT = 90;
+    public const int GSD_SND_NOPLAY_ERROR_CLEAR_SE_CRI_RESTART_LIMIT = 1000;
+    private const int SOUND_TYPE_FX = 0;
+    private const int SOUND_TYPE_BGM = 1;
+    private const int AISAC_TYPE_VOLUME = 0;
+    private const int AISAC_TYPE_PITCH = 1;
+    public const ushort BG_SC_CHAR_NO_MASK = 1023;
+    public const ushort BG_SC_H_FLIP = 1024;
+    public const ushort BG_SC_V_FLIP = 2048;
+    public const int OBD_MAP_CHAR_SIZE_X = 8;
+    public const int OBD_MAP_CHAR_SIZE_Y = 8;
+    public const int OBD_MAP_BLOCK_CHAR_NUM_X = 8;
+    public const int OBD_MAP_BLOCK_CHAR_NUM_Y = 8;
+    public const int OBD_BLOCK_DATA_SIZE = 128;
+    public const int OBD_MAP_CL_CHAR_DATA_SIZE = 8;
+    public const int OBD_MAP_CL_DIFF_DATA_SIZE = 8;
+    public const int MTD_X = 0;
+    public const int MTD_Y = 1;
+    public const int MTD_Z = 2;
+    public const int MTD_W = 3;
+    public const int MTD_XY = 2;
+    public const int MTD_XYZ = 3;
+    public const int MTD_XYZW = 4;
+    public const int MTD_LEFT = 0;
+    public const int MTD_TOP = 1;
+    public const int MTD_RIGHT = 2;
+    public const int MTD_BOTTOM = 3;
+    public const int MTD_RECT = 4;
+    public const int MTD_WIDTH = 0;
+    public const int MTD_HEIGHT = 1;
+    public const int MTD_DEPTH = 2;
+    public const int MTD_WH = 2;
+    public const int MTD_WHD = 3;
     private const int GME_PLY_ACT_STATE_INVALID = -1;
     private const int GME_PLY_ACT_STATE_FW = 0;
     private const int GME_PLY_ACT_STATE_FW_EX = 1;
@@ -2460,37 +1712,6 @@ public partial class AppMain
     public const int GMD_MAIN_NEXT_EVT_TITLE = 5;
     public const int GMD_MAIN_NEXT_EVT_BUYSCREEN = 6;
     public const int GMD_MAIN_NEXT_EVT_MAX = 7;
-    public const uint GMD_GAME_FLAG_GAMESYS_RESTART = 2;
-    public const uint GMD_GAME_FLAG_CLEAR = 4;
-    public const uint GMD_GAME_FLAG_RESULT_START = 8;
-    public const uint GMD_GAME_FLAG_RESULT_END = 16;
-    public const uint GMD_GAME_FLAG_GAMEOVER_START = 32;
-    public const uint GMD_GAME_FLAG_PAUSE_DEMO = 64;
-    public const uint GMD_GAME_FLAG_PAUSE_IS_DECIDED = 128;
-    public const uint GMD_GAME_FLAG_GAMEOVER_END = 256;
-    public const uint GMD_GAME_FLAG_TIMEOVER = 512;
-    public const uint GMD_GAME_FLAG_COUNT_GAME_TIME = 1024;
-    public const uint GMD_GAME_FLAG_COUNT_SYNC_TIME = 2048;
-    public const uint GMD_GAME_FLAG_START_DEMO = 4096;
-    public const uint GMD_GAME_FLAG_WATER_LEVEL_EFCT_OFF = 8192;
-    public const uint GMD_GAME_FLAG_SPECIAL_STAGE = 16384;
-    public const uint GMD_GAME_FLAG_SCR_LIMIT_BUSY = 32768;
-    public const uint GMD_GAME_FLAG_SPL_CHAOSGET = 65536;
-    public const uint GMD_GAME_FLAG_SPL_FAILED = 131072;
-    public const uint GMD_GAME_FLAG_SPL_TIMEOVER = 262144;
-    public const uint GMD_GAME_FLAG_USE_SUPER_SONIC = 524288;
-    public const uint GMD_GAME_FLAG_GOAL_IN = 1048576;
-    public const uint GMD_GAME_FLAG_FINAL_DATA_LOAD = 2097152;
-    public const uint GMD_GAME_FLAG_FINAL_DATA_RELEASE = 4194304;
-    public const uint GMD_GAME_FLAG_ENDING = 8388608;
-    public const uint GMD_GAME_FLAG_START_MSG = 16777216;
-    public const uint GMD_GAME_FLAG_GOAL_AS_S_SONIC = 33554432;
-    public const uint GMD_GAME_FLAG_RESUMED_FROM_MARKER = 67108864;
-    public const uint GMD_GAME_FLAG_BGM_PLAY_ENABLE = 134217728;
-    public const uint GMD_GAME_FLAG_BGM_PLAY_WAIT = 268435456;
-    public const uint GMD_GAME_FLAG_SUSPENDED_PAUSE = 536870912;
-    public const uint GMD_GAME_FLAG_PAUSE_WAIT_MASK = 32968936;
-    public const uint GMD_GAME_FLAG_START_CLEAR_MASK = 107488254;
     public const int GMD_ENE_MOTORA_EVE_FLAG_RIGHT = 1;
     public const int GMD_ENE_MOTORA_MOVE_SPD_X = 2048;
     public const int GMD_ENE_MOTORA_FW_TIME = 61440;
@@ -2596,74 +1817,7 @@ public partial class AppMain
     public const uint OBD_DRAW_CMD_STATE_3DNN_WS = 17;
     public const uint OBD_DRAW_SET_NN_CMD_STATE_TBL_MSG_START = 16;
     public const uint OBD_DRAW_CMD_STATE_MAX = 18;
-    public const uint NND_CLIP_NONE = 0;
-    public const uint NND_CLIP_NORMAL = 0;
-    public const uint NND_CLIP_INSIDE = 2;
-    public const uint NND_CLIP_CROSSNEAR = 4;
-    public const uint NND_CLIP_CROSSFAR = 8;
-    public const uint NND_CLIP_OUTSIDE = 16;
-    public const uint NND_CLIP_PS2_GSINSIDE = 32;
-    public const uint NND_CLIPOBJECT_MASK = 3;
-    public const uint NND_CLIP_STAT_MASK = 62;
-    private const int NNE_PROJECTION_TYPE_PERSPECTIVE = 0;
-    private const int NNE_PROJECTION_TYPE_ORTHO = 1;
-    private const uint NND_MATSTATUS_NONE = 0;
-    private const uint NND_MATSTATUS_HIDE = 1;
-    private const int NNE_MATCTRLMODE_NONE = 0;
-    private const int NNE_MATCTRLMODE_REPLACE = 1;
-    private const int NNE_MATCTRLMODE_ADD = 2;
-    private const int NNE_MATCTRLMODE_MODULATE = 3;
-    private const int NNE_MATCTRL_TEXCOORDSRC_POSITION = 0;
-    private const int NNE_MATCTRL_TEXCOORDSRC_NORMAL = 1;
-    private const int NNE_MATCTRL_BLEND_ALPHA = 0;
-    private const int NNE_MATCTRL_BLEND_ADD = 1;
-    private const int NNE_MATCTRL_BLEND_SUBTRACT = 2;
-    public const int NND_MAG_NEAREST = 0;
-    public const int NND_MAG_LINEAR = 1;
-    public const int NND_MAG_ANISOTROPIC = 2;
-    public const int NND_MIN_NEAREST = 0;
-    public const int NND_MIN_LINEAR = 1;
-    public const int NND_MIN_NEAREST_MIPMAP_NEAREST = 2;
-    public const int NND_MIN_NEAREST_MIPMAP_LINEAR = 3;
-    public const int NND_MIN_LINEAR_MIPMAP_NEAREST = 4;
-    public const int NND_MIN_LINEAR_MIPMAP_LINEAR = 5;
-    public const int NND_MIN_ANISOTROPIC = 6;
-    public const int NND_MIN_ANISOTROPIC_MIPMAP_NEAREST = 7;
-    public const int NND_MIN_ANISOTROPIC_MIPMAP_LINEAR = 8;
-    public const int NND_MIN_ANISOTROPIC2 = 6;
-    public const int NND_MIN_ANISOTROPIC2_MIPMAP_NEAREST = 7;
-    public const int NND_MIN_ANISOTROPIC2_MIPMAP_LINEAR = 8;
-    public const int NND_MIN_ANISOTROPIC4 = 9;
-    public const int NND_MIN_ANISOTROPIC4_MIPMAP_NEAREST = 10;
-    public const int NND_MIN_ANISOTROPIC4_MIPMAP_LINEAR = 11;
-    public const int NND_MIN_ANISOTROPIC8 = 12;
-    public const int NND_MIN_ANISOTROPIC8_MIPMAP_NEAREST = 13;
-    public const int NND_MIN_ANISOTROPIC8_MIPMAP_LINEAR = 14;
-    public const uint NND_TEXFTYPE_TEXTYPE_MASK = 255;
-    public const uint NND_TEXFTYPE_GVRTEX = 0;
-    public const uint NND_TEXFTYPE_SVRTEX = 1;
-    public const uint NND_TEXFTYPE_XVRTEX = 2;
-    public const uint NND_TEXFTYPE_NO_FILENAME = 256;
-    public const uint NND_TEXFTYPE_NO_FILTER = 512;
-    public const uint NND_TEXFTYPE_LISTGLBIDX = 1024;
-    public const uint NND_TEXFTYPE_LISTBANK = 2048;
-    public const uint NND_CAMERATYPE_MEMBER_USER = 1;
-    public const uint NND_CAMERATYPE_MEMBER_FOVY = 2;
-    public const uint NND_CAMERATYPE_MEMBER_ASPECT = 4;
-    public const uint NND_CAMERATYPE_MEMBER_ZNEAR = 8;
-    public const uint NND_CAMERATYPE_MEMBER_ZFAR = 16;
-    public const uint NND_CAMERATYPE_MEMBER_POSITION = 32;
-    public const uint NND_CAMERATYPE_MEMBER_TARGET = 64;
-    public const uint NND_CAMERATYPE_MEMBER_ROLL = 128;
-    public const uint NND_CAMERATYPE_MEMBER_UPVECTOR = 256;
-    public const uint NND_CAMERATYPE_MEMBER_UPTARGET = 512;
-    public const uint NND_CAMERATYPE_MEMBER_ROTTYPE = 1024;
-    public const uint NND_CAMERATYPE_MEMBER_ROTATION = 2048;
-    public const uint NND_CAMERATYPE_MEMBER_COMMON = 63;
-    public const uint NND_CAMERATYPE_ROTATION = 3135;
-    public const uint NND_CAMERATYPE_TARGET_ROLL = 255;
-    public const uint NND_CAMERATYPE_TARGET_UPVECTOR = 383;
-    public const uint NND_CAMERATYPE_TARGET_UPTARGET = 639;
+
     public const byte GMD_TASK_PAUSELEVEL_DEF = 0;
     public const byte GMD_TASK_GAME_PAUSE_LEVEL = 2;
     public const byte GMD_TASK_NO_GAME_PAUSE = 3;
@@ -2671,36 +1825,7 @@ public partial class AppMain
     public const byte GMD_TASK_PAUSE_LEVEL_CAMERA = 0;
     public const byte GMD_TASK_PAUSE_LEVEL_EVTMGR = 0;
     public const byte GMD_TASK_PAUSE_LEVEL_DEMO = 2;
-    public const ushort GMD_TASK_PRIO_OBJSYS = 61435;
-    public const ushort GMD_TASK_PRIO_INIT = 16;
-    public const ushort GMD_TASK_PRIO_MAIN_PRE = 4096;
-    public const ushort GMD_TASK_PRIO_CAMERA = 8192;
-    public const ushort GMD_TASK_PRIO_MAIN_POST = 32768;
-    public const ushort GMD_TASK_PRIO_DATA_LOAD = 2048;
-    public const ushort GMD_TASK_PRIO_MAP = 12288;
-    public const ushort GMD_TASK_PRIO_MAPFAR = 12544;
-    public const ushort GMD_TASK_PRIO_EVTMGR = 4240;
-    public const ushort GMD_TASK_PRIO_PLAYER = 4352;
-    public const ushort GMD_TASK_PRIO_ENEMY = 5376;
-    public const ushort GMD_TASK_PRIO_GIMMICK = 6144;
-    public const ushort GMD_TASK_PRIO_GIMMICK_R = 4342;
-    public const ushort GMD_TASK_PRIO_EFFECT = 6656;
-    public const ushort GMD_TASK_PRIO_EFFECT_MAX = 6912;
-    public const ushort GMD_TASK_PRIO_EFFECT_SERVER = 20480;
-    public const ushort GMD_TASK_PRIO_TRAIL_SYS = 8448;
-    public const ushort GMD_TASK_PRIO_DECORATION = 5376;
-    public const ushort GMD_TASK_PRIO_RING = 7680;
-    public const ushort GMD_TASK_PRIO_WATER_SURFACE = 8202;
-    public const ushort GMD_TASK_PRIO_FIX = 18432;
-    public const ushort GMD_TASK_PRIO_SCORE = 18432;
-    public const ushort GMD_TASK_PRIO_CLEARDEMO = 18448;
-    public const ushort GMD_TASK_PRIO_STARTDEMO = 18448;
-    public const ushort GMD_TASK_PRIO_GAMEOVER = 18464;
-    public const ushort GMD_TASK_PRIO_START_MSG = 18512;
-    public const ushort GMD_TASK_PRIO_DATALOAD_WAIT = 4096;
-    public const ushort GMD_TASK_PRIO_PAUSE = 28928;
-    public const ushort GMD_TASK_PRIO_PAD_VIB = 4224;
-    public const ushort GMD_TASK_PRIO_SOUND = 32767;
+
     public const byte GMD_TASK_GROUP_OBJSYS = 4;
     public const byte GMD_TASK_GROUP_DATA_LOAD = 5;
     public const byte GMD_TASK_GROUP_PLAYER = 1;
@@ -2780,54 +1905,6 @@ public partial class AppMain
     public const byte OBD_COL_DATA_ATTR_THROUGH = 1;
     public const byte OBD_COL_DATA_ATTR_CLIFF = 2;
     public const byte OBD_COL_DATA_ATTR_GRAIND = 4;
-    public const uint NND_TEXFLAG_ALLOCATE = 1;
-    private const int NNE_TEXSLOT_0 = 0;
-    private const int NNE_TEXSLOT_1 = 1;
-    private const int NNE_TEXSLOT_2 = 2;
-    private const int NNE_TEXSLOT_3 = 3;
-    private const int NNE_TEXSLOT_4 = 4;
-    private const int NNE_TEXSLOT_5 = 5;
-    private const int NNE_TEXSLOT_6 = 6;
-    private const int NNE_TEXSLOT_7 = 7;
-    private const int NNE_TEXSLOT_MAX = 8;
-    public const uint NND_VTXTYPE_GL_VERTEXDESC = 1;
-    public const uint NND_VTXTYPE_GL_VERTEXDESC_MORPH_TARGET = 2;
-    public const uint NND_VTXTYPE_GL_VERTEXDESC_MORPH_TARGET_NULL = 4;
-    public const uint NND_VTXTYPE_GL_BOUNDBUFFER = 16;
-    public const uint NND_VTXARRAYTYPE_GL_POS = 1;
-    public const uint NND_VTXARRAYTYPE_GL_WGT = 2;
-    public const uint NND_VTXARRAYTYPE_GL_MTXIDX = 4;
-    public const uint NND_VTXARRAYTYPE_GL_NRM = 8;
-    public const uint NND_VTXARRAYTYPE_GL_COL = 16;
-    public const uint NND_VTXARRAYTYPE_GL_TEX0 = 256;
-    public const uint NND_VTXARRAYTYPE_GL_TEX1 = 512;
-    public const uint NND_VTXARRAYTYPE_INTERLEAVED = 65536;
-    public const uint NND_VTXARRAYTYPE_REVERSE_NORMAL = 134217728;
-    public const uint NND_VTXARRAYTYPE_REVERSE_TANGENT = 268435456;
-    public const uint NND_VTXARRAYTYPE_REVERSE_BINORMAL = 536870912;
-    public const uint NND_VTXARRAYTYPE_OBJECT_SPACE_NORMAL = 1073741824;
-    public const uint NND_VTXARRAYTYPE_MORPH_TARGET_DIFF = 2147483648;
-    public const int NND_DATATYPE_GL_BYTE = 5120;
-    public const int NND_DATATYPE_GL_UNSIGNED_BYTE = 5121;
-    public const int NND_DATATYPE_GL_SHORT = 5122;
-    public const int NND_DATATYPE_GL_UNSIGNED_SHORT = 5123;
-    public const int NND_DATATYPE_GL_INT = 5124;
-    public const int NND_DATATYPE_GL_UNSIGNED_INT = 5125;
-    public const int NND_DATATYPE_GL_FLOAT = 5126;
-    public const int NND_DATATYPE_GL_DOUBLE = 5130;
-    public const int NND_DATATYPE_GL_FIXED_OES = 5132;
-    public const uint NND_PRIMTYPE_GL_PRIMITIVEDESC = 1;
-    public const uint NND_PRIMTYPE_GL_BOUNDBUFFER = 2;
-    public const int NND_PRIMMODE_GL_POINTS = 0;
-    public const int NND_PRIMMODE_GL_LINES = 1;
-    public const int NND_PRIMMODE_GL_LINE_LOOP = 2;
-    public const int NND_PRIMMODE_GL_LINE_STRIP = 3;
-    public const int NND_PRIMMODE_GL_TRIANGLES = 4;
-    public const int NND_PRIMMODE_GL_TRIANGLE_STRIP = 5;
-    public const int NND_PRIMMODE_GL_TRIANGLE_FAN = 6;
-    public const int NND_PRIMMODE_GL_QUADS = 7;
-    public const int NND_PRIMMODE_GL_QUAD_STRIP = 8;
-    public const int NND_PRIMMODE_GL_POLYGON = 9;
     public const int gm_map_prim_draw_tvx_texture_z2_num = 21;
     public const int gm_map_prim_draw_tvx_texture_z3_num = 4;
     public const int gm_map_prim_draw_tvx_texture_z4_num = 9;
@@ -3146,144 +2223,6 @@ public partial class AppMain
     public const int DMD_FILESLCT_DISP_FLAG_ACT_CRSR = 4;
     public const int DMD_FILESLCT_DISP_FLAG_OBI_TEX = 8;
     public const int AOD_PLATFORM_IPHONE = 1;
-    public const uint NND_SMOTTYPE_FRAME_FLOAT = 1;
-    public const uint NND_SMOTTYPE_FRAME_SINT16 = 2;
-    public const uint NND_SMOTTYPE_FRAME_MASK = 3;
-    public const uint NND_SMOTTYPE_ANGLE_RADIAN = 4;
-    public const uint NND_SMOTTYPE_ANGLE_ANGLE32 = 8;
-    public const uint NND_SMOTTYPE_ANGLE_ANGLE16 = 16;
-    public const uint NND_SMOTTYPE_ANGLE_MASK = 28;
-    public const uint NND_SMOTTYPE_TRANSLATION_X = 256;
-    public const uint NND_SMOTTYPE_TRANSLATION_Y = 512;
-    public const uint NND_SMOTTYPE_TRANSLATION_Z = 1024;
-    public const uint NND_SMOTTYPE_ROTATION_X = 2048;
-    public const uint NND_SMOTTYPE_ROTATION_Y = 4096;
-    public const uint NND_SMOTTYPE_ROTATION_Z = 8192;
-    public const uint NND_SMOTTYPE_QUATERNION = 16384;
-    public const uint NND_SMOTTYPE_SCALING_X = 32768;
-    public const uint NND_SMOTTYPE_SCALING_Y = 65536;
-    public const uint NND_SMOTTYPE_SCALING_Z = 131072;
-    public const uint NND_SMOTTYPE_USER_UINT32 = 262144;
-    public const uint NND_SMOTTYPE_USER_FLOAT = 524288;
-    public const uint NND_SMOTTYPE_NODEHIDE = 1048576;
-    public const uint NND_SMOTTYPE_TARGET_X = 262144;
-    public const uint NND_SMOTTYPE_TARGET_Y = 524288;
-    public const uint NND_SMOTTYPE_TARGET_Z = 1048576;
-    public const uint NND_SMOTTYPE_MORPH_WEIGHT = 16777216;
-    public const uint NND_SMOTTYPE_ROLL = 2097152;
-    public const uint NND_SMOTTYPE_UPTARGET_X = 4194304;
-    public const uint NND_SMOTTYPE_UPTARGET_Y = 8388608;
-    public const uint NND_SMOTTYPE_UPTARGET_Z = 16777216;
-    public const uint NND_SMOTTYPE_UPVECTOR_X = 33554432;
-    public const uint NND_SMOTTYPE_UPVECTOR_Y = 67108864;
-    public const uint NND_SMOTTYPE_UPVECTOR_Z = 134217728;
-    public const uint NND_SMOTTYPE_FOVY = 268435456;
-    public const uint NND_SMOTTYPE_ZNEAR = 536870912;
-    public const uint NND_SMOTTYPE_ZFAR = 1073741824;
-    public const uint NND_SMOTTYPE_ASPECT = 2147483648;
-    public const uint NND_SMOTTYPE_HIDE = 256;
-    public const uint NND_SMOTTYPE_DIFFUSE_R = 512;
-    public const uint NND_SMOTTYPE_DIFFUSE_G = 1024;
-    public const uint NND_SMOTTYPE_DIFFUSE_B = 2048;
-    public const uint NND_SMOTTYPE_ALPHA = 4096;
-    public const uint NND_SMOTTYPE_SPECULAR_R = 8192;
-    public const uint NND_SMOTTYPE_SPECULAR_G = 16384;
-    public const uint NND_SMOTTYPE_SPECULAR_B = 32768;
-    public const uint NND_SMOTTYPE_SPECULAR_LEVEL = 65536;
-    public const uint NND_SMOTTYPE_SPECULAR_GLOSS = 131072;
-    public const uint NND_SMOTTYPE_AMBIENT_R = 262144;
-    public const uint NND_SMOTTYPE_AMBIENT_G = 524288;
-    public const uint NND_SMOTTYPE_AMBIENT_B = 1048576;
-    public const uint NND_SMOTTYPE_TEXTURE_INDEX = 2097152;
-    public const uint NND_SMOTTYPE_TEXTURE_BLEND = 4194304;
-    public const uint NND_SMOTTYPE_OFFSET_U = 8388608;
-    public const uint NND_SMOTTYPE_OFFSET_V = 16777216;
-    public const uint NND_SMOTTYPE_MATCLBK_USER = 33554432;
-    public const uint NND_SMOTTYPE_LIGHT_COLOR_R = 2097152;
-    public const uint NND_SMOTTYPE_LIGHT_COLOR_G = 4194304;
-    public const uint NND_SMOTTYPE_LIGHT_COLOR_B = 8388608;
-    public const uint NND_SMOTTYPE_LIGHT_ALPHA = 16777216;
-    public const uint NND_SMOTTYPE_LIGHT_INTENSITY = 33554432;
-    public const uint NND_SMOTTYPE_FALLOFF_START = 67108864;
-    public const uint NND_SMOTTYPE_FALLOFF_END = 134217728;
-    public const uint NND_SMOTTYPE_INNER_ANGLE = 268435456;
-    public const uint NND_SMOTTYPE_OUTER_ANGLE = 536870912;
-    public const uint NND_SMOTTYPE_INNER_RANGE = 1073741824;
-    public const uint NND_SMOTTYPE_OUTER_RANGE = 2147483648;
-    public const uint NND_SMOTTYPE_TRANSLATION_XYZ = 1792;
-    public const uint NND_SMOTTYPE_ROTATION_XYZ = 14336;
-    public const uint NND_SMOTTYPE_SCALING_XYZ = 229376;
-    public const uint NND_SMOTTYPE_TARGET_XYZ = 1835008;
-    public const uint NND_SMOTTYPE_UPTARGET_XYZ = 29360128;
-    public const uint NND_SMOTTYPE_UPVECTOR_XYZ = 234881024;
-    public const uint NND_SMOTTYPE_DIFFUSE_RGB = 3584;
-    public const uint NND_SMOTTYPE_SPECULAR_RGB = 57344;
-    public const uint NND_SMOTTYPE_AMBIENT_RGB = 1835008;
-    public const uint NND_SMOTTYPE_OFFSET_UV = 25165824;
-    public const uint NND_SMOTTYPE_LIGHT_COLOR_RGB = 14680064;
-    public const uint NND_SMOTTYPE_TRANSLATION_MASK = 1792;
-    public const uint NND_SMOTTYPE_ROTATION_MASK = 30720;
-    public const uint NND_SMOTTYPE_SCALING_MASK = 229376;
-    public const uint NND_SMOTTYPE_TARGET_MASK = 1835008;
-    public const uint NND_SMOTTYPE_UPTARGET_MASK = 29360128;
-    public const uint NND_SMOTTYPE_UPVECTOR_MASK = 234881024;
-    public const uint NND_SMOTTYPE_DIFFUSE_MASK = 3584;
-    public const uint NND_SMOTTYPE_SPECULAR_MASK = 57344;
-    public const uint NND_SMOTTYPE_AMBIENT_MASK = 1835008;
-    public const uint NND_SMOTTYPE_OFFSET_MASK = 25165824;
-    public const uint NND_SMOTTYPE_USER_MASK = 786432;
-    public const uint NND_SMOTTYPE_TEXTURE_MASK = 31457280;
-    public const uint NND_SMOTTYPE_LIGHT_COLOR_MASK = 14680064;
-    public const uint NND_SMOTTYPE_VALUETYPE_MASK = 4294967040;
-    public const uint NND_SMOTIPTYPE_SPLINE = 1;
-    public const uint NND_SMOTIPTYPE_LINEAR = 2;
-    public const uint NND_SMOTIPTYPE_CONSTANT = 4;
-    public const uint NND_SMOTIPTYPE_BEZIER = 16;
-    public const uint NND_SMOTIPTYPE_SI_SPLINE = 32;
-    public const uint NND_SMOTIPTYPE_TRIGGER = 64;
-    public const uint NND_SMOTIPTYPE_QUAT_LERP = 512;
-    public const uint NND_SMOTIPTYPE_QUAT_SLERP = 1024;
-    public const uint NND_SMOTIPTYPE_QUAT_SQUAD = 2048;
-    public const uint NND_SMOTIPTYPE_IP_MASK = 3703;
-    public const uint NND_SMOTIPTYPE_NOREPEAT = 65536;
-    public const uint NND_SMOTIPTYPE_CONSTREPEAT = 131072;
-    public const uint NND_SMOTIPTYPE_REPEAT = 262144;
-    public const uint NND_SMOTIPTYPE_MIRROR = 524288;
-    public const uint NND_SMOTIPTYPE_OFFSET = 1048576;
-    public const uint NND_SMOTIPTYPE_REPEAT_MASK = 2031616;
-    public const uint NND_MOTIONTYPE_NODE = 1;
-    public const uint NND_MOTIONTYPE_CAMERA = 2;
-    public const uint NND_MOTIONTYPE_LIGHT = 4;
-    public const uint NND_MOTIONTYPE_MORPH = 8;
-    public const uint NND_MOTIONTYPE_MATERIAL = 16;
-    public const uint NND_MOTIONTYPE_CATEGORY_MASK = 31;
-    public const uint NND_MOTIONTYPE_NOREPEAT = 65536;
-    public const uint NND_MOTIONTYPE_CONSTREPEAT = 131072;
-    public const uint NND_MOTIONTYPE_REPEAT = 262144;
-    public const uint NND_MOTIONTYPE_MIRROR = 524288;
-    public const uint NND_MOTIONTYPE_OFFSET = 1048576;
-    public const uint NND_MOTIONTYPE_TRIGGER = 64;
-    public const uint NND_MOTIONTYPE_VERSION2 = 268435456;
-    public const uint NND_MOTIONTYPE_REPEAT_MASK = 2031680;
-    public const uint NND_LIGHTTYPE_STANDARD_GL = 65536;
-    public const uint NND_LIGHTTYPE_MASK = 65599;
-    private const int NNE_ROTATETYPE_XYZ = 0;
-    private const int NNE_ROTATETYPE_XZY = 1;
-    private const int NNE_ROTATETYPE_YXZ = 2;
-    private const int NNE_ROTATETYPE_YZX = 3;
-    private const int NNE_ROTATETYPE_ZXY = 4;
-    private const int NNE_ROTATETYPE_ZYX = 5;
-    public const uint NND_LIGHTTYPE_PARALLEL = 1;
-    public const uint NND_LIGHTTYPE_POINT = 2;
-    public const uint NND_LIGHTTYPE_TARGET_SPOT = 4;
-    public const uint NND_LIGHTTYPE_ROTATION_SPOT = 8;
-    public const uint NND_LIGHTTYPE_TARGET_DIRECTIONAL = 16;
-    public const uint NND_LIGHTTYPE_ROTATION_DIRECTIONAL = 32;
-    public const uint NND_LIGHTTYPE_COMMON_MASK = 63;
-    public const int NND_BZR_MAX_NEWTON_LOOP_COUNT = 0;
-    public const float NND_BZR_EPSILON = 1.525879E-05f;
-    public const float NND_BZR_EPSILON2 = 2.328306E-10f;
-    public const int NND_BZR_BISECTION_LOOP_COUNT = 16;
     private const int GMD_GMK_WATER_SLIDER_MODE_WAIT = 0;
     private const int GMD_GMK_WATER_SLIDER_MODE_START = 1;
     private const int GMD_GMK_WATER_SLIDER_MODE_ACTIVE = 2;
@@ -3482,77 +2421,7 @@ public partial class AppMain
     public const uint GMD_PLY_SEQ_STATE_ACCEPT_ATTR_WALLPUSH = 1024;
     public const uint GMD_PLY_SEQ_STATE_ACCEPT_ATTR_PINBALL_SPINACC = 2048;
     public const uint GMD_PLY_SEQ_STATE_ACCEPT_ATTR_SQUAT_SPIN = 4096;
-    private const int GME_PLY_SEQ_STATE_FW = 0;
-    private const int GME_PLY_SEQ_STATE_WALK = 1;
-    private const int GME_PLY_SEQ_STATE_TURN = 2;
-    private const int GME_PLY_SEQ_STATE_LOOKUP_ST = 3;
-    private const int GME_PLY_SEQ_STATE_LOOKUP_M = 4;
-    private const int GME_PLY_SEQ_STATE_LOOKUP_END = 5;
-    private const int GME_PLY_SEQ_STATE_SQUAT_ST = 6;
-    private const int GME_PLY_SEQ_STATE_SQUAT_M = 7;
-    private const int GME_PLY_SEQ_STATE_SQUAT_END = 8;
-    private const int GME_PLY_SEQ_STATE_BRAKE = 9;
-    private const int GME_PLY_SEQ_STATE_SPIN = 10;
-    private const int GME_PLY_SEQ_STATE_SPIN_DASHACC = 11;
-    private const int GME_PLY_SEQ_STATE_SPIN_DASH = 12;
-    private const int GME_PLY_SEQ_STATE_STAGGER_F = 13;
-    private const int GME_PLY_SEQ_STATE_STAGGER_B = 14;
-    private const int GME_PLY_SEQ_STATE_STAGGER_D = 15;
-    private const int GME_PLY_SEQ_STATE_FALL = 16;
-    private const int GME_PLY_SEQ_STATE_JUMP = 17;
-    private const int GME_PLY_SEQ_STATE_WALLPUSH = 18;
-    private const int GME_PLY_SEQ_STATE_HOMING = 19;
-    private const int GME_PLY_SEQ_STATE_HOMING_REF = 20;
-    private const int GME_PLY_SEQ_STATE_JUMPDASH = 21;
-    private const int GME_PLY_SEQ_STATE_DAMAGE = 22;
-    private const int GME_PLY_SEQ_STATE_DEATH = 23;
-    private const int GME_PLY_SEQ_STATE_TRANS_SUPER = 24;
-    private const int GME_PLY_SEQ_STATE_BOSS_GOAL = 25;
-    private const int GME_PLY_SEQ_STATE_BOSS5_DEMO = 26;
-    private const int GME_PLY_SEQ_STATE_T_RETRY_FW = 27;
-    private const int GME_PLY_SEQ_STATE_T_RETRY_ACC = 28;
-    private const int GME_PLY_SEQ_STATE_NORMAL_NUM = 29;
-    private const int GME_PLY_SEQ_STATE_NORMAL_END = 29;
-    private const int GME_PLY_SEQ_STATE_GMK_START = 29;
-    private const int GME_PLY_SEQ_STATE_GMK_SPRINGJUMP = 29;
-    private const int GME_PLY_SEQ_STATE_GMK_ROCK_RIDE_START = 30;
-    private const int GME_PLY_SEQ_STATE_GMK_ROCK_RIDE = 31;
-    private const int GME_PLY_SEQ_STATE_GMK_PULLEY = 32;
-    private const int GME_PLY_SEQ_STATE_GMK_BREATHING = 33;
-    private const int GME_PLY_SEQ_STATE_GMK_DASHPANEL = 34;
-    private const int GME_PLY_SEQ_STATE_GMK_TARZAN_ROPE = 35;
-    private const int GME_PLY_SEQ_STATE_GMK_WATER_SLIDER = 36;
-    private const int GME_PLY_SEQ_STATE_GMK_SPIPE = 37;
-    private const int GME_PLY_SEQ_STATE_GMK_SCREW = 38;
-    private const int GME_PLY_SEQ_STATE_GMK_DEMO_FW = 39;
-    private const int GME_PLY_SEQ_STATE_GMK_STOPPER = 40;
-    private const int GME_PLY_SEQ_STATE_GMK_CANNON = 41;
-    private const int GME_PLY_SEQ_STATE_GMK_CANNON_SHOOT = 42;
-    private const int GME_PLY_SEQ_STATE_GMK_UPBUMPER = 43;
-    private const int GME_PLY_SEQ_STATE_GMK_SEESAW = 44;
-    private const int GME_PLY_SEQ_STATE_GMK_PINBALL = 45;
-    private const int GME_PLY_SEQ_STATE_GMK_PINBALL_AIR = 46;
-    private const int GME_PLY_SEQ_STATE_GMK_FLIPPER = 47;
-    private const int GME_PLY_SEQ_STATE_GMK_SPRINGCTPLT_HOLD = 48;
-    private const int GME_PLY_SEQ_STATE_GMK_SPRINGCTPLT_UP = 49;
-    private const int GME_PLY_SEQ_STATE_GMK_SPRINGCTPLT_LR = 50;
-    private const int GME_PLY_SEQ_STATE_GMK_FORCESPIN = 51;
-    private const int GME_PLY_SEQ_STATE_GMK_FORCESPIN_DEC = 52;
-    private const int GME_PLY_SEQ_STATE_GMK_FORCESPIN_FALL = 53;
-    private const int GME_PLY_SEQ_STATE_GMK_MOVE_GEAR = 54;
-    private const int GME_PLY_SEQ_STATE_GMK_DRAIN_TANK = 55;
-    private const int GME_PLY_SEQ_STATE_GMK_DRAIN_TANK_FALL = 56;
-    private const int GME_PLY_SEQ_STATE_GMK_STEAMPIPE = 57;
-    private const int GME_PLY_SEQ_STATE_GMK_POP_STEAM = 58;
-    private const int GME_PLY_SEQ_STATE_GMK_SPL_IN = 59;
-    private const int GME_PLY_SEQ_STATE_GMK_BOSS2_CATCH = 60;
-    private const int GME_PLY_SEQ_STATE_GMK_BOSS5_QUAKE = 61;
-    private const int GME_PLY_SEQ_STATE_GMK_ENDING_DEMO1 = 62;
-    private const int GME_PLY_SEQ_STATE_GMK_ENDING_DEMO2 = 63;
-    private const int GME_PLY_SEQ_STATE_GMK_TRUCK_DANGER = 64;
-    private const int GME_PLY_SEQ_STATE_GMK_TRUCK_DANGER_RET = 65;
-    private const int GME_PLY_SEQ_STATE_GMK_SPIN_FALL = 66;
-    private const int GME_PLY_SEQ_STATE_MAX = 67;
+
     public const int GMD_GMK_SWWALL_SW_CLOSE = 1;
     public const int GMD_GMK_SW_WALL_OPT_MDL_Z3_STONE = 0;
     public const int GMD_GMK_SW_WALL_OPT_MDL_Z3_GLARE = 1;
@@ -3722,9 +2591,6 @@ public partial class AppMain
     private const int AOD_STORAGE_STATE_DELETE = 3;
     private const int AOD_STORAGE_STATE_NUM = 4;
     private const int AOD_STORAGE_STATE_NONE = 5;
-    private const int NND_CIRCLE_N = 20;
-    private const int NND_CIRCLE_PN = 120;
-    private const uint NND_DRAWCS_CALCCLIP = 2147483648;
     private const int GME_SOUND_JINGLE_IDX_1UP = 0;
     private const int GME_SOUND_JINGLE_IDX_CLEAR = 1;
     private const int GME_SOUND_JINGLE_IDX_CLEAR_FINAL = 2;
@@ -4349,42 +3215,7 @@ public partial class AppMain
     private const int GMD_PLY_MODEL_SET_NORMAL = 0;
     private const int GMD_PLY_MODEL_SET_SUPER = 1;
     private const int GMD_PLY_MODEL_SET_MAX = 2;
-    public const uint GMD_PLF_USER1 = 1;
-    public const uint GMD_PLF_USER2 = 2;
-    public const uint GMD_PLF_USER3 = 4;
-    public const uint GMD_PLF_USER4 = 8;
-    public const uint GMD_PLF_USER_MASK = 15;
-    public const uint GMD_PLF_PGM_TURN = 16;
-    public const uint GMD_PLF_NOJUMPMOVE = 32;
-    public const uint GMD_PLF_NOHOMING_SEARCH = 64;
-    public const uint GMD_PLF_NOHOMING = 128;
-    public const uint GMD_PLF_PGM_TURN_RDM = 256;
-    public const uint GMD_PLF_WALK_SMK_EFCT_OFF = 512;
-    public const uint GMD_PLF_DIE = 1024;
-    public const uint GMD_PLF_COLDIE = 2048;
-    public const uint GMD_PLF_NOCOLDIE = 4096;
-    public const uint GMD_PLF_NOCAMERA_OFST = 8192;
-    public const uint GMD_PLF_SUPER_SONIC = 16384;
-    public const uint GMD_PLF_AUTO_RUN = 32768;
-    public const uint GMD_PLF_TATK_RETRY = 65536;
-    public const uint GMD_PLF_PINBALL_SONIC = 131072;
-    public const uint GMD_PLF_TRUCK_RIDE = 262144;
-    public const uint GMD_PLF_NO_ITEMSLOW = 524288;
-    public const uint GMD_PLF_ACT_GOAL = 1048576;
-    public const uint GMD_PLF_BOSS_GOAL_PRE = 2097152;
-    public const uint GMD_PLF_NOKEY = 4194304;
-    public const uint GMD_PLF_GAMEOVER = 8388608;
-    public const uint GMD_PLF_GOAL = 16777216;
-    public const uint GMD_PLF_RESET_FALL_PARAM = 33554432;
-    public const uint GMD_PLF_WATER = 67108864;
-    public const uint GMD_PLF_NOBRAKE = 134217728;
-    public const uint GMD_PLF_BARRIER = 268435456;
-    public const uint GMD_PLF_MAGNET = 536870912;
-    public const uint GMD_PLF_BOSS5_DEMO = 1073741824;
-    public const uint GMD_PLF_PGM_FALL_TURN = 2147483648;
-    public const uint GMD_PLF_PGM_TURN_MASK = 2147483920;
-    public const uint GMD_PLF_STATE_INIT_CLEAR_MASK = 599727;
-    public const uint GMD_PLF_STATE_GIMMICK_INIT_CLEAR_MASK = 533167;
+
     public const uint GMD_PLGF_TOUCH = 1;
     public const uint GMD_PLGF_TOUCH_FLIP = 2;
     public const uint GMD_PLGF_GRAIND_HITCHECK = 4;
@@ -4429,6 +3260,7 @@ public partial class AppMain
     public const uint GMD_PLGF2_TRUCK_JUMP_NO_CAM_ROT = 256;
     public const uint GMD_PLGF2_TRUCK_JUMP_MOVE_ROT = 512;
     public const uint GMD_PLGF2_STATE_GIMMICK_INIT_CLEAR_MASK = 198;
+
     public const int GMD_PLG_GRAIND_OUTCHECK = 2;
     public const int GMD_PLG_GRAIND_ID_MASK = 63;
     public const int GMD_PLG_GRAIND_RIDE = 128;
@@ -5201,23 +4033,6 @@ public partial class AppMain
     public const uint GSD_MAINSYS_GAME_FLAG_STARTINIT_MASK = 286;
     public const uint GSD_MAINSYS_GAME_FLAG_RETRY_MASK = 270;
     public const int GSD_MAINSYS_SYS_FLAG_SUSPEND = 1;
-    public const int NNE_TEXCOORD_NONE = 0;
-    public const int NNE_TEXCOORD_0 = 0;
-    public const int NNE_TEXCOORD_1 = 1;
-    public const int NNE_TEXCOORD_3 = 3;
-    public const int NNE_TEXCOORD_2 = 2;
-    public const int NNE_TEXCOORD_NRM = -1;
-    public const int NNE_TEXCOORD_POS = -2;
-    public const int NNE_TEXCOORD_SPHERE_MAP = -1;
-    public const int NNE_TEXCOORD_PROJECTION_MAP = -2;
-    public const int NNE_TEXCOORD_DUALPARABOLOID_MAP = -3;
-    public const int NNE_TEXCOORD_MAX = 3;
-    public const int NNE_TEXCOORD_MIN = -3;
-    public const int NND_FRAGPARALIGHT_MAX = 3;
-    public const int NND_FRAGPOINTLIGHT_MAX = 3;
-    public const int NND_MAX_USER_PROFILE = 63;
-    public const int NND_MAX_USER_PROFILE_DRAWOBJ = 255;
-    public const int NND_MAX_NUM_USER_UNIFORM = 256;
     public const int GMD_START_DEMO_INVLID_ID = -1;
     public const int GMD_START_DEMO_ACT_NO_NUM = 4;
     public const float GMD_START_DEMO_FADEIN_TIME = 30f;
@@ -7338,40 +6153,6 @@ public partial class AppMain
     public const uint OBD_TBLWORK_FLAG_NO_DIR = 134217728;
     public const uint MTD_MATH_MAX_ANGLE = 65536;
     public const uint MTD_MATH_ANGLE_MASK = 65535;
-    private const int NNE_PRIM3D_POINT_FMT_P = 0;
-    private const int NNE_PRIM3D_POINT_FMT_PC = 1;
-    private const int NNE_PRIM_ALPHABLEND_OFF = 0;
-    private const int NNE_PRIM_ALPHABLEND_ON = 1;
-    private const int NNE_PRIM_TEXBLEND_MODULATE = 0;
-    private const int NNE_PRIM_TEXBLEND_REPLACE = 1;
-    private const int NNE_PRIM_TEXWRAP_REPEAT = 0;
-    private const int NNE_PRIM_TEXWRAP_CLAMP = 1;
-    private const int NNE_PRIM_TEXWRAP_REGION_REPEAT = 2;
-    private const int NNE_PRIM_TEXWRAP_REGION_CLAMP = 3;
-    private const int NNE_PRIM_TEXCOORD_UV = 0;
-    private const int NNE_PRIM_TEXCOORD_ENVIRONMENT = 1;
-    private const int NNE_PRIM2D_FMT_P = 0;
-    private const int NNE_PRIM2D_FMT_PC = 1;
-    private const int NNE_PRIM2D_FMT_PCT = 2;
-    private const int NNE_PRIM2D_POINT_FMT_P = 0;
-    private const int NNE_PRIM2D_POINT_FMT_PC = 1;
-    private const int NNE_PRIM3D_FMT_P = 0;
-    private const int NNE_PRIM3D_FMT_PN = 1;
-    private const int NNE_PRIM3D_FMT_PC = 2;
-    private const int NNE_PRIM3D_FMT_PNT = 3;
-    private const int NNE_PRIM3D_FMT_PCT = 4;
-    private const int NNE_PRIM_LIGHT_DISABLE = 0;
-    private const int NNE_PRIM_LIGHT_ENABLE = 1;
-    private const int NNE_PRIM_LIGHT_SPECULAR = 2;
-    private const int NNE_PRIM_BLEND_ADD = 0;
-    private const int NNE_PRIM_BLEND_BLEND = 1;
-    private const int NNE_PRIM_BLEND_PS2_CUSTOM = 2;
-    private const int NNE_PRIM_BLEND_PSP_CUSTOM = 3;
-    private const int NNE_PRIM_CULL_NONE = 0;
-    private const int NNE_PRIM_CULL_R = 1;
-    private const int NNE_PRIM_CULL_L = 2;
-    public const int NNE_PRIM_TRIANGLE_LIST = 0;
-    public const int NNE_PRIM_TRIANGLE_STRIP = 1;
     public const double X16 = 0.0625;
     public const uint BIT_0 = 1;
     public const uint BIT_1 = 2;
@@ -7651,17 +6432,6 @@ public partial class AppMain
     public const uint MTD_TASK_SYS_UID = 32768;
     public const uint MTD_TASK_SYS_ATTR = 1;
     public const uint MTD_TASK_TCB_FLAG_SYSTEM = 2147483648;
-    public const uint NND_CLIP_NEAR = 256;
-    public const uint NND_CLIP_FAR = 512;
-    public const uint NND_CLIP_RIGHT = 4096;
-    public const uint NND_CLIP_LEFT = 8192;
-    public const uint NND_CLIP_TOP = 16384;
-    public const uint NND_CLIP_BOTTOM = 32768;
-    public const uint NND_CLIP_GS_RIGHT = 65536;
-    public const uint NND_CLIP_GS_LEFT = 131072;
-    public const uint NND_CLIP_GS_TOP = 262144;
-    public const uint NND_CLIP_GS_BOTTOM = 524288;
-    public const uint NND_CLIP_GS_MASK = 983040;
     private const float g_ZeroVal = 0.0f;
     private const float g_OneVal = 1f;
     public const int GMD_PL_DEF_MAX_SPD = 61440;
@@ -8035,7 +6805,6 @@ public partial class AppMain
     public const uint MPP_ALTERNATIVE_OBJECT_LIGHTING = 65536;
     public const uint MPP_ALTERNATIVE_OBJECT_LIGHTING_1 = 32768;
     public const int GSD_SHADER_USER_PROFILE_ID_TOON = 0;
-    public const int NND_DRAWOBJ_SHADER_USER_PROFILE_TOON = 0;
     public const int OBD_ACTION3D_NN_MTN_BUF_NUM = 2;
     public const float OBD_ACTION3D_NN_DEF_BLEND_SPD = 0.25f;
     public const int OBD_ACTION3D_NN_MTN_FILENAME_LEN = 64;
@@ -8222,46 +6991,6 @@ public partial class AppMain
     public const int OBD_OBJECT_COL_MAX = 32768;
     public const int OBD_CAMERA_2DSPRITE_FOV = 16128;
     public const int OBD_COL_THROUGH_CHECK_LENGTH = 5;
-    public const uint NND_NODESTATUS_NONE = 0;
-    public const uint NND_NODESTATUS_HIDE = 1;
-    public const uint NND_NODESTATUS_INSIDE = 2;
-    public const uint NND_NODESTATUS_CROSSNEAR = 4;
-    public const uint NND_NODESTATUS_CROSSFAR = 8;
-    public const uint NND_NODESTATUS_OUTSIDE = 16;
-    public const uint NND_NODESTATUS_PS2_GSINSIDE = 32;
-    public const uint NND_NODESTATUS_CLIP_MASK = 62;
-    public const uint NND_NODESTATUS_WIRE = 1024;
-    public const uint NND_SETNODESTATUS_CLIP_HIDE = 1;
-    public const uint NND_SETNODESTATUS_CLIP_WIRE = 2;
-    public const uint NND_SETNODESTATUS_CLIP_BRANCH = 8;
-    public const uint NND_SETNODESTATUS_CLIP_SCALE = 16;
-    public const uint NND_SETNODESTATUS_CLIP_SPHERE = 32;
-    public const uint NND_SETNODESTATUS_CLIP_MASK = 59;
-    public const uint NND_SETNODESTATUS_HIDE = 4;
-    public const uint NND_DRAWCS_OBJECT = 256;
-    public const uint NND_DRAWCS_NODE = 512;
-    public const uint NND_DRAWCS_MESHSET = 1024;
-    public const uint NND_DRAWCS_SPHERE = 32768;
-    public const uint NND_DRAWCS_HIDE = 65536;
-    public const uint NND_DRAWSIIKBONE_WIRE = 1;
-    public const uint NND_DRAWSIIKBONE_POLY = 2;
-    public const uint NND_DRAWNODETREE_WIRE = 1;
-    public const uint NND_DRAWNODETREE_POLY = 2;
-    public const uint NND_DRAWNODETREE_ALLNODE = 4;
-    public const uint NND_DRAWNODETREE_DRAWNODE = 8;
-    public const uint NND_DRAWNODETREE_STRATPOINT = 16;
-    public const uint NND_DRAWNODETREE_DRAWTYPEMASK = 1;
-    public const uint NND_BINDOBJ_EXCLUDE_PLIABLE_VERTICES = 1;
-    public const uint NND_BINDOBJ_DETACHED_ARRAY = 2;
-    public const int NND_WEIGHT_LOCATION = 1;
-    public const int NND_MTXIDX_LOCATION = 5;
-    public const int NND_TANGENT_LOCATION = 6;
-    public const int NND_BINORMAL_LOCATION = 7;
-    private const int NNE_TEXCOORDSRC_DISABLE = 0;
-    private const int NNE_TEXCOORDSRC_TEXCOORD0 = 1;
-    private const int NNE_TEXCOORDSRC_TEXCOORD1 = 2;
-    private const int NNE_TEXCOORDSRC_NORMAL = 3;
-    private const int NNE_TEXCOORDSRC_POSITION = 4;
     public const int AMD_IPHONE_TOUCH_POS_MAX = 4;
     public const uint A2D_AMA_ACT_FLAG_W_NONE = 0;
     public const uint A2D_AMA_ACT_FLAG_W_CENTER = 1;
@@ -16120,82 +14849,7 @@ public partial class AppMain
     public const int OBD_COLLISION_OBJECT_MAX = 144;
     public const int OBD_COLOBJ_OFFSET = 24;
     public const int OBD_COLOBJ_OFFSET_SS = 24;
-    public const int NND_CLIP_DBGPRINT = 0;
-    public const int NND_BBCLIP_DBGPRINT = 0;
-    public const uint NND_OBJECTSTATUS_HIDE = 1;
-    public const uint NND_OBJECTSTATUS_INSIDE = 2;
-    public const uint NND_DRAWOBJ_HIDE = 1;
-    public const uint NND_DRAWOBJ_INSIDE = 2;
-    public const uint NND_DRAWOBJ_MESHSETCLIP = 16;
-    public const uint NND_DRAWOBJ_DOUBLESIDE = 32;
-    public const uint NND_DRAWOBJ_BACKSIDE = 64;
-    public const uint NND_DRAWOBJ_FRONTSIDE = 96;
-    public const uint NND_DRAWOBJ_CULLING_MASK = 96;
-    public const uint NND_DRAWOBJ_DISABLE_LIGHTING = 128;
-    public const uint NND_DRAWOBJ_LIGHTING_MASK = 128;
-    public const uint NND_DRAWOBJ_NORM = 256;
-    public const uint NND_DRAWOBJ_NORMAL = 256;
-    public const uint NND_DRAWOBJ_TANGENTSPACE = 512;
-    public const uint NND_DRAWOBJ_VECTORMASK = 768;
-    public const uint NND_DRAWOBJ_IGNOREMATSPEC = 1024;
-    public const uint NND_DRAWOBJ_IGNORETEXTURE = 2048;
-    public const uint NND_DRAWOBJ_IGNOREMATMASK = 3072;
-    public const uint NND_DRAWOBJ_WIRE = 4096;
-    public const uint NND_DRAWOBJ_COLORNTEXTURE = 8192;
-    public const uint NND_DRAWOBJ_COLORSTRIP = 12288;
-    public const uint NND_DRAWOBJ_COLORMESHSET = 16384;
-    public const uint NND_DRAWOBJ_COLORMATERIAL = 20480;
-    public const uint NND_DRAWOBJ_COLORNWEIGHT = 24576;
-    public const uint NND_DRAWOBJ_COLORSHADER = 28672;
-    public const uint NND_DRAWOBJ_SURFACE_MASK = 28672;
-    public const uint NND_DRAWOBJ_FRAGPARALIGHT1 = 65536;
-    public const uint NND_DRAWOBJ_FRAGPARALIGHT2 = 131072;
-    public const uint NND_DRAWOBJ_FRAGPARALIGHT3 = 196608;
-    public const uint NND_DRAWOBJ_FRAGPARALIGHT_MASK = 196608;
-    public const uint NND_DRAWOBJ_FRAGPOINTLIGHT1 = 262144;
-    public const uint NND_DRAWOBJ_FRAGPOINTLIGHT2 = 524288;
-    public const uint NND_DRAWOBJ_FRAGPOINTLIGHT3 = 786432;
-    public const uint NND_DRAWOBJ_FRAGPOINTLIGHT_MASK = 786432;
-    public const uint NND_DRAWOBJ_FRAGLIGHT_MASK = 983040;
-    public const uint NND_DRAWOBJ_DEPTH_ONLY = 2147483648;
-    public const uint NND_DRAWOBJ_DISABLE_ALPHATEST = 1;
-    public const uint NND_DRAWOBJ_SHADER_VERTEXBLEND = 2;
-    public const uint NND_DRAWOBJ_DISABLE_NORMALMAP = 1024;
-    public const uint NND_DRAWOBJ_DISABLE_SPECULARMAP = 2048;
-    public const uint NND_DRAWOBJ_DISABLE_SHININESSMAP = 4096;
-    public const uint NND_DRAWOBJ_DISABLE_DUALPARABOLOIDMAP = 8192;
-    public const uint NND_DRAWOBJ_DISABLE_ENVMASKMAP = 16384;
-    public const uint NND_DRAWOBJ_DISABLE_MODULATEMAP = 32768;
-    public const uint NND_DRAWOBJ_DISABLE_ADDMAP = 65536;
-    public const uint NND_DRAWOBJ_DISABLE_OPACITYMAP = 131072;
-    public const uint NND_DRAWOBJ_DISABLE_USER1MAP = 262144;
-    public const uint NND_DRAWOBJ_DISABLE_USER2MAP = 524288;
-    public const uint NND_DRAWOBJ_DISABLE_USER3MAP = 1048576;
-    public const uint NND_DRAWOBJ_DISABLE_USER4MAP = 2097152;
-    public const uint NND_DRAWOBJ_DISABLE_USER5MAP = 4194304;
-    public const uint NND_DRAWOBJ_DISABLE_USER6MAP = 8388608;
-    public const uint NND_DRAWOBJ_DISABLE_USER7MAP = 16777216;
-    public const uint NND_DRAWOBJ_DISABLE_USER8MAP = 33554432;
-    public const uint NND_DRAWOBJ_DISABLE_MAPMASK = 67107840;
-    public const uint NND_DRAWOBJ_MATCTRL_DIFFUSE = 1048576;
-    public const uint NND_DRAWOBJ_MATCTRL_AMBIENT = 2097152;
-    public const uint NND_DRAWOBJ_MATCTRL_SPECULAR = 4194304;
-    public const uint NND_DRAWOBJ_MATCTRL_ALPHA = 8388608;
-    public const uint NND_DRAWOBJ_MATCTRL_ENVTEXMTX = 16777216;
-    public const uint NND_DRAWOBJ_MATCTRL_BLEND = 33554432;
-    public const uint NND_DRAWOBJ_MATCTRL_TEXOFFSET = 268435456;
-    public const uint NND_DRAWOBJ_MATCTRL_USERSAMPLERCUBE1 = 1073741824;
-    public const uint NND_DRAWOBJ_MATCTRL_USERSAMPLERCUBE2 = 2147483648;
-    public const uint NND_DRAWOBJ_MATCTRL_USERSAMPLERCUBE_MASK = 3221225472;
-    public const uint NND_DRAWOBJ_MATCTRL_MASK = 334495744;
-    public const uint NND_CALCPLIABLE_PLIABILITY_ALL = 1;
-    public const uint NND_CALCPLIABLE_GL_BINDBUFFER = 2;
-    public const uint NND_CALCPLIABLE_PS3_BINDBUFFER = 2;
-    public const uint NND_CALCPLIABLE_PS2_SINGLEBUFFER = 4;
-    public const uint NND_CALCPLIABLE_USE_NODESTATUS = 8;
-    public const uint NND_CALCPLIABLE_DX_OBJECTBUFFER = 16;
-    public const uint NND_CALCPLIABLE_DX_PRINODEOBJCT = 32;
-    public const uint NND_CALCPLIABLE_DX_NOINDEX = 64;
+
     public const int AMD_THREAD_SAFE_NO_THREAD_MAIN = 0;
     public const int AMD_THREAD_SAFE_NO_THREAD_DRAW = 2;
     public const int AMD_MOTION_FILE_MAX = 4;
@@ -16249,475 +14903,8 @@ public partial class AppMain
     public const uint AMD_AME_RWFLAG_TEXTURE_FLIP_V = 16;
     public const uint AMD_AME_RWFLAG_SOFTPTR_OFF = 32;
     public const uint AMD_AME_RWFLAG_SHADOW_ON = 64;
-    private const int GME_PLY_EFCT_TRAIL_TYPE_HOMING = 0;
-    private const int GME_PLY_EFCT_TRAIL_TYPE_SPINDASH = 1;
-    private const int GME_PLY_EFCT_TRAIL_TYPE_MAX = 2;
-    public const float GMD_PLY_EFCT_OFST_FRONT_PLAYER = 16f;
-    public const float GMD_PLY_EFCT_OFST_FRONT_A = 160f;
-    public const int GMD_PLY_EFCT_BARRIER_ADD_OFST_Z = 15;
-    public const int GMD_PLY_EFCT_SPIN_DASH_CIRCLE_BLUR_BASE_OFST_Y = 0;
-    public const int GMD_PLY_EFCT_SPIN_DASH_CIRCLE_BLUR_BASE_OFST_Y_PINBALL = 0;
-    public const int GMD_PLY_EFCT_SPIN_DASH_CIRCLE_BLUR_BASE_OFST_Z = 0;
-    public const int GMD_PLY_EFCT_SPIN_DASH_BLUR_BASE_OFST_Y = 0;
-    public const int GMD_PLY_EFCT_SPIN_DASH_BLUR_BASE_OFST_Y_PINBALL = 1;
-    public const int GMD_PLY_EFCT_SPIN_START_BLUR_BASE_OFST_Y = 2;
-    public const int GMD_PLY_EFCT_SPIN_START_BLUR_BASE_OFST_Y_PINBALL = 1;
-    public const int GMD_PLY_EFCT_SPIN_START_BLUR_BASE_OFST_Z = 14;
-    public const int GMD_PLY_EFCT_SPIN_START_BLUR_FRAME = 15;
-    public const int GMD_PLY_EFCT_SPIN_JUMP_BLUR_BASE_OFST_Y = -5;
-    public const int GMD_PLY_EFCT_SPIN_JUMP_BLUR_BASE_OFST_Y_PINBALL = 1;
-    public const int GMD_PLY_EFCT_SPIN_JUMP_BLUR_DIST_MAX = 8;
-    public const int GMD_PLY_EFCT_SPIN_JUMP_BLUR_DIST_MIN = 1;
-    public const int GMD_PLY_EFCT_SPIN_JUMP_BLUR_PLY_MTN_FRAME = 20;
-    public const int GMD_PLY_EFCT_BUBBLE_SPD_Y_ACC = -64;
-    public const int GMD_PLY_EFCT_BUBBLE_SPD_Y_MAX = -65536;
-    public const int GMD_PLY_EFCT_BUBBLE_SURFACE_ADJUST = 32768;
-    public const int GMD_PLF_EFCT_RUN_SPRAY_MIN_SPD = 4096;
-    public const int GMD_PLF_EFCT_RUN_SPRAY_BIG_SPD = 16384;
-    public const int GMD_PLF_EFCT_RUN_SPRAY_OFST_Z = 15;
-    public const int GMD_DWORK_NO_DUMMY = 0;
-    public const int GMD_DWORK_NO_FIX_START = 1;
-    public const int GMD_DWORK_NO_FIX_END = 2;
-    public const int GMD_DWORK_NO_RING_START = 2;
-    public const int GMD_DWORK_NO_RING_MODEL = 2;
-    public const int GMD_DWORK_NO_RING_TEX = 3;
-    public const int GMD_DWORK_NO_RING_MAT = 4;
-    public const int GMD_DWORK_NO_RING_END = 5;
-    public const int GMD_DWORK_NO_EFFECT_START = 5;
-    public const int GMD_DWORK_NO_EFFECT_ARC_START = 5;
-    public const int GMD_DWORK_NO_EFFECT_CMN_ARC = 5;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_ARC = 6;
-    public const int GMD_DWORK_NO_EFFECT_ENE_E02_ARC = 7;
-    public const int GMD_DWORK_NO_EFFECT_ENE_E04_ARC = 8;
-    public const int GMD_DWORK_NO_EFFECT_ENE_E05_ARC = 9;
-    public const int GMD_DWORK_NO_EFFECT_ENE_E06_ARC = 10;
-    public const int GMD_DWORK_NO_EFFECT_ENE_E07_ARC = 11;
-    public const int GMD_DWORK_NO_EFFECT_ENE_E10_ARC = 12;
-    public const int GMD_DWORK_NO_EFFECT_ENE_E13_ARC = 13;
-    public const int GMD_DWORK_NO_EFFECT_ENE_E14_ARC = 14;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_ARC = 15;
-    public const int GMD_DWORK_NO_EFFECT_ARC_END = 16;
-    public const int GMD_DWORK_NO_EFFECT_CMN_AMBTEX = 17;
-    public const int GMD_DWORK_NO_EFFECT_CMN_TEXLIST = 18;
-    public const int GMD_DWORK_NO_EFFECT_CMN_AME_START = 19;
-    public const int GMD_DWORK_NO_EFFECT_CMN_AME_00 = 19;
-    public const int GMD_DWORK_NO_EFFECT_CMN_AME_END = 116;
-    public const int GMD_DWORK_NO_EFFECT_CMN_MODELDAT_START = 117;
-    public const int GMD_DWORK_NO_EFFECT_CMN_MODELDAT_00 = 117;
-    public const int GMD_DWORK_NO_EFFECT_CMN_MODELDAT_END = 214;
-    public const int GMD_DWORK_NO_EFFECT_CMN_OBJECT_START = 215;
-    public const int GMD_DWORK_NO_EFFECT_CMN_OBJECT_00 = 215;
-    public const int GMD_DWORK_NO_EFFECT_CMN_OBJECT_END = 312;
-    public const int GMD_DWORK_NO_EFFECT_CMN_MDL_AMBTEX_START = 313;
-    public const int GMD_DWORK_NO_EFFECT_CMN_MDL_AMBTEX_END = 410;
-    public const int GMD_DWORK_NO_EFFECT_CMN_MDL_TEXLIST_START = 411;
-    public const int GMD_DWORK_NO_EFFECT_CMN_MDL_TEXLIST_END = 508;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_AMBTEX = 509;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_TEXLIST = 510;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_AME_START = 511;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_AME_00 = 511;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_AME_END = 581;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_MODELDAT_START = 582;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_MODELDAT_END = 583;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_OBJECT_START = 584;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_OBJECT_END = 585;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_MDL_AMBTEX_START = 586;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_MDL_AMBTEX_END = 587;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_MDL_TEXLIST_START = 588;
-    public const int GMD_DWORK_NO_EFFECT_ZONE_MDL_TEXLIST_END = 589;
-    public const int GMD_DWORK_NO_EFFECT_ENE_START = 590;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AMBTEX_E02 = 590;
-    public const int GMD_DWORK_NO_EFFECT_ENE_TEXLIST_E02 = 591;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AMBTEX_E04 = 592;
-    public const int GMD_DWORK_NO_EFFECT_ENE_TEXLIST_E04 = 593;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AMBTEX_E05 = 594;
-    public const int GMD_DWORK_NO_EFFECT_ENE_TEXLIST_E05 = 595;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AMBTEX_E06 = 596;
-    public const int GMD_DWORK_NO_EFFECT_ENE_TEXLIST_E06 = 597;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AMBTEX_E07 = 598;
-    public const int GMD_DWORK_NO_EFFECT_ENE_TEXLIST_E07 = 599;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AMBTEX_E10 = 600;
-    public const int GMD_DWORK_NO_EFFECT_ENE_TEXLIST_E10 = 601;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AMBTEX_E13 = 602;
-    public const int GMD_DWORK_NO_EFFECT_ENE_TEXLIST_E13 = 603;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AMBTEX_E14 = 604;
-    public const int GMD_DWORK_NO_EFFECT_ENE_TEXLIST_E14 = 605;
-    public const int GMD_DWORK_NO_EFFECT_ENE_TEX_END = 606;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E02_JET_S = 607;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E02_JET_S_SMORK = 608;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E04_DUMMY1 = 609;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E04_DUMMY2 = 610;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E04_MEREON_MISS = 611;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E05_GUARD = 612;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E06_HARO = 613;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E07_MOGU_E = 614;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E07_MOGU_W = 615;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E10_BUKUBUKU = 616;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E13_CROW = 617;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E13_T_STAR = 618;
-    public const int GMD_DWORK_NO_EFFECT_ENE_AME_E14_JET_H = 619;
-    public const int GMD_DWORK_NO_EFFECT_ENE_END = 620;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_START = 621;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_AMBTEX = 621;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_TEXLIST = 622;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_AME_START = 623;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_AME_00 = 623;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_AME_END = 629;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_MODELDAT_START = 630;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_MODELDAT_00 = 630;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_MODELDAT_END = 636;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_OBJECT_START = 637;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_OBJECT_00 = 637;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_OBJECT_END = 643;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_MDL_AMBTEX_START = 644;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_MDL_AMBTEX_END = 650;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_MDL_TEXLIST_START = 651;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_MDL_TEXLIST_END = 657;
-    public const int GMD_DWORK_NO_EFFECT_BOSS_CMN_END = 658;
-    public const int GMD_DWORK_NO_EFFECT_END = 658;
-    public const int GMD_DWORK_NO_ENEMY_START = 658;
-    public const int GMD_DWORK_NO_ENEMY_HARISENBO_MODEL = 658;
-    public const int GMD_DWORK_NO_ENEMY_HARISENBO_TEX = 659;
-    public const int GMD_DWORK_NO_ENEMY_HARISENBO_MTN = 660;
-    public const int GMD_DWORK_NO_ENEMY_MOTORA_MODEL = 661;
-    public const int GMD_DWORK_NO_ENEMY_MOTORA_TEX = 662;
-    public const int GMD_DWORK_NO_ENEMY_MOTORA_MTN = 663;
-    public const int GMD_DWORK_NO_ENEMY_GABU_MODEL = 664;
-    public const int GMD_DWORK_NO_ENEMY_GABU_TEX = 665;
-    public const int GMD_DWORK_NO_ENEMY_GABU_MTN = 666;
-    public const int GMD_DWORK_NO_ENEMY_STING_MODEL = 667;
-    public const int GMD_DWORK_NO_ENEMY_STING_TEX = 668;
-    public const int GMD_DWORK_NO_ENEMY_STING_MTN = 669;
-    public const int GMD_DWORK_NO_ENEMY_MEREON_MODEL = 670;
-    public const int GMD_DWORK_NO_ENEMY_MEREON_R_MODEL = 671;
-    public const int GMD_DWORK_NO_ENEMY_MEREON_TEX = 672;
-    public const int GMD_DWORK_NO_ENEMY_MEREON_MTN = 673;
-    public const int GMD_DWORK_NO_ENEMY_MOGU_MODEL = 674;
-    public const int GMD_DWORK_NO_ENEMY_MOGU_TEX = 675;
-    public const int GMD_DWORK_NO_ENEMY_MOGU_MTN = 676;
-    public const int GMD_DWORK_NO_ENEMY_GARDON_MODEL = 677;
-    public const int GMD_DWORK_NO_ENEMY_GARDON_TEX = 678;
-    public const int GMD_DWORK_NO_ENEMY_GARDON_MTN = 679;
-    public const int GMD_DWORK_NO_ENEMY_T_STAR_MODEL = 680;
-    public const int GMD_DWORK_NO_ENEMY_T_STAR_TEX = 681;
-    public const int GMD_DWORK_NO_ENEMY_T_STAR_MTN = 682;
-    public const int GMD_DWORK_NO_ENEMY_T_STAR_MAT = 683;
-    public const int GMD_DWORK_NO_ENEMY_KANI_MODEL = 684;
-    public const int GMD_DWORK_NO_ENEMY_KANI_TEX = 685;
-    public const int GMD_DWORK_NO_ENEMY_KANI_MTN = 686;
-    public const int GMD_DWORK_NO_ENEMY_HARO_MODEL = 687;
-    public const int GMD_DWORK_NO_ENEMY_HARO_TEX = 688;
-    public const int GMD_DWORK_NO_ENEMY_HARO_MTN = 689;
-    public const int GMD_DWORK_NO_ENEMY_UNIDES_MODEL = 690;
-    public const int GMD_DWORK_NO_ENEMY_UNIDES_TEX = 691;
-    public const int GMD_DWORK_NO_ENEMY_UNIDES_MTN = 692;
-    public const int GMD_DWORK_NO_ENEMY_UNIUNI_MODEL = 693;
-    public const int GMD_DWORK_NO_ENEMY_UNIUNI_TEX = 694;
-    public const int GMD_DWORK_NO_ENEMY_UNIUNI_MTN = 695;
-    public const int GMD_DWORK_NO_ENEMY_BUKU_MODEL = 696;
-    public const int GMD_DWORK_NO_ENEMY_BUKU_TEX = 697;
-    public const int GMD_DWORK_NO_ENEMY_BUKU_MTN = 698;
-    public const int GMD_DWORK_NO_ENEMY_KAMA_MODEL = 699;
-    public const int GMD_DWORK_NO_ENEMY_KAMA_TEX = 700;
-    public const int GMD_DWORK_NO_ENEMY_KAMA_MTN = 701;
-    public const int GMD_DWORK_NO_ENEMY_END = 702;
-    public const int GMD_DWORK_NO_BOSS_START = 703;
-    public const int GMD_DWORK_NO_BOSS_01_BODY_MTN = 703;
-    public const int GMD_DWORK_NO_BOSS_01_CHAIN_MTN = 704;
-    public const int GMD_DWORK_NO_BOSS_01_EGG_MTN = 705;
-    public const int GMD_DWORK_NO_BOSS_01_EF_SW00_ES = 706;
-    public const int GMD_DWORK_NO_BOSS_01_EF_SW01_ES = 707;
-    public const int GMD_DWORK_NO_BOSS_01_EF_SW02_ES = 708;
-    public const int GMD_DWORK_NO_BOSS_01_EF_SW_AMBTEX = 709;
-    public const int GMD_DWORK_NO_BOSS_01_EF_SW_TEXLIST = 710;
-    public const int GMD_DWORK_NO_BOSS_02_BODY_MTN = 711;
-    public const int GMD_DWORK_NO_BOSS_02_BODY_MAT = 712;
-    public const int GMD_DWORK_NO_BOSS_02_EGG_MTN = 713;
-    public const int GMD_DWORK_NO_BOSS_02_EF_BLITZ00_ES = 714;
-    public const int GMD_DWORK_NO_BOSS_02_EF_BLITZ01_ES = 715;
-    public const int GMD_DWORK_NO_BOSS_02_EF_BLITZ02_ES = 716;
-    public const int GMD_DWORK_NO_BOSS_02_EF_BALL_ES = 717;
-    public const int GMD_DWORK_NO_BOSS_02_EF_BALL_PART_ES = 718;
-    public const int GMD_DWORK_NO_BOSS_02_EF_ROLLATTACK01_ES = 719;
-    public const int GMD_DWORK_NO_BOSS_02_EF_ROLLATTACK02_ES = 720;
-    public const int GMD_DWORK_NO_BOSS_02_EF_ROLLATTACK03_ES = 721;
-    public const int GMD_DWORK_NO_BOSS_02_EF_AMBTEX = 722;
-    public const int GMD_DWORK_NO_BOSS_02_EF_TEXLIST = 723;
-    public const int GMD_DWORK_NO_BOSS_02_EF_ROLL_OBJECT = 724;
-    public const int GMD_DWORK_NO_BOSS_02_EF_ROLL_MDL_DATA = 725;
-    public const int GMD_DWORK_NO_BOSS_02_EF_ROLL_AMBTEX = 726;
-    public const int GMD_DWORK_NO_BOSS_02_EF_ROLL_TEXLIST = 727;
-    public const int GMD_DWORK_NO_BOSS_03_BODY_MTN = 728;
-    public const int GMD_DWORK_NO_BOSS_03_EGG_MTN = 729;
-    public const int GMD_DWORK_NO_BOSS_04_BODY_MTN = 730;
-    public const int GMD_DWORK_NO_BOSS_04_EGG_MTN = 731;
-    public const int GMD_DWORK_NO_BOSS_04_CAPSULE_MTN = 732;
-    public const int GMD_DWORK_NO_BOSS_04_EF_AMBTEX = 733;
-    public const int GMD_DWORK_NO_BOSS_04_EF_TEXLIST = 734;
-    public const int GMD_DWORK_NO_BOSS_04_EF_CAP_EX_ES = 735;
-    public const int GMD_DWORK_NO_BOSS_04_EF_EGG1_EX_ES = 736;
-    public const int GMD_DWORK_NO_BOSS_04_EF_EGG2_EX_ES = 737;
-    public const int GMD_DWORK_NO_BOSS_04_EF_EGG3_EX_ES = 738;
-    public const int GMD_DWORK_NO_BOSS_04_EF_BOOST1_ES = 739;
-    public const int GMD_DWORK_NO_BOSS_04_EF_BOOST2_ES = 740;
-    public const int GMD_DWORK_NO_BOSS_04_EF_BOOSTX_ES = 741;
-    public const int GMD_DWORK_NO_BOSS_04_EF_BOOSTX2_ES = 742;
-    public const int GMD_DWORK_NO_BOSS_04_EF_PARTS_EX_ES = 743;
-    public const int GMD_DWORK_NO_BOSS_04_EF_BOSS_LIGHT_ES = 744;
-    public const int GMD_DWORK_NO_BOSS_05_BODY_MTN = 745;
-    public const int GMD_DWORK_NO_BOSS_05_EGG_MTN = 746;
-    public const int GMD_DWORK_NO_BOSS_05_ROCKET_MTN = 747;
-    public const int GMD_DWORK_NO_BOSS_05_CTPLT_MAT = 748;
-    public const int GMD_DWORK_NO_BOSS_05_LAND01_MAT = 749;
-    public const int GMD_DWORK_NO_BOSS_05_LAND02_MAT = 750;
-    public const int GMD_DWORK_NO_BOSS_05_LAND03_MAT = 751;
-    public const int GMD_DWORK_NO_BOSS_05_EF_BLITZ_FB_00_ES = 752;
-    public const int GMD_DWORK_NO_BOSS_05_EF_BLITZ_FB_01_ES = 753;
-    public const int GMD_DWORK_NO_BOSS_05_EF_BLITZ_FB_02_ES = 754;
-    public const int GMD_DWORK_NO_BOSS_05_EF_BLITZ_FB_03_ES = 755;
-    public const int GMD_DWORK_NO_BOSS_05_EF_BLITZ_FB_C_00_ES = 756;
-    public const int GMD_DWORK_NO_BOSS_05_EF_BLITZ_FB_C_01_ES = 757;
-    public const int GMD_DWORK_NO_BOSS_05_EF_BLITZ_FB_C_02_ES = 758;
-    public const int GMD_DWORK_NO_BOSS_05_EF_BLITZ_FB_START_ES = 759;
-    public const int GMD_DWORK_NO_BOSS_05_EF_FB_SMORK00_ES = 760;
-    public const int GMD_DWORK_NO_BOSS_05_EF_FB_SMORK01_ES = 761;
-    public const int GMD_DWORK_NO_BOSS_05_EF_FB_SMORK02_ES = 762;
-    public const int GMD_DWORK_NO_BOSS_05_EF_GLASS_ES = 763;
-    public const int GMD_DWORK_NO_BOSS_05_EF_JET_FB_ES = 764;
-    public const int GMD_DWORK_NO_BOSS_05_EF_JET_FB_SMORK_ES = 765;
-    public const int GMD_DWORK_NO_BOSS_05_EF_ROCKET_BLITZ_ES = 766;
-    public const int GMD_DWORK_NO_BOSS_05_EF_ROCKET_E_ES = 767;
-    public const int GMD_DWORK_NO_BOSS_05_EF_ROCKET_JET_ES = 768;
-    public const int GMD_DWORK_NO_BOSS_05_EF_ROCKET_S_ES = 769;
-    public const int GMD_DWORK_NO_BOSS_05_EF_ROCKET_SMORK_ES = 770;
-    public const int GMD_DWORK_NO_BOSS_05_EF_SHOCK_ES = 771;
-    public const int GMD_DWORK_NO_BOSS_05_EF_SHOCK_ATK_ES = 772;
-    public const int GMD_DWORK_NO_BOSS_05_EF_TARGET_FB_ES = 773;
-    public const int GMD_DWORK_NO_BOSS_05_EF_TARGET_FB_E_ES = 774;
-    public const int GMD_DWORK_NO_BOSS_05_EF_TARGET_FB_S_ES = 775;
-    public const int GMD_DWORK_NO_BOSS_05_EF_TARGET_FB_W_ES = 776;
-    public const int GMD_DWORK_NO_BOSS_05_EF_TARGET_FB_W_E_ES = 777;
-    public const int GMD_DWORK_NO_BOSS_05_EF_TARGET_FB_W_S_ES = 778;
-    public const int GMD_DWORK_NO_BOSS_05_EF_CMN_AMBTEX = 779;
-    public const int GMD_DWORK_NO_BOSS_05_EF_CMN_TEXLIST = 780;
-    public const int GMD_DWORK_NO_BOSS_05_EF_MD_JT_AMBTEX = 781;
-    public const int GMD_DWORK_NO_BOSS_05_EF_MD_JT_TEXLIST = 782;
-    public const int GMD_DWORK_NO_BOSS_05_EF_TH_AMBTEX = 783;
-    public const int GMD_DWORK_NO_BOSS_05_EF_TH_TEXLIST = 784;
-    public const int GMD_DWORK_NO_BOSS_05_EF_JET_MODELDAT = 785;
-    public const int GMD_DWORK_NO_BOSS_05_EF_JET_OBJECT = 786;
-    public const int GMD_DWORK_NO_BOSS_05_EF_THUNDER_MODELDAT = 787;
-    public const int GMD_DWORK_NO_BOSS_05_EF_THUNDER_OBJECT = 788;
-    public const int GMD_DWORK_NO_BOSS_END = 789;
-    public const int GMD_DWORK_NO_GMK_START = 789;
-    public const int GMD_DWORK_NO_GMK_ITEM_MODEL = 789;
-    public const int GMD_DWORK_NO_GMK_ITEM_TEX = 790;
-    public const int GMD_DWORK_NO_GMK_SPRING_MODEL = 791;
-    public const int GMD_DWORK_NO_GMK_SPRING_TEX = 792;
-    public const int GMD_DWORK_NO_GMK_SPRING_MTN = 793;
-    public const int GMD_DWORK_NO_GMK_B_LAND1_MODEL = 794;
-    public const int GMD_DWORK_NO_GMK_B_LAND1_TEX = 795;
-    public const int GMD_DWORK_NO_GMK_B_LAND1_MTN = 796;
-    public const int GMD_DWORK_NO_GMK_B_WALL_MODEL = 797;
-    public const int GMD_DWORK_NO_GMK_B_WALL_TEX = 798;
-    public const int GMD_DWORK_NO_GMK_B_OBJ_MODEL = 799;
-    public const int GMD_DWORK_NO_GMK_B_OBJ_TEX = 800;
-    public const int GMD_DWORK_NO_GMK_LAND_1_MODEL = 801;
-    public const int GMD_DWORK_NO_GMK_LAND_1_TEX = 802;
-    public const int GMD_DWORK_NO_GMK_LAND_2_MODEL = 803;
-    public const int GMD_DWORK_NO_GMK_LAND_2_TEX = 804;
-    public const int GMD_DWORK_NO_GMK_LAND_2_MTN = 805;
-    public const int GMD_DWORK_NO_GMK_LAND_2_MAT = 806;
-    public const int GMD_DWORK_NO_GMK_LAND_3_MODEL = 807;
-    public const int GMD_DWORK_NO_GMK_LAND_3_TEX = 808;
-    public const int GMD_DWORK_NO_GMK_LAND_3_ROPE_MAT = 809;
-    public const int GMD_DWORK_NO_GMK_LAND_3_TVX = 810;
-    public const int GMD_DWORK_NO_GMK_LAND_4_MODEL = 811;
-    public const int GMD_DWORK_NO_GMK_LAND_4_TEX = 812;
-    public const int GMD_DWORK_NO_GMK_LAND_F_MODEL = 813;
-    public const int GMD_DWORK_NO_GMK_LAND_F_TEX = 814;
-    public const int GMD_DWORK_NO_GMK_LAND_F_MAT = 815;
-    public const int GMD_DWORK_NO_GMK_ROCK_MODEL = 816;
-    public const int GMD_DWORK_NO_GMK_ROCK_TEX = 817;
-    public const int GMD_DWORK_NO_GMK_ROCK_MTN = 818;
-    public const int GMD_DWORK_NO_GMK_PULLEY_MODEL = 819;
-    public const int GMD_DWORK_NO_GMK_PULLEY_TEX = 820;
-    public const int GMD_DWORK_NO_GMK_PULLEY_MTN = 821;
-    public const int GMD_DWORK_NO_GMK_NEEDLE_MODEL = 822;
-    public const int GMD_DWORK_NO_GMK_NEEDLE_TEX = 823;
-    public const int GMD_DWORK_NO_GMK_NEEDLE_TVX = 824;
-    public const int GMD_DWORK_NO_GMK_DASH_P_MODEL = 825;
-    public const int GMD_DWORK_NO_GMK_DASH_P_TEX = 826;
-    public const int GMD_DWORK_NO_GMK_DASH_P_MTN = 827;
-    public const int GMD_DWORK_NO_GMK_DASH_P_MAT = 828;
-    public const int GMD_DWORK_NO_GMK_T_ROPE_MODEL = 829;
-    public const int GMD_DWORK_NO_GMK_T_ROPE_TEX = 830;
-    public const int GMD_DWORK_NO_GMK_T_ROPE_MTN = 831;
-    public const int GMD_DWORK_NO_GMK_WATER_SLIDER_MODEL = 832;
-    public const int GMD_DWORK_NO_GMK_WATER_SLIDER_TEX = 833;
-    public const int GMD_DWORK_NO_GMK_WATER_SLIDER_MTN = 834;
-    public const int GMD_DWORK_NO_GMK_WATER_SLIDER_MAT = 835;
-    public const int GMD_DWORK_NO_GMK_GOAL_PNL_MODEL = 836;
-    public const int GMD_DWORK_NO_GMK_GOAL_PNL_TEX = 837;
-    public const int GMD_DWORK_NO_GMK_P_MARKER_MODEL = 838;
-    public const int GMD_DWORK_NO_GMK_P_MARKER_TEX = 839;
-    public const int GMD_DWORK_NO_GMK_P_MARKER_MTN = 840;
-    public const int GMD_DWORK_NO_GMK_P_MARKER_MAT = 841;
-    public const int GMD_DWORK_NO_GMK_PISTON_MODEL = 842;
-    public const int GMD_DWORK_NO_GMK_PISTON_TEX = 843;
-    public const int GMD_DWORK_NO_GMK_BELTCONV_MODEL = 844;
-    public const int GMD_DWORK_NO_GMK_BELTCONV_TEX = 845;
-    public const int GMD_DWORK_NO_GMK_BELTCONV_TVX = 846;
-    public const int GMD_DWORK_NO_GMK_STOPPER_MODEL = 847;
-    public const int GMD_DWORK_NO_GMK_STOPPER_TEX = 848;
-    public const int GMD_DWORK_NO_GMK_STOPPER_MAT = 849;
-    public const int GMD_DWORK_NO_GMK_UPBUMPER_MODEL = 850;
-    public const int GMD_DWORK_NO_GMK_UPBUMPER_TEX = 851;
-    public const int GMD_DWORK_NO_GMK_BUMPER_MODEL = 852;
-    public const int GMD_DWORK_NO_GMK_BUMPER_TEX = 853;
-    public const int GMD_DWORK_NO_GMK_BUMPER_MTN = 854;
-    public const int GMD_DWORK_NO_GMK_BUMPER_MAT = 855;
-    public const int GMD_DWORK_NO_GMK_SPEAR_MODEL = 856;
-    public const int GMD_DWORK_NO_GMK_SPEAR_TEX = 857;
-    public const int GMD_DWORK_NO_GMK_CANNON_MODEL = 858;
-    public const int GMD_DWORK_NO_GMK_CANNON_TEX = 859;
-    public const int GMD_DWORK_NO_GMK_CAPSULE_MODEL = 860;
-    public const int GMD_DWORK_NO_GMK_CAPSULE_TEX = 861;
-    public const int GMD_DWORK_NO_GMK_CAPSULE_MTN = 862;
-    public const int GMD_DWORK_NO_GMK_BOBBIN_MODEL = 863;
-    public const int GMD_DWORK_NO_GMK_BOBBIN_TEX = 864;
-    public const int GMD_DWORK_NO_GMK_BOBBIN_MTN = 865;
-    public const int GMD_DWORK_NO_GMK_BOBBIN_MAT = 866;
-    public const int GMD_DWORK_NO_GMK_FLIPPER_MODEL = 867;
-    public const int GMD_DWORK_NO_GMK_FLIPPER_TEX = 868;
-    public const int GMD_DWORK_NO_GMK_FLIPPER_MAT = 869;
-    public const int GMD_DWORK_NO_GMK_ANIMAL_MODEL = 870;
-    public const int GMD_DWORK_NO_GMK_ANIMAL_TEX = 871;
-    public const int GMD_DWORK_NO_GMK_ANIMAL_MTN = 872;
-    public const int GMD_DWORK_NO_GMK_SLOT_MODEL = 873;
-    public const int GMD_DWORK_NO_GMK_SLOT_TEX = 874;
-    public const int GMD_DWORK_NO_GMK_SLOT_MAT = 875;
-    public const int GMD_DWORK_NO_GMK_SEESAW_MODEL = 876;
-    public const int GMD_DWORK_NO_GMK_SEESAW_TEX = 877;
-    public const int GMD_DWORK_NO_GMK_BRIDGE_MODEL = 878;
-    public const int GMD_DWORK_NO_GMK_BRIDGE_TEX = 879;
-    public const int GMD_DWORK_NO_GMK_SPL_RING_MODEL = 880;
-    public const int GMD_DWORK_NO_GMK_SPL_RING_TEX = 881;
-    public const int GMD_DWORK_NO_GMK_SPL_RING_MAT = 882;
-    public const int GMD_DWORK_NO_GMK_SPCTPLT_MODEL = 883;
-    public const int GMD_DWORK_NO_GMK_SPCTPLT_TEX = 884;
-    public const int GMD_DWORK_NO_GMK_SPCTPLT_MTN = 885;
-    public const int GMD_DWORK_NO_GMK_SPCTPLT_MAT = 886;
-    public const int GMD_DWORK_NO_GMK_GEAR = 887;
-    public const int GMD_DWORK_NO_GMK_GEAR_MODEL = 888;
-    public const int GMD_DWORK_NO_GMK_GEAR_TEX = 889;
-    public const int GMD_DWORK_NO_GMK_GEAR2_MODEL = 890;
-    public const int GMD_DWORK_NO_GMK_GEAR2_OPT_MODEL = 891;
-    public const int GMD_DWORK_NO_GMK_PRESSWALL_MODEL = 892;
-    public const int GMD_DWORK_NO_GMK_PRESSWALL_TEX = 893;
-    public const int GMD_DWORK_NO_GMK_PRESSWALL_MTN = 894;
-    public const int GMD_DWORK_NO_GMK_PRESSWALL_MAT = 895;
-    public const int GMD_DWORK_NO_GMK_SS_SQUARE_MODEL = 896;
-    public const int GMD_DWORK_NO_GMK_SS_SQUARE_TEX = 897;
-    public const int GMD_DWORK_NO_GMK_SS_SQUARE_MAT = 898;
-    public const int GMD_DWORK_NO_GMK_SS_SQUARE_TVX = 899;
-    public const int GMD_DWORK_NO_GMK_SS_CIRCLE_MODEL = 900;
-    public const int GMD_DWORK_NO_GMK_SS_CIRCLE_TEX = 901;
-    public const int GMD_DWORK_NO_GMK_SS_CIRCLE_TVX = 902;
-    public const int GMD_DWORK_NO_GMK_SS_ENDURANCE_MODEL = 903;
-    public const int GMD_DWORK_NO_GMK_SS_ENDURANCE_TEX = 904;
-    public const int GMD_DWORK_NO_GMK_SS_ENDURANCE_MAT = 905;
-    public const int GMD_DWORK_NO_GMK_SS_ENDURANCE_TVX = 906;
-    public const int GMD_DWORK_NO_GMK_SS_GOAL_MODEL = 907;
-    public const int GMD_DWORK_NO_GMK_SS_GOAL_TEX = 908;
-    public const int GMD_DWORK_NO_GMK_SS_GOAL_TVX = 909;
-    public const int GMD_DWORK_NO_GMK_SS_EMERALD_MODEL = 910;
-    public const int GMD_DWORK_NO_GMK_SS_EMERALD_TEX = 911;
-    public const int GMD_DWORK_NO_GMK_SS_EMERALD_MTN = 912;
-    public const int GMD_DWORK_NO_GMK_SS_1UP_MODEL = 913;
-    public const int GMD_DWORK_NO_GMK_SS_1UP_TEX = 914;
-    public const int GMD_DWORK_NO_GMK_SS_TIME_MODEL = 915;
-    public const int GMD_DWORK_NO_GMK_SS_TIME_TEX = 916;
-    public const int GMD_DWORK_NO_GMK_SS_RINGGATE_MODEL = 917;
-    public const int GMD_DWORK_NO_GMK_SS_RINGGATE_TEX = 918;
-    public const int GMD_DWORK_NO_GMK_SS_RINGGATE_MAT = 919;
-    public const int GMD_DWORK_NO_GMK_SS_RINGGATE_TVX = 920;
-    public const int GMD_DWORK_NO_GMK_STEAMPIPE_MODEL = 921;
-    public const int GMD_DWORK_NO_GMK_STEAMPIPE_TEX = 922;
-    public const int GMD_DWORK_NO_GMK_DRAIN_TANK_MODEL = 923;
-    public const int GMD_DWORK_NO_GMK_DRAIN_TANK_TEX = 924;
-    public const int GMD_DWORK_NO_GMK_DRAIN_TANK_MAT = 925;
-    public const int GMD_DWORK_NO_GMK_POPSTEAM_MODEL = 926;
-    public const int GMD_DWORK_NO_GMK_POPSTEAM_TEX = 927;
-    public const int GMD_DWORK_NO_GMK_TRUCK_MODEL = 928;
-    public const int GMD_DWORK_NO_GMK_TRUCK_TEX = 929;
-    public const int GMD_DWORK_NO_GMK_TRUCK_MTN = 930;
-    public const int GMD_DWORK_NO_GMK_SWITCH_MODEL = 931;
-    public const int GMD_DWORK_NO_GMK_SWITCH_TEX = 932;
-    public const int GMD_DWORK_NO_GMK_SWITCH_MAT = 933;
-    public const int GMD_DWORK_NO_GMK_SW_WALL_MODEL = 934;
-    public const int GMD_DWORK_NO_GMK_SW_WALL_TEX = 935;
-    public const int GMD_DWORK_NO_GMK_SW_WALL_MAT = 936;
-    public const int GMD_DWORK_NO_GMK_SW_WALL_TVX = 937;
-    public const int GMD_DWORK_NO_GMK_SHUTTER_MODEL = 938;
-    public const int GMD_DWORK_NO_GMK_SHUTTER_TEX = 939;
-    public const int GMD_DWORK_NO_GMK_SHUTTER_MAT = 940;
-    public const int GMD_DWORK_NO_GMK_BOSS3_PILLAR_MODEL = 941;
-    public const int GMD_DWORK_NO_GMK_BOSS3_PILLAR_TEX = 942;
-    public const int GMD_DWORK_NO_GMK_BOSS3_PILLAR_MAT = 943;
-    public const int GMD_DWORK_NO_GMK_BOSS3_PILLAR_TVX = 944;
-    public const int GMD_DWORK_NO_GMK_BOSS3_WALL_MODEL = 945;
-    public const int GMD_DWORK_NO_GMK_BOSS3_WALL_TEX = 946;
-    public const int GMD_DWORK_NO_GMK_BOSS3_WALL_MAT = 947;
-    public const int GMD_DWORK_NO_GMK_BOSS3_WALL_TVX = 948;
-    public const int GMD_DWORK_NO_GMK_END_SONIC_MODEL = 949;
-    public const int GMD_DWORK_NO_GMK_END_SONIC_TEX = 950;
-    public const int GMD_DWORK_NO_GMK_PRESS_PILLAR_MODEL = 951;
-    public const int GMD_DWORK_NO_GMK_PRESS_PILLAR_TEX = 952;
-    public const int GMD_DWORK_NO_GMK_PRESS_PILLAR_MAT = 953;
-    public const int GMD_DWORK_NO_GMK_DSIGN_MODEL = 954;
-    public const int GMD_DWORK_NO_GMK_DSIGN_TEX = 955;
-    public const int GMD_DWORK_NO_GMK_STFRL_RING_MODEL = 956;
-    public const int GMD_DWORK_NO_GMK_STFRL_RING_TEX = 957;
-    public const int GMD_DWORK_NO_GMK_STFRL_FONT_TEX = 958;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_WIN_TEX = 959;
-    public const int GMD_DWORK_NO_GMK_STFRL_SCR_IMG_TEX = 960;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_MSG_JP = 961;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_MSG_US = 962;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_MSG_FR = 963;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_MSG_IT = 964;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_MSG_GE = 965;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_MSG_SP = 966;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_MSG_FI = 967;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_MSG_PT = 968;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_MSG_RU = 969;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_MSG_CN = 970;
-    public const int GMD_DWORK_NO_GMK_STFRL_CMN_MSG_HK = 971;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX = 972;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX_JP = 973;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX_US = 974;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX_FR = 975;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX_IT = 976;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX_GE = 977;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX_SP = 978;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX_FI = 979;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX_PT = 980;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX_RU = 981;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX_CN = 982;
-    public const int GMD_DWORK_NO_GMK_STFRL_END_TEX_HK = 983;
-    public const int GMD_DWORK_NO_GMK_SS_ARROW_MODEL = 984;
-    public const int GMD_DWORK_NO_GMK_SS_ARROW_TEX = 985;
-    public const int GMD_DWORK_NO_GMK_SS_ARROW_MAT = 986;
-    public const int GMD_DWORK_NO_GMK_SS_OBLONG_MODEL = 987;
-    public const int GMD_DWORK_NO_GMK_SS_OBLONG_TEX = 988;
-    public const int GMD_DWORK_NO_GMK_SS_OBLONG_MAT = 989;
-    public const int GMD_DWORK_NO_GMK_SS_OBLONG_TVX = 990;
-    public const int GMD_DWORK_NO_GMK_START_EXP_MSG = 991;
-    public const int GMD_DWORK_NO_GMK_START_EXP_WIN = 992;
-    public const int GMD_DWORK_NO_GMK_END = 993;
-    public const int GMD_DWORK_NO_DEC_START = 993;
-    public const int GMD_DWORK_NO_DEC_END = 994;
-    public const int GMD_DWORK_NO_MAX = 994;
+
+
     public const int GMD_GMK_SS_EME_EVE_FLAG_EME_MASK = 7;
     public const int GMD_GMK_PULLEY_RECT_LF = -4;
     public const int GMD_GMK_PULLEY_RECT_UP = 9;
@@ -16771,9 +14958,6 @@ public partial class AppMain
     public const int GMK_Z4PRESSWALL_MDL_TBL_NUM = 3;
     public const ushort GMD_GMK_PSTEAM_STAT_HIT = 1;
     public const ushort GMD_GMK_PSTEAM_STAT_TRUE = 2;
-    public const int GME_EFCT_CMN_IDX_STEAM_L_LOOP = 87;
-    public const int GME_EFCT_CMN_IDX_STEAM_M_LOOP = 88;
-    public const int GME_EFCT_CMN_IDX_STEAM_S_LOOP = 89;
     public const int GMD_POP_STEAM_MAIN_PRIO_Z = 32768;
     public const int GMD_POP_STEAM_STEAM_PRIO_Z = 4096;
     public const int GMD_POP_STEAM_STEAM_EFFECT_PRIO_Z = 65536;
@@ -17050,23 +15234,23 @@ public partial class AppMain
     private const int AOD_SYS_MSG_RESULT_NUM = 5;
     private const int AOD_SYS_MSG_RESULT_NONE = 6;
     public static readonly int[] gs_trophy_acquisition_tbl;
-    public static readonly AppMain.ACHIEVEMENT_INFO[] achievements;
-    private static AppMain._obj_block_collision_func_delegate[] _obj_block_collision_func;
-    private static AppMain.OBS_BLOCK_COLLISION _obj_bcol;
-    private static AppMain.NNS_NODEUSRMOT_CALLBACK_FUNC nngNodeUserMotionCallbackFunc;
+    public static readonly ACHIEVEMENT_INFO[] achievements;
+    private static _obj_block_collision_func_delegate[] _obj_block_collision_func;
+    private static OBS_BLOCK_COLLISION _obj_bcol;
+    private static NNS_NODEUSRMOT_CALLBACK_FUNC nngNodeUserMotionCallbackFunc;
     private static float nngNodeUserMotionTriggerTime;
-    private static AppMain.AMS_TRAIL_INTERFACE AmTrailGlobal;
-    private static readonly AppMain.AMS_TRAIL_EFFECT _amTrailEF_head;
-    private static readonly AppMain.AMS_TRAIL_EFFECT _amTrailEF_tail;
-    private static AppMain.AMS_TRAIL_EFFECT[] _amTrailEF_buf;
-    private static AppMain.AMS_TRAIL_EFFECT[] _amTrailEF_ref;
+    private static AMS_TRAIL_INTERFACE AmTrailGlobal;
+    private static readonly AMS_TRAIL_EFFECT _amTrailEF_head;
+    private static readonly AMS_TRAIL_EFFECT _amTrailEF_tail;
+    private static AMS_TRAIL_EFFECT[] _amTrailEF_buf;
+    private static AMS_TRAIL_EFFECT[] _amTrailEF_ref;
     private static int _amTrailEF_alloc;
     private static int _amTrailEF_free;
-    private static AppMain.AMS_TRAIL_INTERFACE pTr;
-    private static AppMain.MTS_TASK_TCB gm_pause_tcb;
-    private static AppMain.MTS_TASK_TCB gm_pad_vib_tcb;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_slot_obj_3d_list;
-    private static AppMain.GMS_PLAYER_WORK slot_start_player;
+    private static AMS_TRAIL_INTERFACE pTr;
+    private static MTS_TASK_TCB gm_pause_tcb;
+    private static MTS_TASK_TCB gm_pad_vib_tcb;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_slot_obj_3d_list;
+    private static GMS_PLAYER_WORK slot_start_player;
     private static int slot_start_call;
     private static uint rand_result;
     private static short GMD_GMK_SLOT_PROB_JJJ;
@@ -17104,45 +15288,45 @@ public partial class AppMain
     private static short[][] g_gmk_bumper_rect;
     private static int[] g_gmk_bumper_effect_id_flush;
     private static int[][] g_gmk_bumper_effect_offset_flush;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_bumper_obj_3d_list;
-    private static AppMain._eve_func_[] gm_evemgr_create_eve_func_tbl;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_bumper_obj_3d_list;
+    private static _eve_func_[] gm_evemgr_create_eve_func_tbl;
     private static ushort[] gm_evemgr_create_size_tbl;
-    private static AppMain.GMS_EVE_MGR_WORK g_gm_eve_mgr_work;
-    private static AppMain.MTS_TASK_TCB gm_eve_mgr_tcb;
-    public static AppMain.GMS_EVE_DATA_EV_HEADER gm_eve_data;
-    public static AppMain.GMS_EVE_DATA_RG_HEADER gm_ring_data;
-    public static AppMain.GMS_EVE_DATA_DC_HEADER gm_deco_data;
+    private static GMS_EVE_MGR_WORK g_gm_eve_mgr_work;
+    private static MTS_TASK_TCB gm_eve_mgr_tcb;
+    public static GMS_EVE_DATA_EV_HEADER gm_eve_data;
+    public static GMS_EVE_DATA_RG_HEADER gm_ring_data;
+    public static GMS_EVE_DATA_DC_HEADER gm_deco_data;
     public static readonly uint[] gm_eve_local_evt_obj_use_flag;
-    private static readonly AppMain.GMS_EVE_RECORD_EVENT[] gm_eve_local_evt_record;
+    private static readonly GMS_EVE_RECORD_EVENT[] gm_eve_local_evt_record;
     public static readonly uint[] gm_eve_local_ring_obj_use_flag;
-    private static readonly AppMain.GMS_EVE_RECORD_RING[] gm_eve_local_ring_record;
+    private static readonly GMS_EVE_RECORD_RING[] gm_eve_local_ring_record;
     public static readonly uint[] gm_eve_local_deco_obj_use_flag;
-    private static readonly AppMain.GMS_EVE_RECORD_DECORATE[] gm_eve_local_deco_record;
+    private static readonly GMS_EVE_RECORD_DECORATE[] gm_eve_local_deco_record;
     private static int[] ev_rect;
     private static int[] lcd_rect;
     private static int[] block_rect;
     private static byte[] g_gm_default_col;
-    public static AppMain.MPP_VOID_OBS_OBJECT_WORK _ObjDrawActionSummary;
-    public static AppMain.MPP_VOID_OBS_OBJECT_WORK _GmEnemyDefaultInFunc;
-    public static AppMain.MPP_VOID_OBS_OBJECT_WORK _GmEnemyDefaultMoveFunc;
-    public static AppMain.MPP_VOID_OBS_OBJECT_WORK _gmEnemyDefaultRecFunc;
-    public static AppMain.OBS_OBJECT_WORK_Delegate2 _gmEnemyActionCallBack;
-    public static AppMain.OBS_RECT_WORK_Delegate1 _GmEnemyDefaultDefFunc;
-    public static AppMain.OBS_RECT_WORK_Delegate1 _GmEnemyDefaultAtkFunc;
+    public static MPP_VOID_OBS_OBJECT_WORK _ObjDrawActionSummary;
+    public static MPP_VOID_OBS_OBJECT_WORK _GmEnemyDefaultInFunc;
+    public static MPP_VOID_OBS_OBJECT_WORK _GmEnemyDefaultMoveFunc;
+    public static MPP_VOID_OBS_OBJECT_WORK _gmEnemyDefaultRecFunc;
+    public static OBS_OBJECT_WORK_Delegate2 _gmEnemyActionCallBack;
+    public static OBS_RECT_WORK_Delegate1 _GmEnemyDefaultDefFunc;
+    public static OBS_RECT_WORK_Delegate1 _GmEnemyDefaultAtkFunc;
     private static uint gm_efct_cmn_proc_state;
     private static int gm_efct_cmn_tex_reg_id;
     private static int[] gm_efct_cmn_model_reg_id_list;
     private static int gm_efct_cmn_model_reg_num;
     private static int[] gm_efct_cmn_mdl_tex_reg_id_list;
-    private static AppMain.AMS_AMB_HEADER eff_cmn_arc;
-    private static AppMain.OBS_DATA_WORK ambtex_dwork;
+    private static AMS_AMB_HEADER eff_cmn_arc;
+    private static OBS_DATA_WORK ambtex_dwork;
     private static object texlistbuf;
     private static int model_reg_cnt;
     private static int stage;
     private static int StageCount;
     private static bool GmEfctCmnBuildDataLoopInitPartWorking;
-    private static AppMain.GMS_BOSS5_EFCT_DATA_INFO[] gm_boss5_efct_data_info_tbl;
-    private static AppMain.GMS_EFFECT_CREATE_PARAM[] gm_boss5_efct_create_param_tbl;
+    private static GMS_BOSS5_EFCT_DATA_INFO[] gm_boss5_efct_data_info_tbl;
+    private static GMS_EFFECT_CREATE_PARAM[] gm_boss5_efct_create_param_tbl;
     private static float[][] gm_boss5_efct_breakdown_smoke_disp_ofst_tbl;
     private static short[][] gm_boss5_efct_breakdown_smoke_disp_rot_tbl;
     private static float[][] gm_boss5_efct_body_small_smoke_disp_ofst_tbl;
@@ -17154,9 +15338,9 @@ public partial class AppMain
     private static ushort[] objDiffCollisionDirHeightCheck_usDir2;
     private static ushort[] objDiffCollisionDirHeightCheck_usDir3;
     private static uint[] objDiffCollisionDirHeightCheck_ulAttr;
-    private static AppMain.MTS_TASK_TCB obj_camera_tcb;
-    private static AppMain.OBS_CAMERA_SYS obj_camera_sys;
-    private AppMain.NNS_VECTOR nngGridPos;
+    private static MTS_TASK_TCB obj_camera_tcb;
+    private static OBS_CAMERA_SYS obj_camera_sys;
+    private NNS_VECTOR nngGridPos;
     private int nngGridXnum;
     private int nngGridZnum;
     public static int NNE_LIGHT_0;
@@ -17169,88 +15353,62 @@ public partial class AppMain
     public static int NNE_LIGHT_7;
     public static int NNE_LIGHT_MAX;
     public static int NNE_LIGHT_ALL;
-    private static readonly AppMain.NNS_DRAWCALLBACK_VAL nngDrawCallBackVal;
+    private static readonly NNS_DRAWCALLBACK_VAL nngDrawCallBackVal;
     private static int[] nnsTexCoordSrc;
     private static uint nnsNormalFormatType;
     private static readonly OpenGL.glArray4f BreakWall_1_3_Color;
-    public static AppMain.AMS_DRAW_VIDEO _am_draw_video;
-    public static readonly AppMain.AMS_RENDER_TARGET _am_draw_target;
-    private static AppMain._am_draw_command_delegate _am_draw_command_sort;
-    private static AppMain._am_draw_command_delegate _am_draw_command_func;
+    public static AMS_DRAW_VIDEO _am_draw_video;
+    public static readonly AMS_RENDER_TARGET _am_draw_target;
+    private static _am_draw_command_delegate _am_draw_command_sort;
+    private static _am_draw_command_delegate _am_draw_command_func;
     public static int _am_draw_command_buf_max;
     public static int _am_draw_data_buf_max;
     public static int _am_draw_work_buf_max;
-    public static AppMain.AMS_TASK _am_draw_task;
-    private static AppMain.NNS_RGBA_U8 _am_draw_bg_color;
+    public static AMS_TASK _am_draw_task;
+    private static NNS_RGBA_U8 _am_draw_bg_color;
     private static int _am_draw_in_scene;
     private static int _am_draw_offset_x;
-    private static readonly AppMain.AMS_DRAWSTATE _am_draw_state;
+    private static readonly AMS_DRAWSTATE _am_draw_state;
     private static int _am_draw_state_stack_num;
-    private static readonly AppMain.AMS_DRAWSTATE[] _am_draw_state_stack;
-    public static AppMain.NNS_MATRIX _am_draw_proj_mtx;
+    private static readonly AMS_DRAWSTATE[] _am_draw_state_stack;
+    public static NNS_MATRIX _am_draw_proj_mtx;
     public static int _am_draw_proj_type;
-    private static readonly AppMain.AMS_DISPLAYLIST_MANAGER _am_displaylist_manager;
-    private static AppMain._am_draw_command_delegate[] _am_draw_sort_system_exec;
-    private static AppMain._am_draw_regist_delegate[] _am_draw_regist_func;
-    private static AppMain._am_draw_command_delegate[] _am_draw_system_exec;
-    private static readonly AppMain.NNS_MATRIX _am_draw_world_view_matrix;
+    private static readonly AMS_DISPLAYLIST_MANAGER _am_displaylist_manager;
+    private static _am_draw_command_delegate[] _am_draw_sort_system_exec;
+    private static _am_draw_regist_delegate[] _am_draw_regist_func;
+    private static _am_draw_command_delegate[] _am_draw_system_exec;
+    private static readonly NNS_MATRIX _am_draw_world_view_matrix;
     private static object[][] _am_draw_command_buf;
     private static object[][] _am_draw_data_buf;
-    private static AppMain.Pool<AppMain.AMS_PARAM_DRAW_PRIMITIVE> amDraw_AMS_PARAM_DRAW_PRIMITIVE_Pool;
-    private static AppMain.Pool<AppMain.NNS_MATRIX> amDraw_NNS_MATRIX_Pool;
-    private static AppMain.Pool<AppMain.AMS_PARAM_MAKE_TASK> amDraw_AMS_PARAM_MAKE_TASK_Pool;
-    private static AppMain.Pool<AppMain.AMS_DRAWSTATE_FOG> amDraw_AMS_DRAWSTATE_FOG_Pool;
-    private static AppMain.Pool<AppMain.AMS_DRAWSTATE_FOG_COLOR> amDraw_AMS_DRAWSTATE_FOG_COLOR_Pool;
-    private static AppMain.Pool<AppMain.AMS_DRAWSTATE_FOG_RANGE> amDraw_AMS_DRAWSTATE_FOG_RANGE_Pool;
-    private static AppMain.Pool<AppMain.AMS_PARAM_DRAW_OBJECT_MATERIAL> amDraw_AMS_PARAM_DRAW_OBJECT_MATERIAL_Pool;
-    private static AppMain.Pool<AppMain.GMS_GMK_ITEM_MAT_CB_PARAM> amDraw_GMS_GMK_ITEM_MAT_CB_PARAM_Pool;
-    private static AppMain.Pool<AppMain.DMAP_PARAM_WATER> amDraw_DMAP_PARAM_WATER_Pool;
-    private static AppMain.NNS_PRIM3D_PCT[] NNS_PRIM3D_PCT_buf;
+    private static NNS_PRIM3D_PCT[] NNS_PRIM3D_PCT_buf;
     private static int NNS_PRIM3D_PCT_buf_size;
-    private static AppMain.NNS_PRIM3D_PCT_ARRAY[] NNS_PRIM3D_PCT_arrays;
+    private static NNS_PRIM3D_PCT_ARRAY[] NNS_PRIM3D_PCT_arrays;
     private static int NNS_PRIM3D_PCT_arrays_count;
-    private static AppMain.ArrayPool<AppMain.NNS_PRIM3D_PC> amDraw_NNS_PRIM3D_PC_Array_Pool;
-    private static AppMain.ArrayPool<AppMain.GMS_MAP_PRIM_DRAW_WORK> amDraw_GMS_MAP_PRIM_DRAW_WORK_Array_Pool;
-    private static AppMain.ArrayPoolFast<AppMain.NNS_TRS> amDraw_NNS_TRS_Array_Pool;
-    private static AppMain.Pool<AppMain.NNS_MATERIAL_STDSHADER_COLOR> amDraw_NNS_MATERIAL_STDSHADER_COLOR_Pool;
-    private static AppMain.Pool<AppMain.NNS_MATERIAL_GLES11_DESC> amDraw_NNS_MATERIAL_GLES11_DESC_Pool;
-    private static AppMain.Pool<AppMain.NNS_MATERIALPTR> amDraw_NNS_MATERIALPTR_Pool;
-    private static AppMain.ArrayPoolFast<AppMain.NNS_MATERIALPTR> amDraw_NNS_MATERIALPTR_Array_Pool;
-    private static AppMain.ArrayPoolFast<AppMain.GMS_BS_CMN_CNM_NODE_INFO> amDraw_GMS_BS_CMN_CNM_NODE_INFO_Array_Pool;
-    private static AppMain.Pool<AppMain.GMS_BS_CMN_CNM_NODE_INFO> amDraw_GMS_BS_CMN_CNM_NODE_INFO_Pool;
-    private static AppMain.Pool<AppMain.GMS_BS_CMN_CNM_PARAM> amDraw_GMS_BS_CMN_CNM_PARAM_Pool;
-    private static AppMain.Pool<AppMain.OBS_DRAW_PARAM_3DNN_USER_FUNC> amDraw_OBS_DRAW_PARAM_3DNN_USER_FUNC_Pool;
-    private static AppMain.Pool<AppMain.OBS_DRAW_PARAM_3DNN_MOTION> amDraw_OBS_DRAW_PARAM_3DNN_MOTION_Pool;
-    private static AppMain.Pool<AppMain.OBS_DRAW_PARAM_3DNN_DRAW_MOTION> amDraw_OBS_DRAW_PARAM_3DNN_DRAW_MOTION_Pool;
-    private static AppMain.Pool<AppMain.AMS_PARAM_DRAW_MOTION_TRS> amDraw_AMS_PARAM_DRAW_MOTION_TRS_Pool;
-    private static AppMain.Pool<AppMain.NNS_TRS> amDraw_NNS_TRS_Pool;
-    private static AppMain.Pool<AppMain.AOS_ACT_DRAW> amDraw_AOS_ACT_DRAW_Pool;
-    private static AppMain.Pool<AppMain.NNS_OBJECT> amDraw_NNS_OBJECT_Pool;
     public static int NNS_PRIM3D_PCT_ALLOC_CNT;
-    private static AppMain.NNS_MATRIX _amDrawSortPrimitive3D_base_mtx;
-    private static AppMain.NNS_MATRIX _amDrawSortPrimitive2D_mtx;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_stopper_obj_3d_list;
+    private static NNS_MATRIX _amDrawSortPrimitive3D_base_mtx;
+    private static NNS_MATRIX _amDrawSortPrimitive2D_mtx;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_stopper_obj_3d_list;
     private static short[] tbl_gm_gmk_piston_col_rect;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_spctplt_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_spctplt_obj_3d_list;
     private static short[][] tbl_gm_gmk_spctplt_rect;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_beltconv_obj_3d_list;
-    private static AppMain.AMS_AMB_HEADER gm_gmk_beltconv_obj_tvx_list;
-    public static AppMain.TVX_FILE _tvx_roller;
-    public static AppMain.TVX_FILE _tvx_axis;
-    public static AppMain.TVX_FILE _tvx_belt_up;
-    public static AppMain.TVX_FILE _tvx_belt_down;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_beltconv_obj_3d_list;
+    private static AMS_AMB_HEADER gm_gmk_beltconv_obj_tvx_list;
+    public static TVX_FILE _tvx_roller;
+    public static TVX_FILE _tvx_axis;
+    public static TVX_FILE _tvx_belt_up;
+    public static TVX_FILE _tvx_belt_down;
     public static short GMD_ENE_HARO_EVE_FLAG_RIGHT;
     public static short GMD_ENE_HARO_MOVE_SPD_X;
     public static int GMD_ENE_HARO_FW_TIME;
     public static int GMD_ENE_HARO_TURN_FRAME;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_haro_obj_3d_list;
-    public static readonly AppMain.GMS_EFCT_ENE_CREATE_PARAM[] gm_efct_ene_create_param_tbl;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_haro_obj_3d_list;
+    public static readonly GMS_EFCT_ENE_CREATE_PARAM[] gm_efct_ene_create_param_tbl;
     private static readonly int[] gm_efct_ene_tex_reg_id_list;
     private static readonly int[] gm_efct_ene_model_reg_id_list;
     private static int gm_efct_ene_target_zone_no;
     private static readonly ushort[] gm_boss4_eff_sw_atk_flag_tbl;
     private static readonly ushort[] gm_boss4_eff_sw_def_flag_tbl;
-    private static AppMain.MTS_TASK_TCB gs_sound_tcb;
+    private static MTS_TASK_TCB gs_sound_tcb;
     private static Dictionary<string, SoundEffect> cacheFxSounds;
     private static string[] sLevel_Common_BGMList;
     private static string[] sLevel_1_BGMList;
@@ -17260,29 +15418,29 @@ public partial class AppMain
     private static string[][] bgmLists;
     private static int m_iBGMPreparedLevel;
     private static Dictionary<string, Song> bgmPreloadedList;
-    private static readonly AppMain.GSS_SND_SYS_MAIN_INFO gs_sound_sys_main_info;
-    private static readonly AppMain.GSS_SND_SCB[] gs_sound_scb_heap;
+    private static readonly GSS_SND_SYS_MAIN_INFO gs_sound_sys_main_info;
+    private static readonly GSS_SND_SCB[] gs_sound_scb_heap;
     private static readonly byte[] gs_sound_scb_heap_usage_flag;
-    private static readonly AppMain.GSS_SND_SE_HANDLE[] gs_sound_se_handle_heap;
+    private static readonly GSS_SND_SE_HANDLE[] gs_sound_se_handle_heap;
     private static readonly byte[] gs_sound_se_handle_heap_usage_flag;
-    private static readonly AppMain.GSS_SND_SE_HANDLE gs_sound_se_handle_error;
-    private static AppMain.GSS_SND_SE_HANDLE[] gs_sound_se_handle_default;
+    private static readonly GSS_SND_SE_HANDLE gs_sound_se_handle_error;
+    private static GSS_SND_SE_HANDLE[] gs_sound_se_handle_default;
     private static readonly float[] gs_sound_volume;
-    private static Dictionary<string, AppMain.SOUND_TABLE> sound_fx_list;
-    private static Dictionary<string, AppMain.SOUND_TABLE> sound_bgm_list;
+    private static Dictionary<string, SOUND_TABLE> sound_fx_list;
+    private static Dictionary<string, SOUND_TABLE> sound_bgm_list;
     private static int g_iCurrentCachedIndex;
     private static bool g_bSoundsPrecached;
     private static bool b_bPrioritySoundsLoaded;
-    private static AppMain.OBS_DIFF_COLLISION _obj_fcol;
-    public static AppMain.NNS_CLIP_PLANE nngClipPlane;
-    public static AppMain.NNS_CLIP_PLANE nngClipPlaneGs;
+    private static OBS_DIFF_COLLISION _obj_fcol;
+    public static NNS_CLIP_PLANE nngClipPlane;
+    public static NNS_CLIP_PLANE nngClipPlaneGs;
     private static float nngNormalLength;
     private static float nngTangentLength;
     private static float nngBinormalLength;
-    private static AppMain.NNS_RGBA nngNormalColor;
-    private static AppMain.NNS_RGBA nngTangentColor;
-    private static AppMain.NNS_RGBA nngBinormalColor;
-    private static AppMain.NNS_RGBA nngWireColor;
+    private static NNS_RGBA nngNormalColor;
+    private static NNS_RGBA nngTangentColor;
+    private static NNS_RGBA nngBinormalColor;
+    private static NNS_RGBA nngWireColor;
     private static byte[] gm_player_motion_list_son_right;
     private static byte[] gm_player_motion_list_sson_right;
     private static byte[] gm_player_motion_list_pn_son_right;
@@ -17303,17 +15461,15 @@ public partial class AppMain
     private static byte[] gm_player_mtn_blend_setting_son;
     private static byte[] gm_player_mtn_blend_setting_tr_son;
     private static byte[] gm_player_mtn_blend_setting_pn_son;
-    public static readonly AppMain.GMS_PLY_PARAMETER[] g_gm_player_parameter;
+    public static readonly GMS_PLY_PARAMETER[] g_gm_player_parameter;
     public static int nextDemoLevel;
-    public static AppMain.GMS_MAIN_SYSTEM g_gm_main_system;
-    private static AppMain.MTS_TASK_TCB gm_main_load_wait_tcb;
-    private static AppMain.MTS_TASK_TCB gm_main_release_wait_tcb;
-    private static AppMain.MTS_TASK_TCB gm_main_load_bossbattle_tcb;
-    private static AppMain.MTS_TASK_TCB gm_main_release_bossbattle_tcb;
+    public static GMS_MAIN_SYSTEM g_gm_main_system;
+    private static MTS_TASK_TCB gm_main_load_wait_tcb;
+    private static MTS_TASK_TCB gm_main_release_wait_tcb;
+    private static MTS_TASK_TCB gm_main_load_bossbattle_tcb;
+    private static MTS_TASK_TCB gm_main_release_bossbattle_tcb;
     private static OpenGL.glArray4f[] LightColor;
     public static bool g_pause_flag;
-    private static Thread _bossThread;
-    private static bool _bossFinishThread;
     public static short GMD_GMK_PPIL_COL_WIDTH;
     public static short GMD_GMK_PPIL_COL_HEIGHT;
     public static int GMD_GMK_PPIL_PIL_OFS_MAX;
@@ -17325,16 +15481,15 @@ public partial class AppMain
     public static int GMD_GMK_PPIL_FLAG_SHOCK_ABS;
     public static int GMD_GMK_PPIL_FLAG_EFFECT;
     public static uint GMD_GMK_PPIL_COLHIT;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_press_pillar_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_press_pillar_obj_3d_list;
     private static byte[] gm_gmk_press_pillar_sw;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_motora_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_mereon_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_mereon_r_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_harisenbo_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_harisenbo_r_obj_3d_list;
-    private static AppMain.NNS_MATRIX gmEneHariMotionCallback_node_mtx;
-    private static AppMain.NNS_MATRIX gmEneHariMotionCallback_base_mtx;
-    public static readonly AppMain.GMS_EFCT_CMN_CREATE_PARAM[] gm_efct_cmn_create_param_tbl;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_motora_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_mereon_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_mereon_r_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_harisenbo_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_harisenbo_r_obj_3d_list;
+    private static NNS_MATRIX gmEneHariMotionCallback_node_mtx;
+    private static NNS_MATRIX gmEneHariMotionCallback_base_mtx;
     private static readonly int[][] g_gm_deco_model_index;
     private static readonly uint[] g_gm_deco_disp_flag;
     private static readonly int[][] g_gm_deco_node_motion_index;
@@ -17342,27 +15497,27 @@ public partial class AppMain
     private static uint[] g_gm_deco_user_work;
     private static int[] g_gm_deco_user_timer;
     public static uint[] g_gm_deco_command_state;
-    public static AppMain.OBS_RECT_WORK_Delegate1[] g_gm_deco_func_rect;
+    public static OBS_RECT_WORK_Delegate1[] g_gm_deco_func_rect;
     public static readonly short[][] g_gm_deco_rect_size;
     private static uint[] g_gm_deco_user_flag;
     private static readonly ushort[] g_gm_deco_rot_z;
-    private static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_gm_deco_func_main;
+    private static readonly MPP_VOID_OBS_OBJECT_WORK[] g_gm_deco_func_main;
     private static readonly int[][] g_gm_deco_pos;
-    private static readonly AppMain.GSF_TASK_PROCEDURE[] g_gm_deco_func_dest;
-    private static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_gm_deco_func_move;
-    private static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_gm_deco_func_out;
-    private static AppMain.GMS_DECO_FALL_MANAGER[] g_deco_fall_manager;
-    private static AppMain.GMS_DECO_PRIM_DRAW_WORK[] g_deco_tvx_work;
-    private static AppMain.NNS_RGBA_U8 g_deco_rendaer_target_color;
-    private static AppMain.GMS_DECO_MGR g_deco_mgr_real;
-    private static AppMain.GMS_DECO_MGR g_deco_mgr;
-    private static readonly AppMain.GMS_DECO_DATA g_deco_data_real;
-    private static AppMain.GMS_DECO_DATA g_deco_data;
-    private static AppMain.AMS_AMB_HEADER gmDeco_matMotionHeader;
-    private static AppMain.AMS_AMB_HEADER gmDeco_motionHeader;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _gmDecoTcbProcPostDT;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _gmDecoDrawFallFrontUserFunc;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _gmDecoDrawFallBackUserFunc;
+    private static readonly GSF_TASK_PROCEDURE[] g_gm_deco_func_dest;
+    private static readonly MPP_VOID_OBS_OBJECT_WORK[] g_gm_deco_func_move;
+    private static readonly MPP_VOID_OBS_OBJECT_WORK[] g_gm_deco_func_out;
+    private static GMS_DECO_FALL_MANAGER[] g_deco_fall_manager;
+    private static GMS_DECO_PRIM_DRAW_WORK[] g_deco_tvx_work;
+    private static NNS_RGBA_U8 g_deco_rendaer_target_color;
+    private static GMS_DECO_MGR g_deco_mgr_real;
+    private static GMS_DECO_MGR g_deco_mgr;
+    private static readonly GMS_DECO_DATA g_deco_data_real;
+    private static GMS_DECO_DATA g_deco_data;
+    private static AMS_AMB_HEADER gmDeco_matMotionHeader;
+    private static AMS_AMB_HEADER gmDeco_motionHeader;
+    private static OBF_DRAW_USER_DT_FUNC _gmDecoTcbProcPostDT;
+    private static OBF_DRAW_USER_DT_FUNC _gmDecoDrawFallFrontUserFunc;
+    private static OBF_DRAW_USER_DT_FUNC _gmDecoDrawFallBackUserFunc;
     public static int OBD_DRAW_USER_COMMAND_SORT_3DNN_MODEL;
     public static int OBD_DRAW_USER_COMMAND_SORT_3DNN_MATMTN;
     public static int OBD_DRAW_USER_COMMAND_SORT_3DNN_MAX;
@@ -17375,39 +15530,39 @@ public partial class AppMain
     public static int OBD_DRAW_USER_COMMAND_3DNN_DRAW_MOTION;
     public static int OBD_DRAW_USER_COMMAND_3DNN_DRAW_MOTION_MATMTN;
     public static int OBD_DRAW_USER_COMMAND_3DNN_MAX;
-    public static AppMain._am_draw_command_delegate[] obj_draw_user_command_func_tbl;
-    public static AppMain.MPP_VOID_AMSCOMMANDHEADER_NNFDRAWOBJ[] obj_draw_user_command_sort_func_tbl;
+    public static _am_draw_command_delegate[] obj_draw_user_command_func_tbl;
+    public static MPP_VOID_AMSCOMMANDHEADER_NNFDRAWOBJ[] obj_draw_user_command_sort_func_tbl;
     public static readonly uint[] obj_draw_3dnn_command_state_tbl;
     public static bool[] obj_draw_3dnn_command_state_exe_end_scene_tbl;
-    private static AppMain.MPP_BOOL_NNSDRAWCALLBACKVAL_OBJECT_DELEGATE obj_draw_material_cb_func;
+    private static MPP_BOOL_NNSDRAWCALLBACKVAL_OBJECT_DELEGATE obj_draw_material_cb_func;
     private static object obj_draw_material_cb_param;
-    private static AppMain.MTS_TASK_TCB obj_draw_effect_server_tcb;
-    public static AppMain.TaskProc _objDrawStart_DT;
-    private static AppMain.NNS_MATRIX ObjDrawAction3DNN_obj_mtx;
-    private static AppMain.Pool<AppMain.OBS_DRAW_PARAM_3DNN_MODEL> _ObjDraw3DNNModel_Pool;
-    private static AppMain.Pool<AppMain.OBS_DRAW_PARAM_3DNN_DRAW_PRIMITIVE> OBS_DRAW_PARAM_3DNN_DRAW_PRIMITIVE_Pool;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _objDraw3DNNDrawPrimitive_DT;
-    public static AppMain.SNNS_VECTOR4D vec_dispObjDrawAction3DES;
-    public static AppMain.SNNS_VECTOR4D vec_posObjDrawAction3DES;
-    public static AppMain.SNNS_VECTOR4D vec_scaleObjDrawAction3DES;
-    public static AppMain.SNNS_VECTOR4D vecObjDrawAction3DES;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _objDraw3DESMatrixPush_UserFunc;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _objDraw3DESMatrixPop_UserFunc;
-    private static AppMain.AOS_ACT_ACM ObjDrawAction2DAMA_acm;
-    public static AppMain.OBF_DRAW_USER_DT_FUNC _objDraw2DAMAPre_DT;
-    private static AppMain.Pool<AppMain.OBS_DRAW_PARAM_3DNN_SET_CAMERA> _objDraw3DNNSetCamera_Pool;
-    private static AppMain.Pool<AppMain.OBS_DRAW_PARAM_3DNN_SORT_MODEL> OBS_DRAW_PARAM_3DNN_SORT_MODEL_Pool;
-    private static AppMain.NNS_MATERIALCALLBACK_FUNC _objDraw3DNNMaterialCallback;
-    public static AppMain.SNNS_MATRIX tempSNNS_MATRIX0;
+    private static MTS_TASK_TCB obj_draw_effect_server_tcb;
+    public static TaskProc _objDrawStart_DT;
+    private static NNS_MATRIX ObjDrawAction3DNN_obj_mtx;
+    private static Pool<OBS_DRAW_PARAM_3DNN_MODEL> _ObjDraw3DNNModel_Pool;
+    private static Pool<OBS_DRAW_PARAM_3DNN_DRAW_PRIMITIVE> OBS_DRAW_PARAM_3DNN_DRAW_PRIMITIVE_Pool;
+    private static OBF_DRAW_USER_DT_FUNC _objDraw3DNNDrawPrimitive_DT;
+    public static SNNS_VECTOR4D vec_dispObjDrawAction3DES;
+    public static SNNS_VECTOR4D vec_posObjDrawAction3DES;
+    public static SNNS_VECTOR4D vec_scaleObjDrawAction3DES;
+    public static SNNS_VECTOR4D vecObjDrawAction3DES;
+    private static OBF_DRAW_USER_DT_FUNC _objDraw3DESMatrixPush_UserFunc;
+    private static OBF_DRAW_USER_DT_FUNC _objDraw3DESMatrixPop_UserFunc;
+    private static AOS_ACT_ACM ObjDrawAction2DAMA_acm;
+    public static OBF_DRAW_USER_DT_FUNC _objDraw2DAMAPre_DT;
+    private static Pool<OBS_DRAW_PARAM_3DNN_SET_CAMERA> _objDraw3DNNSetCamera_Pool;
+    private static Pool<OBS_DRAW_PARAM_3DNN_SORT_MODEL> OBS_DRAW_PARAM_3DNN_SORT_MODEL_Pool;
+    private static NNS_MATERIALCALLBACK_FUNC _objDraw3DNNMaterialCallback;
+    public static SNNS_MATRIX tempSNNS_MATRIX0;
     private static int player_spd_x;
     private static int player_spd_y;
     private static short player_spd_keep_timer;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_upbumper_obj_3d_list;
-    private static readonly AppMain.GMS_GMK_UPBUMPER_REBOUND_DATA[] tbl_upbmper_rebound_data;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_upbumper_obj_3d_list;
+    private static readonly GMS_GMK_UPBUMPER_REBOUND_DATA[] tbl_upbmper_rebound_data;
     public static int GMD_GMK_UPBUMPER_REBOUND_DATA_NUM;
-    public static AppMain.GMS_DECOGLARE_PARAM[] _gm_decoGlare_param;
-    public static AppMain.GMDECO_GLARE_INTERFACE gmDeco_Glare_global;
-    public static AppMain.GMDECO_GLARE_INTERFACE pIF;
+    public static GMS_DECOGLARE_PARAM[] _gm_decoGlare_param;
+    public static GMDECO_GLARE_INTERFACE gmDeco_Glare_global;
+    public static GMDECO_GLARE_INTERFACE pIF;
     public static uint GMD_BOSS5_LAND_FLAG_SHAKE_ACTIVE;
     public static uint GMD_BOSS5_LAND_FLAG_BREAK_ACTIVE;
     public static uint GMD_BOSS5_LAND_LDPART_SPIN_ROT_AXIS_NUM;
@@ -17439,109 +15594,109 @@ public partial class AppMain
     private static uint GMD_TVX_DISP_SCALE;
     private static uint GMD_TVX_DISP_LIGHT_DISABLE;
     private static uint GMD_TVX_DISP_BLEND;
-    private static AppMain.GMS_TVX_DRAW_WORK[] gm_tvx_draw_work;
-    public static AppMain.AMS_PARAM_DRAW_PRIMITIVE _AMS_PARAM_DRAW_PRIMITIVE;
-    public static DoubleType<uint[], AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR_INDEX[]> gm_map_prim_draw_tvx_mgr_index_tbl_z2;
-    public static DoubleType<uint[], AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR_INDEX[]> gm_map_prim_draw_tvx_mgr_index_tbl_z3;
-    public static DoubleType<uint[], AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR_INDEX[]> gm_map_prim_draw_tvx_mgr_index_tbl_z4;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z4_MID_2_DRM_A_I_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z4_MID_2_PIPE_I_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z4_MID_2_PISTON_I_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z4_Z4_TANK_02_ACT_I_DDS;
-    public static AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[][] gm_map_prim_draw_tvx_mgr_tbl_z4;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z4_MID_2_DRM_A_I_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z4_MID_2_PIPE_I_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z4_Z4_TANK_02_ACT_I_DDS;
-    public static AppMain.NNS_TEXCOORD[][] gm_map_prim_draw_tvx_uv_mgr_tbl_z4;
-    public static DoubleType<uint[], AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR_INDEX[]> gm_map_prim_draw_tvx_mgr_index_tbl_zf;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_zf_ZF_MAP_IPHONE_TEXANIM_DDS;
+    private static GMS_TVX_DRAW_WORK[] gm_tvx_draw_work;
+    public static AMS_PARAM_DRAW_PRIMITIVE _AMS_PARAM_DRAW_PRIMITIVE;
+    public static DoubleType<uint[], GMS_MAP_PRIM_DRAW_TVX_MGR_INDEX[]> gm_map_prim_draw_tvx_mgr_index_tbl_z2;
+    public static DoubleType<uint[], GMS_MAP_PRIM_DRAW_TVX_MGR_INDEX[]> gm_map_prim_draw_tvx_mgr_index_tbl_z3;
+    public static DoubleType<uint[], GMS_MAP_PRIM_DRAW_TVX_MGR_INDEX[]> gm_map_prim_draw_tvx_mgr_index_tbl_z4;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z4_MID_2_DRM_A_I_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z4_MID_2_PIPE_I_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z4_MID_2_PISTON_I_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z4_Z4_TANK_02_ACT_I_DDS;
+    public static GMS_MAP_PRIM_DRAW_TVX_MGR[][] gm_map_prim_draw_tvx_mgr_tbl_z4;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z4_MID_2_DRM_A_I_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z4_MID_2_PIPE_I_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z4_Z4_TANK_02_ACT_I_DDS;
+    public static NNS_TEXCOORD[][] gm_map_prim_draw_tvx_uv_mgr_tbl_z4;
+    public static DoubleType<uint[], GMS_MAP_PRIM_DRAW_TVX_MGR_INDEX[]> gm_map_prim_draw_tvx_mgr_index_tbl_zf;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_zf_ZF_MAP_IPHONE_TEXANIM_DDS;
     public static int[] gm_map_prim_draw_tvx_mgr_tbl_z4_num;
     public static int[] gm_map_prim_draw_tvx_mgr_tbl_zf_num;
-    public static AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[][] gm_map_prim_draw_tvx_mgr_tbl_zf;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_zf_ZF_MAP_IPHONE_TEXANIM_DDS;
-    public static AppMain.NNS_TEXCOORD[][] gm_map_prim_draw_tvx_uv_mgr_tbl_zf;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_PALM_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_PANEL_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_BUILA_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_BUILB_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILMBELT_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_3MARK_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_V_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_BALLOON_ILM_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_CODE_ILM_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_FLOWER_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ROLL_ILM_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_ASHIBA_DDS;
+    public static GMS_MAP_PRIM_DRAW_TVX_MGR[][] gm_map_prim_draw_tvx_mgr_tbl_zf;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_zf_ZF_MAP_IPHONE_TEXANIM_DDS;
+    public static NNS_TEXCOORD[][] gm_map_prim_draw_tvx_uv_mgr_tbl_zf;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_PALM_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_PANEL_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_BUILA_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_BUILB_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILMBELT_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_3MARK_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_V_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_BALLOON_ILM_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_CODE_ILM_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_FLOWER_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ROLL_ILM_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z2_Z2_ILM_ASHIBA_DDS;
     public static int[] gm_map_prim_draw_tvx_mgr_tbl_z2_num;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_PANEL_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_BUILA_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_BUILB_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILMBELT_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_3MARK_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_V_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_BALLOON_ILM_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_CODE_ILM_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_FLOWER_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ROLL_ILM_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_ASHIBA_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z3_Z3_ANIM_B_DDS;
-    public static readonly AppMain.NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_PALM_DDS;
-    public static readonly AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z3_Z3_ANIM_B_DDS;
-    public static AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[][] gm_map_prim_draw_tvx_mgr_tbl_z2;
-    public static AppMain.NNS_TEXCOORD[][] gm_map_prim_draw_tvx_uv_mgr_tbl_z2;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_PANEL_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_BUILA_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_BUILB_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILMBELT_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_3MARK_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_V_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_BALLOON_ILM_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_CODE_ILM_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_FLOWER_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ROLL_ILM_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_ILM_ASHIBA_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z3_Z3_ANIM_B_DDS;
+    public static readonly NNS_TEXCOORD[] gm_map_prim_draw_tvx_uv_mgr_tbl_z2_Z2_PALM_DDS;
+    public static readonly GMS_MAP_PRIM_DRAW_TVX_MGR[] gm_map_prim_draw_tvx_mgr_tbl_z3_Z3_ANIM_B_DDS;
+    public static GMS_MAP_PRIM_DRAW_TVX_MGR[][] gm_map_prim_draw_tvx_mgr_tbl_z2;
+    public static NNS_TEXCOORD[][] gm_map_prim_draw_tvx_uv_mgr_tbl_z2;
     public static int[] gm_map_prim_draw_tvx_mgr_tbl_z3_num;
-    public static AppMain.GMS_MAP_PRIM_DRAW_TVX_MGR[][] gm_map_prim_draw_tvx_mgr_tbl_z3;
-    public static AppMain.NNS_TEXCOORD[][] gm_map_prim_draw_tvx_uv_mgr_tbl_z3;
+    public static GMS_MAP_PRIM_DRAW_TVX_MGR[][] gm_map_prim_draw_tvx_mgr_tbl_z3;
+    public static NNS_TEXCOORD[][] gm_map_prim_draw_tvx_uv_mgr_tbl_z3;
     private static readonly int[] g_gm_gmk_tarzan_rope_model_id;
     private static readonly int[] g_gm_gmk_tarzan_rope_motion_id;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_tarzan_rope_obj_3d_list;
-    private static readonly AppMain.NNS_MATRIX g_gm_gmk_tarzan_rope_active_matrix;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_spear_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_tarzan_rope_obj_3d_list;
+    private static readonly NNS_MATRIX g_gm_gmk_tarzan_rope_active_matrix;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_spear_obj_3d_list;
     private static readonly short[][] tbl_gm_gmk_spear_rect;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_land_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_land_obj_3d_list;
     private static byte[] gm_gmk_land_spd_tbl;
     private static int[][] gm_gmk_land_obj_data;
     private static int[][] gm_gmk_land_mdl_data;
     private static byte[] gm_gmk_land_col_type_tbl;
-    private static AppMain.AMS_AMB_HEADER gm_gmk_land_3_obj_tvx_list;
-    public static AppMain.MPP_VOID_OBS_OBJECT_WORK _gmGmkLandColFall;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_gear_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_gear_move_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_gear_sw_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_gear_opt_obj_3d_list;
+    private static AMS_AMB_HEADER gm_gmk_land_3_obj_tvx_list;
+    public static MPP_VOID_OBS_OBJECT_WORK _gmGmkLandColFall;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_gear_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_gear_move_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_gear_sw_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_gear_opt_obj_3d_list;
     private static object[] gm_gmk_gear_add_data;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_dash_panel_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_dash_panel_obj_3d_list;
     private static object[] g_gm_gamedat_map;
     private static object[] g_gm_gamedat_map_set;
     private static object[] g_gm_gamedat_map_set_add;
     private static object[] g_gm_gamedat_map_attr_set;
-    private static AppMain.AMS_AMB_HEADER g_gm_gamedat_enemy_arc;
+    private static AMS_AMB_HEADER g_gm_gamedat_enemy_arc;
     private static object[] g_gm_gamedat_ring;
-    private static AppMain.AMS_AMB_HEADER[] g_gm_gamedat_gimmick;
+    private static AMS_AMB_HEADER[] g_gm_gamedat_gimmick;
     private static object[] g_gm_gamedat_enemy;
     private static object[] g_gm_gamedat_effect;
-    private static AppMain.AMS_AMB_HEADER g_gm_gamedat_cockpit_main_arc;
+    private static AMS_AMB_HEADER g_gm_gamedat_cockpit_main_arc;
     private static int[] g_gm_gamedat_bossbattle_stage_id_tbl;
-    private static AppMain.MTS_TASK_TCB gm_gamedat_load_tcb;
-    private static AppMain.GMS_GAMEDAT_LOAD_WORK gm_gamedat_load_work;
-    private static readonly AppMain.GMS_BOSS4_PART_ACT_INFO[] gm_boss4_egg_act_id_tbl;
+    private static MTS_TASK_TCB gm_gamedat_load_tcb;
+    private static GMS_GAMEDAT_LOAD_WORK gm_gamedat_load_work;
+    private static readonly GMS_BOSS4_PART_ACT_INFO[] gm_boss4_egg_act_id_tbl;
     private static readonly int[][] dm_stfrl_ring_disp_pos_tbl;
     private static readonly int[][] dm_stfrl_ring_efct_disp_offset_tbl;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] dm_stfrl_sonic_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] dm_stfrl_boss1_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] dm_stfrl_ring_obj_3d;
+    private static OBS_ACTION3D_NN_WORK[] dm_stfrl_sonic_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] dm_stfrl_boss1_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] dm_stfrl_ring_obj_3d;
     private static ulong _am_timer_id;
-    private AppMain.AMS_ALARM _am_alarm_timer;
+    private AMS_ALARM _am_alarm_timer;
     private static readonly int[] g_gm_gmk_water_slider_model_id_main;
     private static readonly int[] g_gm_gmk_water_slider_material_id_main;
     private static readonly int[] g_gm_gmk_water_slider_model_id_sub;
     private static readonly int[] g_gm_gmk_water_slider_motion_id_sub;
     private static readonly int[] g_gm_gmk_water_slider_material_id_sub;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_water_slider_obj_3d_list;
-    private static AppMain.GSS_SND_SE_HANDLE g_gm_gmk_water_slider_se_handle;
-    private static AppMain.GMS_EFFECT_3DES_WORK g_gm_gmk_water_slider_effct_player;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_water_slider_obj_3d_list;
+    private static GSS_SND_SE_HANDLE g_gm_gmk_water_slider_se_handle;
+    private static GMS_EFFECT_3DES_WORK g_gm_gmk_water_slider_effct_player;
     public static int GMD_GMK_TRUCK_SPARK_EFCT_SMALL_MIN_SPD;
     public static int GMD_GMK_TRUCK_SPARK_EFCT_BIG_MIN_SPD;
     public static int GMD_GMK_TRUCK_SE_MIN_SPD;
@@ -17566,133 +15721,133 @@ public partial class AppMain
     public static int GMD_GMK_T_GRAVITY_A;
     public static int GMD_GMK_T_GRAVITY_B;
     public static int GMD_GMK_T_CLEAR_PSEUDOFALL_DIR_FIX;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_truck_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_truck_obj_3d_list;
     private static short[] gm_gmk_t_gravity_r_rect_tbl;
     private static short[][] gm_gmk_t_gravity_rr_rect_tbl;
     private static int[] g_gm_gmk_en_bmpr_mat_motion_id;
     private static ushort[] g_gm_gmk_en_bmpr_angle_z;
     private static short[][] g_gmk_en_bmpr_rect;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_en_bmpr_obj_3d_list;
-    public static readonly AppMain.GSE_MAIN_STAGE_TYPE[] g_gm_gamedat_stage_type_tbl;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_en_bmpr_obj_3d_list;
+    public static readonly GSE_MAIN_STAGE_TYPE[] g_gm_gamedat_stage_type_tbl;
     public static readonly int[] g_gm_gamedat_zone_type_tbl;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_common;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_common_info_tbl;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_player_sonic;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_player_info_tbl;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map01_01;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map01_02;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map01_03;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map01_BOSS;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map02_01;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map02_02;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map02_03;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map02_BOSS;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map03_01;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map03_02;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map03_03;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map03_BOSS;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map04_01;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map04_02;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map04_03;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map04_BOSS;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_final_BOSS01;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_final_BOSS02;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_final_BOSS03;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_final_BOSS04;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_final_BOSS05;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS01;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS02;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS03;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS04;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS05;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS06;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS07;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_ending;
-    private static readonly AppMain.GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_map_info_tbl;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect01_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect01_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect01_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect01_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect02_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect02_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect02_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect02_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect03_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect03_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect03_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect03_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect04_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect04_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect04_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect04_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_final_BOSS01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_final_BOSS02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_final_BOSS03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_final_BOSS04;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_final_BOSS05;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_ss01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_ending;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_effect_info_tbl;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy01_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy01_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy01_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy01_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy02_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy02_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy02_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy02_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy03_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy03_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy03_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy03_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy03_final_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy04_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy04_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy04_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy04_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_final_BOSS01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_final_BOSS02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_final_BOSS03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_final_BOSS04;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_final_BOSS05;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_ending;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_enemy_info_tbl;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_enemy_final_info_tbl;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_com_gimmick;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick01_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick01_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick01_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick01_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick02_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick02_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick02_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick02_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick03_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick03_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick03_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick03_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick04_01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick04_02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick04_03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick04_BOSS;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_Final_BOSS01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_Final_BOSS02;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_Final_BOSS03;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_Final_BOSS04;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_Final_BOSS05;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_ss01;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_ending;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_gimmick_common_info_tbl;
-    public static readonly AppMain.GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_gimmick_info_tbl;
-    private static AppMain.MTS_TASK_TCB gm_fix_tcb;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_common;
+    private static readonly GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_common_info_tbl;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_player_sonic;
+    private static readonly GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_player_info_tbl;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map01_01;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map01_02;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map01_03;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map01_BOSS;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map02_01;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map02_02;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map02_03;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map02_BOSS;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map03_01;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map03_02;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map03_03;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map03_BOSS;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map04_01;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map04_02;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map04_03;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map04_BOSS;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_final_BOSS01;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_final_BOSS02;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_final_BOSS03;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_final_BOSS04;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_final_BOSS05;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS01;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS02;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS03;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS04;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS05;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS06;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_SS07;
+    private static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_map_ending;
+    private static readonly GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_map_info_tbl;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect01_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect01_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect01_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect01_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect02_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect02_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect02_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect02_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect03_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect03_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect03_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect03_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect04_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect04_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect04_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect04_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_final_BOSS01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_final_BOSS02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_final_BOSS03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_final_BOSS04;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_final_BOSS05;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_ss01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_effect_ending;
+    public static readonly GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_effect_info_tbl;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy01_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy01_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy01_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy01_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy02_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy02_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy02_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy02_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy03_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy03_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy03_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy03_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy03_final_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy04_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy04_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy04_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy04_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_final_BOSS01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_final_BOSS02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_final_BOSS03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_final_BOSS04;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_final_BOSS05;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_enemy_ending;
+    public static readonly GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_enemy_info_tbl;
+    public static readonly GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_enemy_final_info_tbl;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_com_gimmick;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick01_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick01_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick01_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick01_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick02_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick02_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick02_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick02_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick03_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick03_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick03_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick03_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick04_01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick04_02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick04_03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick04_BOSS;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_Final_BOSS01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_Final_BOSS02;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_Final_BOSS03;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_Final_BOSS04;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_Final_BOSS05;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_ss01;
+    public static readonly GMS_GAMEDAT_LOAD_DATA[] gm_gamedat_tbl_gimmick_ending;
+    public static readonly GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_gimmick_common_info_tbl;
+    public static readonly GMS_GAMEDAT_LOAD_INFO[] gm_gamedat_tbl_gimmick_info_tbl;
+    private static MTS_TASK_TCB gm_fix_tcb;
     private static object[] gm_fix_texamb_list;
-    private static AppMain.AOS_TEXTURE[] gm_fix_textures;
+    private static AOS_TEXTURE[] gm_fix_textures;
     private static int[][] gm_fix_tex_amb_idx_tbl;
     private static int[][] gm_fix_ama_amb_idx_tbl;
-    private static AppMain.GMF_FIX_PART_INIT_FUNC[] gm_fix_part_init_func_tbl;
-    private static AppMain.GMF_FIX_PART_INIT_FUNC[] gm_fix_ta_part_init_func_tbl;
-    private static AppMain.GMF_FIX_PART_INIT_FUNC[] gm_fix_ta_s22_part_init_func_tbl;
-    private static AppMain.GMF_FIX_PART_INIT_FUNC[] gm_fix_ss_part_init_func_tbl;
+    private static GMF_FIX_PART_INIT_FUNC[] gm_fix_part_init_func_tbl;
+    private static GMF_FIX_PART_INIT_FUNC[] gm_fix_ta_part_init_func_tbl;
+    private static GMF_FIX_PART_INIT_FUNC[] gm_fix_ta_s22_part_init_func_tbl;
+    private static GMF_FIX_PART_INIT_FUNC[] gm_fix_ss_part_init_func_tbl;
     private static int[] gm_fix_ringcount_act_id_tbl;
     private static int[] gm_fix_score_act_id_tbl;
     private static int[][] gm_fix_score_stage22_act_id_tbl;
@@ -17711,11 +15866,11 @@ public partial class AppMain
     private static int[] act_id_tblgmFixScorePartInit;
     private static int[] act_id_tblgmFixTimerPartInit;
     private static int[] digit_num_listgmFixTimerPartUpdateDigitList;
-    private static readonly AppMain.SKeyToFrame[] c_key_to_frame_table;
+    private static readonly SKeyToFrame[] c_key_to_frame_table;
     public static readonly short GMD_BOSS4_RIGHTWARD_ANGLE;
     public static readonly short GMD_BOSS4_LEFTWARD_ANGLE;
-    public static readonly AppMain.NNS_RGB gm_boss4_color_white;
-    private static AppMain.GMS_RING_WORK gm_boss4_util_ring;
+    public static readonly NNS_RGB gm_boss4_color_white;
+    private static GMS_RING_WORK gm_boss4_util_ring;
     public static readonly short GMD_BOSS4_CAP_FALL_ROTATE_SPD;
     public static readonly int GMD_BOSS4_CAP_FALL_ANGLE;
     private static int _cap_rot_y;
@@ -17731,20 +15886,20 @@ public partial class AppMain
     private static bool _cap_inv_hit;
     private static int _cap_kill_flag;
     private static int _cap_count;
-    public static readonly AppMain.GMS_PLY_SEQ_STATE_DATA[][] g_gm_ply_seq_state_data_tbl;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_sw_wall_obj_3d_list;
-    private static AppMain.AMS_AMB_HEADER g_gm_gmk_sw_wall3_obj_tvx_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_switch_obj_3d_list;
-    private static AppMain.GMS_GMK_SW_STATE_WORK[] gm_gmk_switch_state;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_ss_endurance_obj_3d_list;
+    public static readonly GMS_PLY_SEQ_STATE_DATA[][] g_gm_ply_seq_state_data_tbl;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_sw_wall_obj_3d_list;
+    private static AMS_AMB_HEADER g_gm_gmk_sw_wall3_obj_tvx_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_switch_obj_3d_list;
+    private static GMS_GMK_SW_STATE_WORK[] gm_gmk_switch_state;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_ss_endurance_obj_3d_list;
     private static readonly ushort[] gm_gmk_ss_endurance_color;
-    private static AppMain.AMS_AMB_HEADER gm_gmk_ss_endurance_obj_tvx_list;
-    private static readonly AppMain.NNS_TEXCOORD[] gm_gmk_ss_endurance_mat_color;
+    private static AMS_AMB_HEADER gm_gmk_ss_endurance_obj_tvx_list;
+    private static readonly NNS_TEXCOORD[] gm_gmk_ss_endurance_mat_color;
     private static readonly byte[] gm_gmk_ss_endurance_uv_parameter;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_ss_circle_obj_3d_list;
-    private static AppMain.AMS_AMB_HEADER gm_gmk_ss_circle_obj_tvx_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_dsign_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_t_star_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_ss_circle_obj_3d_list;
+    private static AMS_AMB_HEADER gm_gmk_ss_circle_obj_tvx_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_dsign_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_t_star_obj_3d_list;
     public static int GMD_BOSS5_CTPLT_BG_FARSIDE_POS_Z;
     public static int GMD_BOSS5_CTPLT_MOVE_DOWN_ACC;
     public static int GMD_BOSS5_CTPLT_MOVE_DOWN_HIDE_HEIGHT;
@@ -17752,35 +15907,35 @@ public partial class AppMain
     public static ushort GMD_BOSS5_CTPLT_OBJ_COL_RECT_HEIGHT_INT;
     public static short GMD_BOSS5_CTPLT_OBJ_COL_RECT_OFST_X_INT;
     public static short GMD_BOSS5_CTPLT_OBJ_COL_RECT_OFST_Y_INT;
-    public static AppMain.Reference<AppMain.MTS_TASK_TCB> dm_logo_sega_load_tcb;
-    public static AppMain.MTS_TASK_TCB dm_logo_sega_build_tcb;
-    public static AppMain.MTS_TASK_TCB dm_logo_sega_flush_tcb;
-    public static AppMain.AOS_TEXTURE[] dm_logo_sega_aos_tex;
-    public static readonly AppMain.OBS_DATA_WORK[] dm_logo_sega_efct_mdl_data_work;
+    public static Reference<MTS_TASK_TCB> dm_logo_sega_load_tcb;
+    public static MTS_TASK_TCB dm_logo_sega_build_tcb;
+    public static MTS_TASK_TCB dm_logo_sega_flush_tcb;
+    public static AOS_TEXTURE[] dm_logo_sega_aos_tex;
+    public static readonly OBS_DATA_WORK[] dm_logo_sega_efct_mdl_data_work;
     public static readonly int[] dm_logo_sega_efct_mdl_state;
     public static bool dm_logo_sega_build_state;
-    public static readonly AppMain.DMS_LOGO_COM_LOAD_FILE_INFO[] dm_logo_sega_com_fileinfo_list;
-    private static readonly AppMain.DMS_LOGO_COM_LOAD_FILE_INFO[] dm_logo_sega_localize_fileinfo_list_region_jp;
-    private static readonly AppMain.DMS_LOGO_COM_LOAD_FILE_INFO[] dm_logo_sega_localize_fileinfo_list_region_us;
-    private static readonly AppMain.DMS_LOGO_COM_LOAD_FILE_INFO[] dm_logo_sega_localize_fileinfo_list_region_eu;
-    private static readonly AppMain.DMS_LOGO_COM_LOAD_FILE_INFO[][] dm_logo_sega_localize_fileinfo_list_tbl;
+    public static readonly DMS_LOGO_COM_LOAD_FILE_INFO[] dm_logo_sega_com_fileinfo_list;
+    private static readonly DMS_LOGO_COM_LOAD_FILE_INFO[] dm_logo_sega_localize_fileinfo_list_region_jp;
+    private static readonly DMS_LOGO_COM_LOAD_FILE_INFO[] dm_logo_sega_localize_fileinfo_list_region_us;
+    private static readonly DMS_LOGO_COM_LOAD_FILE_INFO[] dm_logo_sega_localize_fileinfo_list_region_eu;
+    private static readonly DMS_LOGO_COM_LOAD_FILE_INFO[][] dm_logo_sega_localize_fileinfo_list_tbl;
     private static readonly int[] dm_logo_sega_efct_mdl_id_tbl;
-    private static readonly AppMain.AMS_AMB_HEADER[] dm_logo_sega_data;
-    private AppMain.OBS_ACTION3D_NN_WORK[] dm_logo_sega_obj_3d_list;
+    private static readonly AMS_AMB_HEADER[] dm_logo_sega_data;
+    private OBS_ACTION3D_NN_WORK[] dm_logo_sega_obj_3d_list;
     public static byte[] dm_logo_sega_tex_id_tbl;
     public static GameTime lastGameTime;
     public static string g_ao_storage_filename;
-    private static readonly AppMain.AOS_STORAGE g_ao_storage;
-    private static AppMain.NNS_VECTOR nnCalcTRSMotion_tv;
-    private static AppMain.NNS_VECTOR nnCalcTRSMotion_sv;
-    private static AppMain.GSS_SND_SCB gm_sound_bgm_scb;
-    private static AppMain.GSS_SND_SCB gm_sound_bgm_sub_scb;
-    private static AppMain.GSS_SND_SCB gm_sound_jingle_scb;
-    private static AppMain.GSS_SND_SCB gm_sound_jingle_bgm_scb;
+    private static readonly AOS_STORAGE g_ao_storage;
+    private static NNS_VECTOR nnCalcTRSMotion_tv;
+    private static NNS_VECTOR nnCalcTRSMotion_sv;
+    private static GSS_SND_SCB gm_sound_bgm_scb;
+    private static GSS_SND_SCB gm_sound_bgm_sub_scb;
+    private static GSS_SND_SCB gm_sound_jingle_scb;
+    private static GSS_SND_SCB gm_sound_jingle_bgm_scb;
     private static uint gm_sound_flag;
-    private static AppMain.MTS_TASK_TCB gm_sound_1shot_tcb;
-    private static AppMain.MTS_TASK_TCB gm_sound_bgm_fade_tcb;
-    private static AppMain.MTS_TASK_TCB gm_sound_bgm_win_boss_tcb;
+    private static MTS_TASK_TCB gm_sound_1shot_tcb;
+    private static MTS_TASK_TCB gm_sound_bgm_fade_tcb;
+    private static MTS_TASK_TCB gm_sound_bgm_win_boss_tcb;
     private static readonly string[] gm_sound_bgm_name_list;
     private static readonly string[] gm_sound_speedup_bgm_name_list;
     private static readonly string[] gm_sound_jingle_name_list;
@@ -17789,7 +15944,7 @@ public partial class AppMain
     private static readonly int[][] gm_score_vib_tbl;
     private static readonly int[] gm_score_vib_scale_tbl;
     public static float GMD_GMK_ROCK_RIDE_KEY_ANGLE_LIMIT;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_rock_ride_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_rock_ride_obj_3d_list;
     private static readonly uint[] gm_gmk_ndl_type_tbl;
     private static readonly int[][] gm_gmk_atk_rect_tbl;
     private static readonly int[][] gm_gmk_col_rect_tbl;
@@ -17797,49 +15952,49 @@ public partial class AppMain
     private static readonly int[][] gm_gmk_disp_ofst_tbl_l;
     private static readonly int[][] gm_gmk_disp_ofst_tbl_d;
     private static readonly int[][] gm_gmk_disp_ofst_tbl_r;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_needle_obj_3d_list;
-    private static AppMain.AMS_AMB_HEADER gm_gmk_needle_obj_tvx_list;
-    private static AppMain.TVX_FILE tvx_needle;
-    private static AppMain.TVX_FILE tvx_stand;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_goal_panel_obj_3d_list;
-    private static AppMain.GMS_EFFECT_3DES_WORK gm_gmk_goal_panel_effct;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_needle_obj_3d_list;
+    private static AMS_AMB_HEADER gm_gmk_needle_obj_tvx_list;
+    private static TVX_FILE tvx_needle;
+    private static TVX_FILE tvx_stand;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_goal_panel_obj_3d_list;
+    private static GMS_EFFECT_3DES_WORK gm_gmk_goal_panel_effct;
     public static int GMD_GAMEDAT_FILE_PATH_LENGTH_MAX;
     public static int GMD_GAMEDAT_LOAD_CONTEXT_MAX;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_bridge_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_breakobj_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_bridge_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_breakobj_obj_3d_list;
     private static readonly short[][] tbl_gm_gmk_bobj_col_rect;
     private static readonly ushort[] tbl_gm_gmk_bobj_act_id;
     private static readonly ushort[] tbl_gmk_breakobj_effect;
     private static readonly ushort[][] tbl_gm_gmk_bobj1_parts;
     private static readonly ushort[][] tbl_gm_gmk_bobj2_parts;
     private static readonly ushort[][] tbl_gm_gmk_bobj3_parts;
-    private static readonly AppMain.tag_GMS_GMK_BOBJ_PARTS_PARAM_TABLE[] GMS_GMK_BOBJ_PARTS_PARAM_TABLE;
+    private static readonly tag_GMS_GMK_BOBJ_PARTS_PARAM_TABLE[] GMS_GMK_BOBJ_PARTS_PARAM_TABLE;
     private static int GME_GAME_DBUILD_MDL_STATE_REG_WAIT;
     private static int GME_GAME_DBUILD_MDL_STATE_BUILD_WAIT;
     private static int GME_GAME_DBUILD_MDL_STATE_REG_FLUSH_WAIT;
     private static int GME_GAME_DBUILD_MDL_STATE_FLUSH_WAIT;
     private static int GME_GAME_DBUILD_MDL_STATE_MAX;
-    private static AppMain.gamedat_build_area_func[] gm_gamedat_build_area_tbl;
-    private static AppMain.gamedat_build_area_func[] gm_gamedat_flush_area_tbl;
-    private static readonly AppMain.GMS_GDBUILD_BUILD_MDL_WORK[] gm_obj_build_model_work_buf;
+    private static gamedat_build_area_func[] gm_gamedat_build_area_tbl;
+    private static gamedat_build_area_func[] gm_gamedat_flush_area_tbl;
+    private static readonly GMS_GDBUILD_BUILD_MDL_WORK[] gm_obj_build_model_work_buf;
     private static int gm_obj_build_model_work_reg_num;
-    private static AppMain.gamedat_build_area_func[] gm_gamedat_build_boss_buttle_tbl;
-    private static AppMain.gamedat_build_area_func[] gm_gamedat_flush_boss_buttle_tbl;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_kama_obj_3d_list;
-    private static AppMain.GMS_ENE_KAMA_FADE_ANIME_PAT[] gm_ene_kama_blink_anime_pat;
-    private static AppMain.GMS_ENE_KAMA_FADE_ANIME gm_ene_kama_blink_anime;
-    private static AppMain.NNS_MATRIX gmEneKamaHandWaitMain_msm;
-    private static AppMain.NNS_MATRIX gmEneKamaHandAttackMain_rmat;
-    private static AppMain.NNS_MATRIX gmEneKamaHandAttackMain_tmat;
-    private static AppMain.NNS_MATRIX gmEneKamaHandAttackMain_mat;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_gabu_obj_3d_list;
-    private static readonly AppMain.GMS_EFCT_BOSS_CMN_CREATE_PARAM[] gm_efct_boss_cmn_create_param_tbl;
+    private static gamedat_build_area_func[] gm_gamedat_build_boss_buttle_tbl;
+    private static gamedat_build_area_func[] gm_gamedat_flush_boss_buttle_tbl;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_kama_obj_3d_list;
+    private static GMS_ENE_KAMA_FADE_ANIME_PAT[] gm_ene_kama_blink_anime_pat;
+    private static GMS_ENE_KAMA_FADE_ANIME gm_ene_kama_blink_anime;
+    private static NNS_MATRIX gmEneKamaHandWaitMain_msm;
+    private static NNS_MATRIX gmEneKamaHandAttackMain_rmat;
+    private static NNS_MATRIX gmEneKamaHandAttackMain_tmat;
+    private static NNS_MATRIX gmEneKamaHandAttackMain_mat;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_gabu_obj_3d_list;
+    private static readonly GMS_EFCT_BOSS_CMN_CREATE_PARAM[] gm_efct_boss_cmn_create_param_tbl;
     private static int gm_efct_boss_cmn_tex_reg_id;
     private static int[] gm_efct_boss_cmn_model_reg_id_list;
     private static int gm_efct_boss_cmn_model_reg_num;
     private static int[] gm_efct_boss_cmn_mdl_tex_reg_id_list;
     private static int gm_efct_boss_single_reg_num;
-    private static readonly AppMain.GMS_EFCT_BOSS_SINGLE_BUILD_WORK[] gm_efct_boss_single_build_list;
+    private static readonly GMS_EFCT_BOSS_SINGLE_BUILD_WORK[] gm_efct_boss_single_build_list;
     public static uint GMD_BOSS5_EGG_FLAG_SWEAT_ACTIVE;
     public static int GMD_BOSS5_EGG_HIDE_HIGHT;
     public static int GMD_BOSS5_EGG_ESCAPE_RUN_DISTANCE_FASTEST;
@@ -17855,13 +16010,13 @@ public partial class AppMain
     private static readonly float[][] dm_save_win_act_pos_tbl;
     private static readonly int[] dm_save_win_size_y_tbl;
     private static readonly uint[] g_dm_act_id_tbl;
-    private static readonly AppMain.DMS_SAVE_MGR dm_save_mgr;
-    private static AppMain.DMS_SAVE_MGR dm_save_mgr_p;
+    private static readonly DMS_SAVE_MGR dm_save_mgr;
+    private static DMS_SAVE_MGR dm_save_mgr_p;
     private static uint dm_save_draw_state;
     private static uint dm_save_msg_flag;
     private static bool dm_save_first_save;
-    private static readonly AppMain.AOS_TEXTURE[] dm_save_cmn_tex;
-    private static readonly AppMain.AOS_ACTION[] dm_save_act;
+    private static readonly AOS_TEXTURE[] dm_save_cmn_tex;
+    private static readonly AOS_ACTION[] dm_save_act;
     private static uint dm_save_disp_flag;
     private static uint dm_save_is_draw_state;
     private static readonly float[] dm_save_win_size_rate;
@@ -17869,21 +16024,21 @@ public partial class AppMain
     private static bool dm_save_draw_reserve;
     private static bool dm_save_is_task_draw;
     private static bool dm_save_is_snd_build;
-    private static readonly AppMain.AMS_AMB_HEADER[] dm_logo_sonic_data;
-    public static AppMain.Reference<AppMain.MTS_TASK_TCB> dm_logo_sonic_load_tcb;
-    public static AppMain.MTS_TASK_TCB dm_logo_sonic_build_tcb;
-    public static AppMain.MTS_TASK_TCB dm_logo_sonic_flush_tcb;
-    public static AppMain.AOS_TEXTURE[] dm_logo_sonic_aos_tex;
+    private static readonly AMS_AMB_HEADER[] dm_logo_sonic_data;
+    public static Reference<MTS_TASK_TCB> dm_logo_sonic_load_tcb;
+    public static MTS_TASK_TCB dm_logo_sonic_build_tcb;
+    public static MTS_TASK_TCB dm_logo_sonic_flush_tcb;
+    public static AOS_TEXTURE[] dm_logo_sonic_aos_tex;
     public static bool dm_logo_sonic_build_state;
-    public static readonly AppMain.DMS_LOGO_COM_LOAD_FILE_INFO[] dm_logo_sonic_com_fileinfo_list;
+    public static readonly DMS_LOGO_COM_LOAD_FILE_INFO[] dm_logo_sonic_com_fileinfo_list;
     public static int dm_logo_sonic_com_file_num;
     public static byte[] dm_logo_sonic_tex_id_tbl;
     public static uint[] g_dm_act_id_tbl_loading;
-    private static AppMain.DMS_LOADING_MGR dm_loading_mgr_p;
-    private static AppMain.AMS_AMB_HEADER dm_loading_arc_amb;
-    private static AppMain.A2S_AMA_HEADER[] dm_loading_ama;
-    private static AppMain.AMS_AMB_HEADER[] dm_loading_amb;
-    private static AppMain.AOS_TEXTURE[] dm_loading_tex;
+    private static DMS_LOADING_MGR dm_loading_mgr_p;
+    private static AMS_AMB_HEADER dm_loading_arc_amb;
+    private static A2S_AMA_HEADER[] dm_loading_ama;
+    private static AMS_AMB_HEADER[] dm_loading_amb;
+    private static AOS_TEXTURE[] dm_loading_tex;
     private static bool dm_loading_check_load_comp;
     private static uint dm_loading_draw_state;
     public static Game m_game;
@@ -17894,8 +16049,8 @@ public partial class AppMain
     private static uint[] _am_system_flag;
     private static uint[] _am_debug_flag;
     private static uint _am_draw_counter;
-    public static AppMain.NNS_MATRIXSTACK _am_default_stack;
-    private static AppMain.AMS_THREAD _am_cri_thread;
+    public static NNS_MATRIXSTACK _am_default_stack;
+    //private static AppMain.AMS_THREAD _am_cri_thread;
     public static int _am_sample_count;
     public static bool _am_sample_draw_enable;
     private static bool _am_sample_is_suspended;
@@ -17910,19 +16065,19 @@ public partial class AppMain
     public static string storePath;
     public static PresentationParameters presentationParameters;
     private static byte[] g_gs_bin_win_a_amb;
-    public static AppMain.AMS_TCB g_gs_init_tcb;
-    private static AppMain.MatrixPool nnmatrixstack_mtx_pool;
-    public static AppMain.AMS_TP_TOUCH_STATUS[] _am_tp_touch;
-    private static AppMain.AMS_IPHONE_TP_DATA _amTpUpdateTouch_req_DispData;
-    private static AppMain.AMS_TASK _am_default_taskp;
-    private static AppMain.AMS_TASKLIST_OWNER[] _am_owner_list;
+    public static AMS_TCB g_gs_init_tcb;
+    private static MatrixPool nnmatrixstack_mtx_pool;
+    public static AMS_TP_TOUCH_STATUS[] _am_tp_touch;
+    private static AMS_IPHONE_TP_DATA _amTpUpdateTouch_req_DispData;
+    private static AMS_TASK _am_default_taskp;
+    private static AMS_TASKLIST_OWNER[] _am_owner_list;
     private static int _am_szOwnerList;
     private static int _am_display_tasklist;
     private static int _am_tlist_cline;
     private static int _am_tlist_dline;
-    private static LinkedList<AppMain.AMS_FS> ams_fsList;
+    private static LinkedList<AMS_FS> ams_fsList;
     public static int FsReadSpeedBytesPerFrame;
-    public static AppMain.AMS_FS lastReadAMS_FS;
+    public static AMS_FS lastReadAMS_FS;
     public static uint GMD_SMSG_FLAG_WIN_DISP;
     public static uint GMD_SMSG_FLAG_OK_DISP;
     public static uint GMD_SMSG_FLAG_END;
@@ -17980,43 +16135,43 @@ public partial class AppMain
     public static int GMD_SMSG_AMA_ACT_MAX;
     public static int GMD_SMSG_AMA_ACT_ACTION_MAX;
     private static int[][][][] gm_start_msg_ama_act_pos_tbl;
-    private static AppMain.AOS_TEXTURE[] gm_start_msg_aos_tex;
-    private static AppMain.MTS_TASK_TCB gm_start_msg_tcb;
+    private static AOS_TEXTURE[] gm_start_msg_aos_tex;
+    private static MTS_TASK_TCB gm_start_msg_tcb;
     private static bool gm_start_msg_end_state;
     private static short[] gm_start_msg_ama_act_num_tbl;
     private static float[][][] gm_start_msg_win_size_tbl;
     private static int[][] gm_start_msg_body_act_id_table;
-    private static AppMain.OBS_RECT_WORK[] gm_ply_touch_rect;
+    private static OBS_RECT_WORK[] gm_ply_touch_rect;
     private static ushort[][] gm_player_push_jump_key_rect;
     private static ushort[][] gm_player_push_ssonic_key_rect;
     private static int gm_pos_x;
     private static int gm_pos_y;
     private static int gm_pos_z;
     private static int[] gm_ply_score_combo_vib_level_tbl;
-    public static AppMain.OBS_DATA_WORK[][] g_gm_player_data_work;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_ply_son_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_ply_sson_obj_3d_list;
+    public static OBS_DATA_WORK[][] g_gm_player_data_work;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_ply_son_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_ply_sson_obj_3d_list;
     private static int[] gm_ply_score_combo_scale_tbl;
     private static int[] gm_ply_score_combo_tbl;
     private static uint[] gm_key_map_key_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[][][] gm_ply_obj_3d_list_tbl;
+    private static OBS_ACTION3D_NN_WORK[][][] gm_ply_obj_3d_list_tbl;
     private static int fall_rot_buf_gmPlayerDefaultInFunc;
     public static int GMD_PLAYER_NODE_ID_TRUCK_CENTER;
-    private static AppMain.MTS_TASK_TCB gm_over_tcb;
-    private static AppMain.AMS_AMB_HEADER[] gm_over_texamb_list;
-    private static readonly AppMain.AOS_TEXTURE[] gm_over_textures;
+    private static MTS_TASK_TCB gm_over_tcb;
+    private static AMS_AMB_HEADER[] gm_over_texamb_list;
+    private static readonly AOS_TEXTURE[] gm_over_textures;
     private static readonly int[][] gm_over_tex_amb_idx_tbl;
     private static readonly int[][] gm_over_ama_amb_idx_tbl;
     private static readonly uint[][] gm_over_string_act_id_tbl;
     private static readonly uint[] gm_over_fadeout_act_id_tbl;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_ss_ringgate_obj_3d_list;
-    private static AppMain.AMS_AMB_HEADER gm_gmk_ss_ringgate_obj_tvx_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_ss_oblong_obj_3d_list;
-    private static AppMain.AMS_AMB_HEADER gm_gmk_ss_oblong_obj_tvx_list;
-    private static readonly AppMain.NNS_TEXCOORD[] gm_gmk_ss_oblong_mat_color;
-    public static AppMain.TVX_FILE gmGmkSsOblongDrawFunctvx;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_splring_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_pmarker_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_ss_ringgate_obj_3d_list;
+    private static AMS_AMB_HEADER gm_gmk_ss_ringgate_obj_tvx_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_ss_oblong_obj_3d_list;
+    private static AMS_AMB_HEADER gm_gmk_ss_oblong_obj_tvx_list;
+    private static readonly NNS_TEXCOORD[] gm_gmk_ss_oblong_mat_color;
+    public static TVX_FILE gmGmkSsOblongDrawFunctvx;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_splring_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_pmarker_obj_3d_list;
     private static float GMD_BOSS5_DEFAULT_BLEND_SPD;
     private static int GMD_BOSS5_LIFE;
     private static int GMD_BOSS5_STRONG_MODE_THRESHOLD_LIFE;
@@ -18175,27 +16330,27 @@ public partial class AppMain
     public static int GMD_BOSS5_BODY_SE_TARGET_INIT_INTERVAL;
     public static float GMD_BOSS5_BODY_SE_TARGET_INTERVAL_DEC_SPD;
     public static int GMD_BOSS5_BODY_SE_TARGET_INTERVAL_MIN;
-    private AppMain.MPP_VOID_GMS_BOSS5_BODY_WORK GMF_BOSS5_BODY_STATE_ENTER_FUNC;
-    private AppMain.MPP_VOID_GMS_BOSS5_BODY_WORK GMF_BOSS5_BODY_STATE_LEAVE_FUNC;
-    private AppMain.MPP_VOID_GMS_BOSS5_BODY_WORK GMF_BOSS5_BODY_SUBSEQ_ENTER_FUNC;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_boss5_obj_3d_list;
-    private static AppMain.GMS_BOSS5_BODY_STATE_ENTER_INFO[] gm_boss5_body_state_enter_info_tbl;
-    private static AppMain.MPP_VOID_GMS_BOSS5_BODY_WORK[] gm_boss5_body_state_leave_func_tbl;
-    private static AppMain.GMS_BOSS5_BODY_SUBSEQ_ENTER_INFO[] gm_boss5_body_sub_seq_enter_func_tbl;
+    private MPP_VOID_GMS_BOSS5_BODY_WORK GMF_BOSS5_BODY_STATE_ENTER_FUNC;
+    private MPP_VOID_GMS_BOSS5_BODY_WORK GMF_BOSS5_BODY_STATE_LEAVE_FUNC;
+    private MPP_VOID_GMS_BOSS5_BODY_WORK GMF_BOSS5_BODY_SUBSEQ_ENTER_FUNC;
+    private static OBS_ACTION3D_NN_WORK[] gm_boss5_obj_3d_list;
+    private static GMS_BOSS5_BODY_STATE_ENTER_INFO[] gm_boss5_body_state_enter_info_tbl;
+    private static MPP_VOID_GMS_BOSS5_BODY_WORK[] gm_boss5_body_state_leave_func_tbl;
+    private static GMS_BOSS5_BODY_SUBSEQ_ENTER_INFO[] gm_boss5_body_sub_seq_enter_func_tbl;
     private static int[] gm_boss5_body_state_strat_tbl;
-    private static AppMain.GMS_BOSS5_MOVE_INFO[] gm_boss5_body_walk_move_info_tbl;
-    private static AppMain.GMD_BOSS5_WALK_GROUND_TIMING_INFO[] gm_boss5_body_walk_ground_timing_info_tbl;
+    private static GMS_BOSS5_MOVE_INFO[] gm_boss5_body_walk_move_info_tbl;
+    private static GMD_BOSS5_WALK_GROUND_TIMING_INFO[] gm_boss5_body_walk_ground_timing_info_tbl;
     private static int[] gm_boss5_body_scatter_parts_cnm_node_id_tbl;
-    private static AppMain.GMS_BOSS5_SCT_PART_INFO[] gm_boss5_scatter_parts_info_tbl;
-    private static AppMain.GMS_BOSS5_SCT_NDC_INFO[] gm_boss5_scatter_ndc_info_tbl;
-    private static AppMain.GMS_BOSS5_ALARM_FADE_INFO[] gm_boss5_alarm_fade_info;
+    private static GMS_BOSS5_SCT_PART_INFO[] gm_boss5_scatter_parts_info_tbl;
+    private static GMS_BOSS5_SCT_NDC_INFO[] gm_boss5_scatter_ndc_info_tbl;
+    private static GMS_BOSS5_ALARM_FADE_INFO[] gm_boss5_alarm_fade_info;
     private static uint[] gm_boss5_alarm_se_interval_time_tbl;
     private static int[][] gm_boss5_vib_tbl;
     private static int[][] gm_boss5_vib_param_tbl;
-    private static AppMain.GMS_BOSS5_PART_ACT_INFO[][] gm_boss5_act_id_tbl;
-    private static AppMain.GMS_BOSS5_ARM_ANIM_INFO[] gm_boss5_arm_anim_info_tbl;
-    private static AppMain.GMS_BOSS5_BODY_RECT_SETTING_INFO[] gm_boss5_body_rect_setting_info_tbl;
-    private static AppMain.GMS_BOSS5_STRAT_PROB_INFO[][] gm_boss5_body_seq_strat_branch_prob_tbl;
+    private static GMS_BOSS5_PART_ACT_INFO[][] gm_boss5_act_id_tbl;
+    private static GMS_BOSS5_ARM_ANIM_INFO[] gm_boss5_arm_anim_info_tbl;
+    private static GMS_BOSS5_BODY_RECT_SETTING_INFO[] gm_boss5_body_rect_setting_info_tbl;
+    private static GMS_BOSS5_STRAT_PROB_INFO[][] gm_boss5_body_seq_strat_branch_prob_tbl;
     private static int[] snm_reg_id_tbl;
     private static int[][] arm_part_node_ids;
     public static bool event_after_buy;
@@ -18207,7 +16362,7 @@ public partial class AppMain
     private static readonly float[,] dm_title_win_act_pos_tbl;
     public static readonly uint[] dm_title_g_dm_act_id_tbl;
     private static bool dm_title_is_title_start;
-    private static AppMain.MTS_TASK_TCB dm_snd_bgm_player_tcb;
+    private static MTS_TASK_TCB dm_snd_bgm_player_tcb;
     private static uint dm_snd_bgm_player_flag;
     public static string DMD_OPT_CMN_DATA_FILENAME;
     public static string DMD_OPT_DATA_FILENAME;
@@ -18226,22 +16381,22 @@ public partial class AppMain
     public static int[] dm_opt_top_menu_tex_tbl;
     public static int[] dm_opt_set_menu_tex_tbl;
     public static readonly uint[] g_dm_act_id_tbl_opt;
-    public static AppMain.DMS_OPT_MGR dm_opt_mgr;
-    public static AppMain.DMS_OPT_MGR dm_opt_mgr_p;
-    public static AppMain.AOS_TEXTURE dm_opt_win_tex;
+    public static DMS_OPT_MGR dm_opt_mgr;
+    public static DMS_OPT_MGR dm_opt_mgr_p;
+    public static AOS_TEXTURE dm_opt_win_tex;
     public static uint dm_opt_draw_state;
     public static bool dm_opt_is_pause_maingame;
     public static short dm_opt_prev_evt;
     public static bool dm_opt_show_xboxlive;
     public static int dm_xbox_show_progress;
     private static int g_ao_account_current_id;
-    private static AppMain.SYS_EVT_DATA[] _gs_evt_data;
+    private static SYS_EVT_DATA[] _gs_evt_data;
     public static uint[] gs_main_eme_get_act_no_tbl;
-    public static AppMain.NNS_TEXLIST nngCurrentTextureList;
-    private static AppMain.NNS_RGBA nngColorWhite;
-    private static AppMain.NNS_RGBA nngColorBlack;
-    private static AppMain.NNS_MATRIX nngUnitMatrix;
-    private static AppMain.NNS_MATRIX nngProjectionMatrix;
+    public static NNS_TEXLIST nngCurrentTextureList;
+    private static NNS_RGBA nngColorWhite;
+    private static NNS_RGBA nngColorBlack;
+    private static NNS_MATRIX nngUnitMatrix;
+    private static NNS_MATRIX nngProjectionMatrix;
     private static int nngProjectionType;
     private static int nnsystem_init;
     private static bool nngFogSwitch;
@@ -18249,10 +16404,10 @@ public partial class AppMain
     private static float nngFogEnd;
     private static float nngFogDensity;
     private static float[] nnSetFogColor_col;
-    public static readonly AppMain.GMS_START_DEMO_DATA g_start_demo_data_real;
-    private static AppMain.GMS_START_DEMO_DATA g_start_demo_data;
-    private static readonly AppMain.GMS_START_DEMO_MGR g_start_demo_mgr_real;
-    private static AppMain.GMS_START_DEMO_MGR g_start_demo_mgr;
+    public static readonly GMS_START_DEMO_DATA g_start_demo_data_real;
+    private static GMS_START_DEMO_DATA g_start_demo_data;
+    private static readonly GMS_START_DEMO_MGR g_start_demo_mgr_real;
+    private static GMS_START_DEMO_MGR g_start_demo_mgr;
     private static int[][] g_gm_start_demo_data_amb_id;
     private static int[][] g_gm_start_demo_data_ama_id;
     private static int[] g_gm_start_demo_data_type_cmn;
@@ -18270,14 +16425,14 @@ public partial class AppMain
     private static string[] g_gm_start_demo_action_name_act;
     private static string g_gm_start_demo_action_name_message;
     private static int[] g_gm_start_demo_action_node_flag_act;
-    private static AppMain.MTS_TASK_TCB gm_spl_tcb;
+    private static MTS_TASK_TCB gm_spl_tcb;
     private static uint[] gm_spl_stage_init_time;
     private static ushort[][] gm_spl_stage_ringgate_num;
     private static byte[] gm_gmk_ss_switch;
     public static short g_gm_ring_size;
-    public static AppMain.MTS_TASK_TCB gm_ring_tcb;
-    public static AppMain.GMS_RING_SYS_WORK gm_ring_sys_work;
-    public static AppMain.OBS_ACTION3D_NN_WORK gm_ring_obj_3d;
+    public static MTS_TASK_TCB gm_ring_tcb;
+    public static GMS_RING_SYS_WORK gm_ring_sys_work;
+    public static OBS_ACTION3D_NN_WORK gm_ring_obj_3d;
     public static readonly int GMD_RING_SIZE;
     public static short gm_ring_fall_acc_x;
     public static short gm_ring_fall_acc_y;
@@ -18285,22 +16440,22 @@ public partial class AppMain
     public static short gm_ring_die_offset;
     private static readonly float[][] gm_ring_roll_uv;
     private static byte[] gm_ring_damege_num_tbl;
-    private static AppMain.OBS_RECT[] ply_rect;
-    private static AppMain.OBS_RECT ring_rect;
-    public static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_steampipe_obj_3d_list;
+    private static OBS_RECT[] ply_rect;
+    private static OBS_RECT ring_rect;
+    public static OBS_ACTION3D_NN_WORK[] gm_gmk_steampipe_obj_3d_list;
     private static byte[] tbl_gmk_pipe_vect;
     private static short[][] tbl_gm_gmk_steampipe_rect;
     private static byte[] g_gm_ss_parts_col;
-    public static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_ss_square_obj_3d_list;
-    public static AppMain.AMS_AMB_HEADER gm_gmk_ss_square_obj_tvx_list;
-    private static AppMain.NNS_TEXCOORD[] gm_gmk_ss_square_mat_color;
+    public static OBS_ACTION3D_NN_WORK[] gm_gmk_ss_square_obj_3d_list;
+    public static AMS_AMB_HEADER gm_gmk_ss_square_obj_tvx_list;
+    private static NNS_TEXCOORD[] gm_gmk_ss_square_mat_color;
     private static byte[] gm_gmk_ss_square_uv_parameter;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_ss_arrow_obj_3d_list;
-    private static AppMain.VecFx32[] g_gm_gmk_disp_offset;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_needle_neon_obj_3d_list;
-    private static AppMain.AMS_AMB_HEADER g_gm_gmk_needle_neon_obj_tvx_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_unides_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_kani_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_ss_arrow_obj_3d_list;
+    private static VecFx32[] g_gm_gmk_disp_offset;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_needle_neon_obj_3d_list;
+    private static AMS_AMB_HEADER g_gm_gmk_needle_neon_obj_tvx_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_unides_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_kani_obj_3d_list;
     private static readonly int[] dm_clrdm_stage_text_amb_id;
     private static ushort[] dm_clrdm_stage_text_act_id;
     private static readonly ushort[] dm_clrdm_stage_num_act_id;
@@ -18316,10 +16471,10 @@ public partial class AppMain
     private static readonly ushort[] dm_clrdm_act_id_tbl;
     private static readonly int[] dm_clrdm_spe_stg_get_act_no;
     private static ushort[] dm_clrdm_spe_stg_get_prev_act_no;
-    private static readonly AppMain.GMS_CLRDM_MGR gm_clrdm_mgr;
-    private static AppMain.GMS_CLRDM_MGR gm_clrdm_mgr_p;
-    private static readonly AppMain.AMS_AMB_HEADER[] gm_clrdm_amb;
-    private static readonly AppMain.AOS_TEXTURE[] gm_clrdm_tex;
+    private static readonly GMS_CLRDM_MGR gm_clrdm_mgr;
+    private static GMS_CLRDM_MGR gm_clrdm_mgr_p;
+    private static readonly AMS_AMB_HEADER[] gm_clrdm_amb;
+    private static readonly AOS_TEXTURE[] gm_clrdm_tex;
     public static int GMD_BOSS5_TURRET_TILT_NEAR_ANGLE;
     public static float GMD_BOSS5_TURRET_FACE_PLY_SPD_DEG;
     public static uint GMD_BOSS5_TURRET_FACE_TIME;
@@ -18338,10 +16493,10 @@ public partial class AppMain
     public static int GMD_BOSS5_TURRET_VULCAN_BULLET_OFST_FORWARD;
     public static int GMD_BOSS5_TURRET_VULCAN_BULLET_OFST_Z;
     public static int GMD_BOSS5_TURRET_START_LIFE_THRESHOLD;
-    public static AppMain.GMS_BOSS5_TURRET_SEQ_VUL_SHOT_INFO[] gm_boss5_trt_seq_vul_shot_info_tbl;
-    private static AppMain.NNS_MATRIX gmBoss5TurretMain_trt_ofst;
+    public static GMS_BOSS5_TURRET_SEQ_VUL_SHOT_INFO[] gm_boss5_trt_seq_vul_shot_info_tbl;
+    private static NNS_MATRIX gmBoss5TurretMain_trt_ofst;
     public static readonly int GMD_BOSS4_CHIBI_ABURNER1_TURN_X;
-    private static readonly AppMain.NNS_RGB gm_boss4_color_red;
+    private static readonly NNS_RGB gm_boss4_color_red;
     private static bool gm_chibi_inv_flag;
     private static bool gm_chibi_exp_flag;
     public static float GMD_BOSS4_SCROLL_SPD_MAX;
@@ -18350,9 +16505,9 @@ public partial class AppMain
     public static float GMD_BOSS4_SCROLL_SPD_SUB;
     public static float GMD_BOSS4_SCROLL_SPD_BOSS;
     public static float GMD_BOSS4_SCROLL_SPD_BOSS_BROKEN;
-    public static readonly AppMain.GMS_BOSS4_PART_ACT_INFO[][] gm_boss4_act_id_tbl;
-    public static AppMain.OBS_ACTION3D_NN_WORK[] gm_boss4_obj_3d_list;
-    public static AppMain.GMS_BOSS4_MGR_WORK gm_boss4_mgr_work;
+    public static readonly GMS_BOSS4_PART_ACT_INFO[][] gm_boss4_act_id_tbl;
+    public static OBS_ACTION3D_NN_WORK[] gm_boss4_obj_3d_list;
+    public static GMS_BOSS4_MGR_WORK gm_boss4_mgr_work;
     public static int gm_boss4_n_scroll;
     public static int gm_boss4_n_offset_x;
     public static float gm_boss4_f_scroll_spd;
@@ -18362,18 +16517,18 @@ public partial class AppMain
     public static int gm_boss4_n_scroll_end;
     public static bool gm_boss4_b_warpout;
     public static bool gm_boss4_is_2nd;
-    private static AppMain.GSS_SND_SCB dm_sound_bgm_scb;
-    private static AppMain.GSS_SND_SCB dm_sound_jingle_scb;
+    private static GSS_SND_SCB dm_sound_bgm_scb;
+    private static GSS_SND_SCB dm_sound_jingle_scb;
     private static string[] dm_sound_bgm_name_list;
     private static string[] dm_sound_jingle_name_list;
-    private static readonly AppMain.AMS_CRIAUDIO_INTERFACE amCriAudio_global;
-    private static AppMain.AMS_CRIAUDIO_INTERFACE pAu;
+    private static readonly AMS_CRIAUDIO_INTERFACE amCriAudio_global;
+    private static AMS_CRIAUDIO_INTERFACE pAu;
     private static bool g_gs_font_builded;
-    private static readonly AppMain.OBS_RECT_WORK[] _obj_user_resist;
+    private static readonly OBS_RECT_WORK[] _obj_user_resist;
     private static readonly byte[] _obj_user_resist_num;
     private static ushort _obj_user_resist_all_num;
     private static readonly ushort[] _obj_user_flag;
-    private static readonly AppMain.OBS_RECT_WORK[] _obj_user_resist_nx;
+    private static readonly OBS_RECT_WORK[] _obj_user_resist_nx;
     private static readonly byte[] _obj_user_resist_num_nx;
     private static readonly ushort[] _obj_user_flag_nx;
     private static ushort _obj_user_resist_all_num_nx;
@@ -18395,26 +16550,26 @@ public partial class AppMain
     public static uint AMD_RENDER_CLEAR_DEPTH;
     public static uint AMD_RENDER_CLEAR_STENCIL;
     public static uint AMD_RENDER_CLEAR_ALL;
-    private static AppMain.AMS_RENDER_MANAGER _am_render_manager;
-    private static AppMain.AMS_RENDER_TARGET _am_render_default;
-    private static readonly AppMain.AMS_PAD_DATA[] _am_pad;
-    private static readonly AppMain.HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_clear_demo;
-    private static readonly AppMain.HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_goal_in;
-    private static readonly AppMain.HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_inc_ene_kill_count;
-    private static readonly AppMain.HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_end_credits_finished;
-    private static readonly AppMain.HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_upload_record;
-    private static readonly AppMain.HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_inc_challenge;
-    private static readonly AppMain.HGS_TROPHY_CHECK_TIMING_INFO[] hg_trophy_check_timing_info_tbl;
+    private static AMS_RENDER_MANAGER _am_render_manager;
+    private static AMS_RENDER_TARGET _am_render_default;
+    private static readonly AMS_PAD_DATA[] _am_pad;
+    private static readonly HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_clear_demo;
+    private static readonly HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_goal_in;
+    private static readonly HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_inc_ene_kill_count;
+    private static readonly HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_end_credits_finished;
+    private static readonly HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_upload_record;
+    private static readonly HGS_TROPHY_CHECK_INFO[] hg_trophy_check_info_tbl_inc_challenge;
+    private static readonly HGS_TROPHY_CHECK_TIMING_INFO[] hg_trophy_check_timing_info_tbl;
     private static short[][] gm_gmk_spring_rect;
     private static ushort[] gm_gmk_spring_dir;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_spring_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_spring_obj_3d_list;
     private static readonly int[] gm_gmk_shutter_disp_offset_for_final_zone;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_shutter_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_rock_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_capsule_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_shutter_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_rock_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_capsule_obj_3d_list;
     private static ushort GMD_GMK_CAPSULE_ANIMAL_BASEWAIT;
     private static ushort GMD_GMK_CAPSULE_ANIMAL_WAITGAP;
-    private static AppMain.GMS_GMK_CAPSULE_ANIMAL_SET_PARAM[] g_gm_gmk_capsule_animal_set;
+    private static GMS_GMK_CAPSULE_ANIMAL_SET_PARAM[] g_gm_gmk_capsule_animal_set;
     public static int GMD_GMK_BUBBLE_INTERVAL_EFFECT_START;
     public static long GMD_GMK_BUBBLE_SPEED_X_ADD;
     public static long GMD_GMK_BUBBLE_SPEED_X_MAX;
@@ -18426,13 +16581,13 @@ public partial class AppMain
     public static int GMD_GMK_BUBBLE_HIT_EFFECT_NUM;
     private static ushort[] gm_gmk_bubble_table_atk;
     private static ushort[] gm_gmk_bubble_table_def;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_uniuni_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_mogu_obj_3d_list;
-    private static readonly AppMain.NNS_VECTOR gm_camera_vibration;
-    private static readonly AppMain.GMS_CAMERA_WORK gm_camera_work;
-    private static readonly AppMain.NNS_VECTOR gm_camera_option_allow_pos;
-    private static readonly AppMain.NNS_VECTOR gm_camera_common_allow_pos;
-    private static readonly AppMain.NNS_VECTOR gm_camera_splstg_allow_pos;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_uniuni_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_mogu_obj_3d_list;
+    private static readonly NNS_VECTOR gm_camera_vibration;
+    private static readonly GMS_CAMERA_WORK gm_camera_work;
+    private static readonly NNS_VECTOR gm_camera_option_allow_pos;
+    private static readonly NNS_VECTOR gm_camera_common_allow_pos;
+    private static readonly NNS_VECTOR gm_camera_splstg_allow_pos;
     private static short GMD_BOSS5_RKT_SEARCH_INITIAL_DIR_Z_L;
     private static short GMD_BOSS5_RKT_SEARCH_INITIAL_DIR_Z_R;
     private static int GMD_BOSS5_RKT_SEARCH_INITIAL_ADJ_DIR_X_LA;
@@ -18447,103 +16602,103 @@ public partial class AppMain
     private static int GMD_BOSS5_RKT_LOCKON_DIR_LIMIT_R_END;
     private static int GMD_BOSS5_RKT_LOCKON_DIR_LIMIT_L_START;
     private static int GMD_BOSS5_RKT_LOCKON_DIR_LIMIT_L_END;
-    private static AppMain.GMS_BOSS5_RKT_SEQ_WAITFALL_INFO[] gm_boss5_rkt_seq_wait_fall_time_tbl;
+    private static GMS_BOSS5_RKT_SEQ_WAITFALL_INFO[] gm_boss5_rkt_seq_wait_fall_time_tbl;
     private static short GMD_BOSS3_ANGLE_LEFT;
     private static short GMD_BOSS3_ANGLE_RIGHT;
-    public static AppMain.OBS_ACTION3D_NN_WORK[] gm_boss3_obj_3d_list;
-    public static AppMain.GMS_BOSS3_PART_ACT_INFO[][] gm_boss3_act_info_tbl;
-    private static AppMain.GMS_BOSS3_PART_ACT_INFO[] gm_boss3_egg_act_info_tbl;
-    private static AppMain.GMF_BOSS3_BODY_STATE_FUNC[] gm_boss3_body_state_func_tbl_enter;
-    private static AppMain.GMF_BOSS3_BODY_STATE_FUNC[] gm_boss3_body_state_func_tbl_leave;
+    public static OBS_ACTION3D_NN_WORK[] gm_boss3_obj_3d_list;
+    public static GMS_BOSS3_PART_ACT_INFO[][] gm_boss3_act_info_tbl;
+    private static GMS_BOSS3_PART_ACT_INFO[] gm_boss3_egg_act_info_tbl;
+    private static GMF_BOSS3_BODY_STATE_FUNC[] gm_boss3_body_state_func_tbl_enter;
+    private static GMF_BOSS3_BODY_STATE_FUNC[] gm_boss3_body_state_func_tbl_leave;
     private static int[] g_boss3_node_index_list;
     private static int[][] g_gm_boss3_battle_move_x;
     private static int[][] g_gm_boss3_battle_pattern_per;
-    private static AppMain.MTS_TASK_TCB iz_fade_tcb;
+    private static MTS_TASK_TCB iz_fade_tcb;
     private static readonly byte[][] iz_fade_color;
     private static byte[] iz_fade_alpha;
-    private static readonly AppMain.GMS_WATER_SURFACE_DATA g_water_surface_data_real;
-    private static AppMain.GMS_WATER_SURFACE_DATA g_water_surface_data;
-    private static readonly AppMain.GMS_WATER_SURFACE_MGR g_water_surface_mgr_real;
-    private static AppMain.GMS_WATER_SURFACE_MGR g_water_surface_mgr;
-    private static AppMain.DMAP_WATER _dmap_water;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _gmWaterSurfaceTcbProcPreDrawDT;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _gmWaterSurfaceUserFuncMatrixPush;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _gmWaterSurfaceUserFuncPop;
-    private static readonly AppMain.AMS_RENDER_TARGET _gm_mapFar_render_work;
-    private static readonly AppMain.GMS_MAP_FAR_DATA g_map_far_data_real;
-    private static AppMain.GMS_MAP_FAR_DATA g_map_far_data;
-    private static readonly AppMain.GMS_MAP_FAR_MGR g_map_far_mgr_real;
-    private static AppMain.GMS_MAP_FAR_MGR g_map_far_mgr;
+    private static readonly GMS_WATER_SURFACE_DATA g_water_surface_data_real;
+    private static GMS_WATER_SURFACE_DATA g_water_surface_data;
+    private static readonly GMS_WATER_SURFACE_MGR g_water_surface_mgr_real;
+    private static GMS_WATER_SURFACE_MGR g_water_surface_mgr;
+    private static DMAP_WATER _dmap_water;
+    private static OBF_DRAW_USER_DT_FUNC _gmWaterSurfaceTcbProcPreDrawDT;
+    private static OBF_DRAW_USER_DT_FUNC _gmWaterSurfaceUserFuncMatrixPush;
+    private static OBF_DRAW_USER_DT_FUNC _gmWaterSurfaceUserFuncPop;
+    private static readonly AMS_RENDER_TARGET _gm_mapFar_render_work;
+    private static readonly GMS_MAP_FAR_DATA g_map_far_data_real;
+    private static GMS_MAP_FAR_DATA g_map_far_data;
+    private static readonly GMS_MAP_FAR_MGR g_map_far_mgr_real;
+    private static GMS_MAP_FAR_MGR g_map_far_mgr;
     public static readonly uint[] g_map_far_zone_1_scene_obj_data;
     public static readonly uint[] g_map_far_zone_1_scene_obj_data_mat_motion;
-    public static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_1_scene_obj_func_main;
-    public static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_1_scene_obj_func_out;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_1_scroll_x;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_1_boss_scroll_x;
+    public static readonly MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_1_scene_obj_func_main;
+    public static readonly MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_1_scene_obj_func_out;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_1_scroll_x;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_1_boss_scroll_x;
     public static readonly int g_map_far_zone_1_scroll_num_x;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_1_scroll_y;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_1_boss_scroll_y;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_1_scroll_y;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_1_boss_scroll_y;
     public static readonly int g_map_far_zone_1_scroll_num_y;
     public static readonly uint[] g_map_far_zone_2_scene_obj_data;
     public static readonly uint[] g_map_far_zone_2_scene_obj_data_motion;
     public static readonly uint[] g_map_far_zone_2_scene_obj_data_mat_motion;
-    public static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_2_scene_obj_func_main;
-    public static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_2_scene_obj_func_out;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_2_scroll_x;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_2_boss_scroll_x;
+    public static readonly MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_2_scene_obj_func_main;
+    public static readonly MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_2_scene_obj_func_out;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_2_scroll_x;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_2_boss_scroll_x;
     public static readonly int g_map_far_zone_2_scroll_num_x;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_2_scroll_y;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_2_boss_scroll_y;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_2_scroll_y;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_2_boss_scroll_y;
     public static readonly int g_map_far_zone_2_scroll_num_y;
     public static readonly uint[] g_map_far_zone_3_scene_obj_data;
     public static readonly uint[] g_map_far_zone_3_scene_obj_data_mat_motion;
-    public static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_3_scene_obj_func_main;
-    public static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_3_scene_obj_func_out;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_3_scroll_x;
+    public static readonly MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_3_scene_obj_func_main;
+    public static readonly MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_3_scene_obj_func_out;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_3_scroll_x;
     public static readonly int g_map_far_zone_3_scroll_num_x;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_3_scroll_y;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_3_scroll_y;
     public static readonly int g_map_far_zone_3_scroll_num_y;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_4_scroll_x;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_4_scroll_x;
     public static readonly int g_map_far_zone_4_scroll_num_x;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_4_scroll_y;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_4_scroll_y;
     public static readonly int g_map_far_zone_4_scroll_num_y;
     public static readonly uint[] g_map_far_zone_final_scene_obj_data;
-    public static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_final_scene_obj_func_main;
-    public static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_final_scene_obj_func_out;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_final_scroll_x;
+    public static readonly MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_final_scene_obj_func_main;
+    public static readonly MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_final_scene_obj_func_out;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_final_scroll_x;
     public static readonly int g_map_far_zone_final_scroll_num_x;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_final_scroll_y;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_final_scroll_y;
     public static readonly int g_map_far_zone_final_scroll_num_y;
     public static readonly uint[] g_map_far_zone_ss_scene_obj_data;
     public static readonly uint[] g_map_far_zone_ss_scene_obj_data_mat_motion;
-    public static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_ss_scene_obj_func_main;
-    public static readonly AppMain.MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_ss_scene_obj_func_out;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_ss_scroll_x;
+    public static readonly MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_ss_scene_obj_func_main;
+    public static readonly MPP_VOID_OBS_OBJECT_WORK[] g_map_far_zone_ss_scene_obj_func_out;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_ss_scroll_x;
     public static readonly int g_map_far_zone_ss_scroll_num_x;
-    public static readonly AppMain.GMS_MAP_FAR_SCROLL[] g_map_far_zone_ss_scroll_y;
+    public static readonly GMS_MAP_FAR_SCROLL[] g_map_far_zone_ss_scroll_y;
     public static readonly int g_map_far_zone_ss_scroll_num_y;
-    private static readonly AppMain.NNS_VECTOR[] g_gm_map_far_camera_target_offset;
-    private static AppMain.NNS_RGBA_U8[] g_gm_map_far_clear_color;
-    private static readonly AppMain.NNS_VECTOR GmMapFarGetCameraTarget_result;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _gmMapFarTcbProcPreDrawDT;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _gmMapFarTcbProcPostDrawDT;
-    private static AppMain.NNS_VECTOR gmMapFarCameraGetPos_result;
-    private static readonly AppMain.NNS_VECTOR gmMapFarZone1GetCameraPos_result;
-    private static readonly AppMain.NNS_VECTOR gmMapFarZone2GetCameraPos_result;
-    private static readonly AppMain.NNS_VECTOR gmMapFarZone3GetCameraPos_result;
-    private static readonly AppMain.NNS_VECTOR gmMapFarZoneFinalGetCameraPos_result;
-    private static readonly AppMain.NNS_VECTOR gmMapFarZoneSSGetCameraPos_result;
+    private static readonly NNS_VECTOR[] g_gm_map_far_camera_target_offset;
+    private static NNS_RGBA_U8[] g_gm_map_far_clear_color;
+    private static readonly NNS_VECTOR GmMapFarGetCameraTarget_result;
+    private static OBF_DRAW_USER_DT_FUNC _gmMapFarTcbProcPreDrawDT;
+    private static OBF_DRAW_USER_DT_FUNC _gmMapFarTcbProcPostDrawDT;
+    private static NNS_VECTOR gmMapFarCameraGetPos_result;
+    private static readonly NNS_VECTOR gmMapFarZone1GetCameraPos_result;
+    private static readonly NNS_VECTOR gmMapFarZone2GetCameraPos_result;
+    private static readonly NNS_VECTOR gmMapFarZone3GetCameraPos_result;
+    private static readonly NNS_VECTOR gmMapFarZoneFinalGetCameraPos_result;
+    private static readonly NNS_VECTOR gmMapFarZoneSSGetCameraPos_result;
     public static readonly int GMD_GMK_DRAIN_TANK_ROLL_ANGLE_MAX;
     public static readonly int GMD_GMK_DRAIN_TANK_ROLL_ANGLE_MIN;
     public static readonly int GMD_GMK_DRAIN_TANK_ROLL_ANGLE_SPEED;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_drain_tank_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_cannon_obj_3d_list;
-    public static AppMain.Del__[] g_gm_event_tbl;
-    public static AppMain.Del__2[] g_gm_decorate_tbl;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_drain_tank_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_cannon_obj_3d_list;
+    public static Del__[] g_gm_event_tbl;
+    public static Del__2[] g_gm_decorate_tbl;
     public static ushort[] g_gm_event_size_tbl;
     public static ushort[] g_gm_decorate_size_tbl;
-    private static AppMain.MTS_TASK_TCB gm_ending_tcb;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ending_obj_3d_list;
+    private static MTS_TASK_TCB gm_ending_tcb;
+    private static OBS_ACTION3D_NN_WORK[] gm_ending_obj_3d_list;
     private static int[] gm_ending_obj_offset;
     private static short GMD_BOSS2_ANGLE_LEFT;
     private static short GMD_BOSS2_ANGLE_RIGHT;
@@ -18552,11 +16707,11 @@ public partial class AppMain
     private static short GMD_BOSS2_BODY_PINBALL_ANGLE_RIGHT_ROLL;
     private static short GMD_BOSS2_EFFECT_BLITZ_LINE_DISP_ROT_Z;
     private static short GMD_BOSS2_EFFECT_BLITZ_ARM_DISP_ROT_Z;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_boss2_obj_3d_list;
-    private static AppMain.GMS_BOSS2_PART_ACT_INFO[][] gm_boss2_act_info_tbl;
-    private static AppMain.GMS_BOSS2_PART_ACT_INFO[] gm_boss2_egg_act_info_tbl;
-    private static AppMain.MPP_VOID_GMS_BOSS2_BODY_WORK[] gm_boss2_body_state_func_tbl_enter;
-    private static AppMain.MPP_VOID_GMS_BOSS2_BODY_WORK[] gm_boss2_body_state_func_tbl_leave;
+    private static OBS_ACTION3D_NN_WORK[] gm_boss2_obj_3d_list;
+    private static GMS_BOSS2_PART_ACT_INFO[][] gm_boss2_act_info_tbl;
+    private static GMS_BOSS2_PART_ACT_INFO[] gm_boss2_egg_act_info_tbl;
+    private static MPP_VOID_GMS_BOSS2_BODY_WORK[] gm_boss2_body_state_func_tbl_enter;
+    private static MPP_VOID_GMS_BOSS2_BODY_WORK[] gm_boss2_body_state_func_tbl_leave;
     private static int[] g_boss2_node_index_list;
     private static readonly uint[] g_dm_act_id_tbl_stg_slct;
     public static readonly string[] dm_stgslct_main_lng_amb_name_tbl;
@@ -18584,11 +16739,11 @@ public partial class AppMain
     public static readonly float[][] dm_stgslct_a_zone_nodisp_pos_tbl;
     public static readonly float[] dm_stgslct_act_disp_y_pos_tbl;
     private static bool dm_stgslct_is_stage_start;
-    private static AppMain.CActionDraw stgSelect_act_draw_sys;
+    private static CActionDraw stgSelect_act_draw_sys;
     private static int[] dmStgSlctSetScoreDispFrame_tmp_digit;
     private static int[] dmStgSlctSetScoreDispFrame_time_digit;
-    private static AppMain.MTS_TASK_TCB sy_evt_tcb;
-    private static AppMain.SYS_EVT_INFO sy_evt_info;
+    private static MTS_TASK_TCB sy_evt_tcb;
+    private static SYS_EVT_INFO sy_evt_info;
     private static Random random;
     private static float _am_performance_main;
     private static float _am_performance_draw;
@@ -18596,7 +16751,7 @@ public partial class AppMain
     private static float _am_framerate_main;
     private static float _am_framerate_draw;
     private static int _am_exit_game;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_piston_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_piston_obj_3d_list;
     private static int gm_gmk_boss3_pillar_se_use_count;
     private static int gm_gmk_boss3_pillar_global_flag;
     private static readonly int[] g_gm_gmk_boss3_pillar_event_id;
@@ -18638,19 +16793,19 @@ public partial class AppMain
     private static readonly int[][] g_gm_boss3_pillar_f_field_rect_offset;
     private static readonly int[][] g_gm_boss3_pillar_f_adjust_dir;
     private static readonly int[][] g_gm_gmk_boss3_pillar_f_wall_default_pos;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_boss3_pillar_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_boss3_wall_obj_3d_list;
-    private static AppMain.AMS_AMB_HEADER g_gm_gmk_boss3_pillar_obj_tvx_list;
-    private static AppMain.AMS_AMB_HEADER g_gm_gmk_boss3_wall_obj_tvx_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_bobbin_obj_3d_list;
-    public static AppMain.TaskWorkFactoryDelegate _GmEffectCreateWork_Delegate;
-    private static AppMain.GSF_TASK_PROCEDURE _GmEffectDefaultExit;
-    private static AppMain.MPP_VOID_OBS_OBJECT_WORK _ObjDrawActionSummaryDelegate;
-    private static AppMain.MPP_VOID_OBS_OBJECT_WORK _ObjObjectMoveDelegate;
-    private static AppMain.MPP_VOID_OBS_OBJECT_WORK _gmEffectDefaultRecFuncDelegate;
-    private static AppMain.SimplePool<AppMain.GMS_EFFECT_3DES_WORK> GMS_EFFECT_3DES_WORK_Pool;
-    private static AppMain.TaskWorkFactoryDelegate _GmEffect3dESTaskDelegate;
-    private static AppMain.MPP_VOID_OBS_OBJECT_WORK _GmEffectDefaultMainFuncDeleteAtEnd;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_boss3_pillar_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_boss3_wall_obj_3d_list;
+    private static AMS_AMB_HEADER g_gm_gmk_boss3_pillar_obj_tvx_list;
+    private static AMS_AMB_HEADER g_gm_gmk_boss3_wall_obj_tvx_list;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_bobbin_obj_3d_list;
+    public static TaskWorkFactoryDelegate _GmEffectCreateWork_Delegate;
+    private static GSF_TASK_PROCEDURE _GmEffectDefaultExit;
+    private static MPP_VOID_OBS_OBJECT_WORK _ObjDrawActionSummaryDelegate;
+    private static MPP_VOID_OBS_OBJECT_WORK _ObjObjectMoveDelegate;
+    private static MPP_VOID_OBS_OBJECT_WORK _gmEffectDefaultRecFuncDelegate;
+    private static SimplePool<GMS_EFFECT_3DES_WORK> GMS_EFFECT_3DES_WORK_Pool;
+    private static TaskWorkFactoryDelegate _GmEffect3dESTaskDelegate;
+    private static MPP_VOID_OBS_OBJECT_WORK _GmEffectDefaultMainFuncDeleteAtEnd;
     public static uint GMD_BS_CMN_CNM_FLAG_INHERIT_SCALE;
     public static uint GMD_BS_CMN_CNM_FLAG_LOCAL_COORDINATE;
     public static uint GMD_BS_CMN_RECT_HIT_SIDE_LEFT;
@@ -18663,27 +16818,27 @@ public partial class AppMain
     public static uint GMD_BS_CMN_DMG_FLICKER_INTERVAL_TIME;
     private static ushort[] gm_bs_cmn_efct_atk_flag_tbl;
     private static ushort[] gm_bs_cmn_efct_def_flag_tbl;
-    private static AppMain.NNS_RGB gm_bs_cmn_dmg_flicker_default_color;
-    private static AppMain.NNS_MATRIX GmBsCmnUpdateObject3DNNStuckWithNode_rot_mtx;
-    private static AppMain.NNS_MATRIX GmBsCmnUpdateObject3DNNStuckWithNode_node_w_rot;
-    private static AppMain.NNS_MATRIX GmBsCmnUpdateObject3DESStuckWithNode_node_w_rot;
-    private static AppMain.NNS_MATRIX GmBsCmnUpdateObject3DESStuckWithNode_rot_mtx;
-    private static AppMain.NNS_MATRIX GmBsCmnUpdateObject3DESStuckWithNode_nml_w_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMotionCallbackStoreNodeMatrix_base_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMotionCallbackStoreNodeMatrix_node_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_init_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_candidate_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_inv_view_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_node_w_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_cur_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_inv_cur_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_parent_cur_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_inv_parent_orig_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_parent_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_diff_mtx;
-    private static AppMain.NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_parent_init_mtx;
-    private static AppMain.NNS_MATRIX[] gmBsCmnMtxpltCallbackControlNodeMatrix_orig_mtx_plt;
-    private static AppMain.NNS_MATRIX gmBsCmnGetNodeWorldMtx_init_mtx;
+    private static NNS_RGB gm_bs_cmn_dmg_flicker_default_color;
+    private static NNS_MATRIX GmBsCmnUpdateObject3DNNStuckWithNode_rot_mtx;
+    private static NNS_MATRIX GmBsCmnUpdateObject3DNNStuckWithNode_node_w_rot;
+    private static NNS_MATRIX GmBsCmnUpdateObject3DESStuckWithNode_node_w_rot;
+    private static NNS_MATRIX GmBsCmnUpdateObject3DESStuckWithNode_rot_mtx;
+    private static NNS_MATRIX GmBsCmnUpdateObject3DESStuckWithNode_nml_w_mtx;
+    private static NNS_MATRIX gmBsCmnMotionCallbackStoreNodeMatrix_base_mtx;
+    private static NNS_MATRIX gmBsCmnMotionCallbackStoreNodeMatrix_node_mtx;
+    private static NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_init_mtx;
+    private static NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_candidate_mtx;
+    private static NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_inv_view_mtx;
+    private static NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_node_w_mtx;
+    private static NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_cur_mtx;
+    private static NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_inv_cur_mtx;
+    private static NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_parent_cur_mtx;
+    private static NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_inv_parent_orig_mtx;
+    private static NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_parent_mtx;
+    private static NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_diff_mtx;
+    private static NNS_MATRIX gmBsCmnMtxpltCallbackControlNodeMatrix_parent_init_mtx;
+    private static NNS_MATRIX[] gmBsCmnMtxpltCallbackControlNodeMatrix_orig_mtx_plt;
+    private static NNS_MATRIX gmBsCmnGetNodeWorldMtx_init_mtx;
     public static readonly short GMD_BOSS1_RIGHTWARD_ANGLE;
     public static readonly short GMD_BOSS1_LEFTWARD_ANGLE;
     public static readonly int GMD_BOSS1_BODY_ATKNML_MOVE_CURVE_ANGLE_WIDTH;
@@ -18691,23 +16846,22 @@ public partial class AppMain
     public static readonly int GMD_BOSS1_EFF_SHOCKWAVE_SUB_ROT_X;
     public static readonly int GMD_BOSS1_EFF_SCT_PART_RING_SPIN_SPD_DEG;
     public static readonly int GMD_BOSS1_EFF_SCT_PART_IBALL_SPIN_SPD_DEG;
-    private static readonly AppMain.GMS_BOSS1_PART_ACT_INFO[][] gm_boss1_act_id_tbl;
-    private static readonly AppMain.GMS_BOSS1_PART_ACT_INFO[] gm_boss1_egg_act_id_tbl;
-    private static readonly AppMain.GMS_BOSS1_BODY_STATE_ENTER_INFO[] gm_boss1_body_state_enter_info_tbl;
-    private static readonly AppMain.GMF_BOSS1_BODY_STATE_LEAVE_FUNC[] gm_boss1_body_state_leave_func_tbl;
+    private static readonly GMS_BOSS1_PART_ACT_INFO[][] gm_boss1_act_id_tbl;
+    private static readonly GMS_BOSS1_PART_ACT_INFO[] gm_boss1_egg_act_id_tbl;
+    private static readonly GMS_BOSS1_BODY_STATE_ENTER_INFO[] gm_boss1_body_state_enter_info_tbl;
+    private static readonly GMF_BOSS1_BODY_STATE_LEAVE_FUNC[] gm_boss1_body_state_leave_func_tbl;
     private static readonly ushort[] gm_boss1_eff_sw_atk_flag_tbl;
     private static readonly ushort[] gm_boss1_eff_sw_def_flag_tbl;
     private static readonly float[][] gm_boss1_eff_small_smoke_disp_ofst_tbl;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_boss1_obj_3d_list;
-    public static readonly AppMain.GSS_MAIN_SYS_INFO g_gs_main_sys_info;
-    public static uint _mt_math_rand;
-    private static AppMain.NNS_MATCTRL_RGB nngMatCtrlDiffuse;
-    private static AppMain.NNS_MATCTRL_RGB nngMatCtrlAmbient;
-    private static AppMain.NNS_MATCTRL_RGB nngMatCtrlSpecular;
-    private static AppMain.NNS_MATCTRL_ALPHA nngMatCtrlAlpha;
-    private static AppMain.NNS_MATCTRL_ENVTEXMATRIX nngMatCtrlEnvTexMtx;
-    private static AppMain.NNS_MATCTRL_BLENDMODE nngMatCtrlBlendMode;
-    private static AppMain.NNS_MATCTRL_TEXOFFSET[] nngMatCtrlTexOffset;
+    private static OBS_ACTION3D_NN_WORK[] gm_boss1_obj_3d_list;
+    public static readonly GSS_MAIN_SYS_INFO g_gs_main_sys_info;
+    private static NNS_MATCTRL_RGB nngMatCtrlDiffuse;
+    private static NNS_MATCTRL_RGB nngMatCtrlAmbient;
+    private static NNS_MATCTRL_RGB nngMatCtrlSpecular;
+    private static NNS_MATCTRL_ALPHA nngMatCtrlAlpha;
+    private static NNS_MATCTRL_ENVTEXMATRIX nngMatCtrlEnvTexMtx;
+    private static NNS_MATCTRL_BLENDMODE nngMatCtrlBlendMode;
+    private static NNS_MATCTRL_TEXOFFSET[] nngMatCtrlTexOffset;
     public static int nngDrawPrimBlend;
     public static int nngDrawPrimTexture;
     public static int nngDrawPrimTexCoord;
@@ -18720,13 +16874,13 @@ public partial class AppMain
     public static SpriteBatch m_spriteBatch;
     private static bool _am_iPhone_quit_req;
     private static bool _am_iPhone_quit;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_ss_goal_obj_3d_list;
-    private static AppMain.AMS_AMB_HEADER gm_gmk_ss_goal_obj_tvx_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_ss_goal_obj_3d_list;
+    private static AMS_AMB_HEADER gm_gmk_ss_goal_obj_tvx_list;
     private static int[] g_gm_gmk_flipper_model_id;
     private static int[] g_gm_gmk_flipper_mat_motion_id;
     private static ushort[] g_gm_gmk_flipper_angle_z;
     private static short[][] g_gmk_flipper_rect;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] g_gm_gmk_flipper_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] g_gm_gmk_flipper_obj_3d_list;
     private static int gmk_bwall_effect_y;
     private static short[][] tbl_gm_gmk_bwall_col_rect;
     private static ushort[][] tbl_breakwall_mdl;
@@ -18738,7 +16892,7 @@ public partial class AppMain
     public static uint GMD_GMK_BWALL_HARD_SPIN_J;
     public static uint GMD_GMK_BWALL_HARD_DASH;
     public static uint GMD_GMK_BFLOOR_HARD_CANNON;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_breakwall_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_breakwall_obj_3d_list;
     private static ushort[][] tbl_gm_gmk_bwall1_1_parts;
     private static ushort[][] tbl_gm_gmk_bwall1_2_parts;
     private static ushort[][] tbl_gm_gmk_bfloor1_parts;
@@ -18751,11 +16905,11 @@ public partial class AppMain
     private static ushort[][] tbl_gm_gmk_bwall4_1_parts;
     private static ushort[][] tbl_gm_gmk_bwall4_2_parts;
     private static ushort[][] tbl_gm_gmk_bwall4_h_parts;
-    private static AppMain.GMS_GMK_BWALL_PARTS_PARAM_TABLE[] tbl_gmk_bwall_parts_z1;
-    private static AppMain.GMS_GMK_BWALL_PARTS_PARAM_TABLE[] tbl_gmk_bwall_parts_z2;
-    private static AppMain.GMS_GMK_BWALL_PARTS_PARAM_TABLE[] tbl_gmk_bwall_parts_z3;
-    private static AppMain.GMS_GMK_BWALL_PARTS_PARAM_TABLE[] tbl_gmk_bwall_parts_z4;
-    private static AppMain.GMS_GMK_BWALL_PARTS_PARAM_TABLE[][] tbl_gmk_bwall_parts;
+    private static GMS_GMK_BWALL_PARTS_PARAM_TABLE[] tbl_gmk_bwall_parts_z1;
+    private static GMS_GMK_BWALL_PARTS_PARAM_TABLE[] tbl_gmk_bwall_parts_z2;
+    private static GMS_GMK_BWALL_PARTS_PARAM_TABLE[] tbl_gmk_bwall_parts_z3;
+    private static GMS_GMK_BWALL_PARTS_PARAM_TABLE[] tbl_gmk_bwall_parts_z4;
+    private static GMS_GMK_BWALL_PARTS_PARAM_TABLE[][] tbl_gmk_bwall_parts;
     public static int GMD_ENE_STING_JET_S_SMOKE_ON;
     public static short GMD_ENE_STING_EVE_FLAG_RIGHT;
     public static short GMD_ENE_STING_SPD_X;
@@ -18773,7 +16927,7 @@ public partial class AppMain
     public static int GMD_ENE_STING_SEARCH_DIR_END;
     public static int GMD_ENE_STING_GUN_OFST_Y;
     public static int GMD_ENE_STING_TURN_FRAME;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_sting_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_sting_obj_3d_list;
     public static int GMD_ENE_STING_NODE_ID_R_JET;
     public static int GMD_ENE_STING_NODE_ID_L_JET;
     public static int GMD_ENE_STING_NODE_ID_GUN;
@@ -18782,91 +16936,91 @@ public partial class AppMain
     public static readonly int GMD_BOSS4_BODY_ATKNML_MOVE_CURVE_ANGLE_WIDTH;
     public static readonly int GMD_BOSS4_BODY_ATKNML_MOVE_CURVE_START_ANGLE;
     public static readonly int GMD_BOSS4_EFF_ABURNER3_DISP_ROT_X;
-    private static readonly AppMain.GMS_BOSS4_BODY_STATE_ENTER_INFO[] gm_boss4_body_state_enter_info_tbl;
-    private static readonly AppMain.GMF_BOSS4_BODY_STATE_LEAVE_FUNC[] gm_boss4_body_state_leave_func_tbl;
+    private static readonly GMS_BOSS4_BODY_STATE_ENTER_INFO[] gm_boss4_body_state_enter_info_tbl;
+    private static readonly GMF_BOSS4_BODY_STATE_LEAVE_FUNC[] gm_boss4_body_state_leave_func_tbl;
     private static int gm_boss4_locking;
-    public static AppMain.AOS_SYS_GLOBAL g_ao_sys_global;
+    public static AOS_SYS_GLOBAL g_ao_sys_global;
     private static uint g_ao_act_sys_draw_prio;
     private static bool g_ao_act_sys_draw_state_enable;
     private static uint g_ao_act_sys_draw_state;
-    private static float g_ao_act_sys_frame_rate;
+    public static float g_ao_act_sys_frame_rate;
     private static float g_ao_act_sys_adjust_x;
     private static float g_ao_act_sys_adjust_y;
     private static byte[] g_ao_act_master_buf;
     private static int g_ao_act_wide_shift;
-    private static AppMain.AOS_SPRITE[] g_ao_act_spr_buf;
-    private static AppMain.AOS_SPRITE[] g_ao_act_spr_ref;
+    private static AOS_SPRITE[] g_ao_act_spr_buf;
+    private static AOS_SPRITE[] g_ao_act_spr_ref;
     private static uint g_ao_act_spr_alloc;
     private static uint g_ao_act_spr_free;
     private static uint g_ao_act_spr_buf_size;
     private static uint g_ao_act_spr_num;
     private static uint g_ao_act_spr_peak;
-    private static AppMain.AOS_ACTION[] g_ao_act_buf;
-    private static AppMain.AOS_ACTION[] g_ao_act_ref;
+    private static AOS_ACTION[] g_ao_act_buf;
+    private static AOS_ACTION[] g_ao_act_ref;
     private static uint g_ao_act_alloc;
     private static uint g_ao_act_free;
     private static uint g_ao_act_buf_size;
     private static uint g_ao_act_num;
     private static uint g_ao_act_peak;
-    private static AppMain.ArrayPointer<AppMain.AOS_ACT_SORT> g_ao_act_sort_buf;
+    private static ArrayPointer<AOS_ACT_SORT> g_ao_act_sort_buf;
     private static uint g_ao_act_sort_buf_size;
     private static uint g_ao_act_sort_num;
     private static uint g_ao_act_sort_peak;
-    private static AppMain.ArrayPointer<AppMain.AOS_ACT_ACM> g_ao_act_acm_buf;
-    private static AppMain.ArrayPointer<AppMain.AOS_ACT_ACM> g_ao_act_acm_cur;
+    private static ArrayPointer<AOS_ACT_ACM> g_ao_act_acm_buf;
+    private static ArrayPointer<AOS_ACT_ACM> g_ao_act_acm_cur;
     private static uint g_ao_act_acm_buf_size;
     private static uint g_ao_act_acm_num;
     private static uint g_ao_act_acm_peak;
-    public static AppMain.ArrayPointer<uint> g_ao_act_acm_flag_buf;
-    public static AppMain.ArrayPointer<uint> g_ao_act_acm_flag_cur;
+    public static ArrayPointer<uint> g_ao_act_acm_flag_buf;
+    public static ArrayPointer<uint> g_ao_act_acm_flag_cur;
     private static uint g_ao_act_acm_flag_buf_size;
     private static uint g_ao_act_acm_flag_num;
     private static uint g_ao_act_acm_flag_peak;
-    private static AppMain.NNS_TEXLIST g_ao_act_texlist;
-    private static AppMain.Pool<AppMain.AOS_SPRITE> AOS_SPRITE_Pool;
-    private static AppMain.TaskProc aoActDrawTask_TaskProc;
+    private static NNS_TEXLIST g_ao_act_texlist;
+    private static Pool<AOS_SPRITE> AOS_SPRITE_Pool;
+    private static TaskProc aoActDrawTask_TaskProc;
     private static byte[] AmaMagicId;
-    private static AppMain.NNS_MATRIX AoActDrawPre_mtx;
-    private static AppMain.NNS_PRIM3D_PCT_ARRAY aoActDrawTask_pct_array;
-    private static AppMain.NNS_PRIM3D_PCT[] aoActDrawTask_pct;
-    private static AppMain.NNS_PRIM3D_PC[] aoActDrawTask_pc;
-    private static AppMain.AOS_SPRITE[] aoActDrawSprState_spr_tbl;
-    private static AppMain.AOS_SPRITE[] aoActDrawSortState_spr_tbl;
-    private static AppMain.MTS_TASK_TCB gs_task_mt_system_tcb;
-    private static AppMain.GSS_TASK_SYS gs_task_mtsys;
-    private static AppMain.TaskProc _mtTaskProcedure;
-    private static AppMain.TaskProc _mtTaskDestructor;
-    private static Dictionary<System.Type, AppMain.SCallSlot> mtTaskMethodDictionary;
-    private static AppMain.NNS_SCREEN nngScreen;
-    private static AppMain.NNS_CLIP nngClip2d;
-    private static AppMain.NNS_CLIP nngClip3d;
+    private static NNS_MATRIX AoActDrawPre_mtx;
+    private static NNS_PRIM3D_PCT_ARRAY aoActDrawTask_pct_array;
+    private static NNS_PRIM3D_PCT[] aoActDrawTask_pct;
+    private static NNS_PRIM3D_PC[] aoActDrawTask_pc;
+    private static AOS_SPRITE[] aoActDrawSprState_spr_tbl;
+    private static AOS_SPRITE[] aoActDrawSortState_spr_tbl;
+    private static MTS_TASK_TCB gs_task_mt_system_tcb;
+    private static GSS_TASK_SYS gs_task_mtsys;
+    private static TaskProc _mtTaskProcedure;
+    private static TaskProc _mtTaskDestructor;
+    private static Dictionary<Type, SCallSlot> mtTaskMethodDictionary;
+    private static NNS_SCREEN nngScreen;
+    private static NNS_CLIP nngClip2d;
+    private static NNS_CLIP nngClip3d;
     private static ushort[] g_txb_min_filter;
     private static ushort[] g_txb_mag_filter;
-    public static readonly AppMain.seq_func_delegate[] g_gm_ply_seq_init_tbl_son;
-    public static readonly AppMain.seq_func_delegate[] g_gm_ply_seq_init_tbl_sp_son;
-    public static readonly AppMain.seq_func_delegate[] g_gm_ply_seq_init_tbl_tr_son;
-    public static readonly AppMain.seq_func_delegate[][] g_gm_ply_seq_init_tbl_list;
+    public static readonly seq_func_delegate[] g_gm_ply_seq_init_tbl_son;
+    public static readonly seq_func_delegate[] g_gm_ply_seq_init_tbl_sp_son;
+    public static readonly seq_func_delegate[] g_gm_ply_seq_init_tbl_tr_son;
+    public static readonly seq_func_delegate[][] g_gm_ply_seq_init_tbl_list;
     public static readonly ushort[] gm_ply_seq_turn_dir_tbl;
     public static readonly ushort[] gm_ply_seq_turn_l_dir_tbl;
     public static readonly ushort[] gm_ply_seq_fall_turn_dir_tbl;
     public static readonly ushort[] gm_ply_seq_fall_turn_l_dir_tbl;
     private static bool gm_ply_seq_jump_call_se_jump;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_ss_time_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_ss_time_obj_3d_list;
     private static readonly uint[] gm_gmk_ss_time_add_subtract;
     private static readonly int[] gm_gmk_ss_time_add_msg;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_seesaw_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_seesaw_obj_3d_list;
     private static readonly short[][] tbl_gm_gmk_seesaw_rect;
     private static short[] seesaw_tilt;
     private static short[] seesaw_alive;
-    private static AppMain.GMS_GMK_SEESAW_WORK control_right;
+    private static GMS_GMK_SEESAW_WORK control_right;
     private static ushort lock_seesaw_id;
     private static bool dm_manual_is_pause_maingame;
     private static uint dm_manual_draw_state;
-    private static AppMain.AOS_TEXTURE[] dm_manual_tex;
-    private static readonly AppMain.DMS_MANUAL_MGR dm_manual_mgr;
-    private static AppMain.DMS_MANUAL_MGR dm_manual_mgr_p;
-    private static AppMain.A2S_AMA_HEADER[] dm_manual_ama;
-    private static AppMain.AMS_AMB_HEADER[] dm_manual_amb;
+    private static AOS_TEXTURE[] dm_manual_tex;
+    private static readonly DMS_MANUAL_MGR dm_manual_mgr;
+    private static DMS_MANUAL_MGR dm_manual_mgr_p;
+    private static A2S_AMA_HEADER[] dm_manual_ama;
+    private static AMS_AMB_HEADER[] dm_manual_amb;
     public static readonly int[][] dm_manual_disp_act_cmn_tbl;
     private static readonly int[][] dm_manual_disp_act_lang_tbl;
     public static readonly uint[] g_dm_act_id_tbl_m;
@@ -18876,64 +17030,64 @@ public partial class AppMain
     public static int GSD_KEY_DOWN;
     public static int GSD_KEY_LEFT;
     public static int GSD_KEY_RIGHT;
-    private static AppMain.GSE_REGION g_gs_env_region;
+    private static GSE_REGION g_gs_env_region;
     private static bool g_gs_env_is_asia;
     public static int g_gs_env_language;
-    private static AppMain.GSE_DECIDE_KEY g_gs_env_decide_key;
+    private static GSE_DECIDE_KEY g_gs_env_decide_key;
     private static uint _obj_disp_rand;
-    public static AppMain.OBS_OBJECT _g_obj;
+    public static OBS_OBJECT _g_obj;
     public static readonly short[] g_object_vib_tbl;
-    public static readonly AppMain.AMS_DRAWSTATE g_obj_draw_3dnn_draw_state;
-    private static AppMain.MTS_TASK_TCB obj_ptcb;
-    private static AppMain.OBS_DATA_WORK[] obj_data_work_save;
+    public static readonly AMS_DRAWSTATE g_obj_draw_3dnn_draw_state;
+    private static MTS_TASK_TCB obj_ptcb;
+    private static OBS_DATA_WORK[] obj_data_work_save;
     private static int obj_data_max_save;
-    private static AppMain.GSF_TASK_PROCEDURE _ObjObjectExit;
-    private static AppMain.GSF_TASK_PROCEDURE _ObjObjectMain;
-    private static AppMain.OBS_OBJECT_WORK_Delegate3 _ObjObjectViewOutCheck;
-    private static AppMain.GSF_TASK_PROCEDURE _objObjectDataReleaseCheck;
-    private static AppMain.SimplePool<AppMain.NNS_MATRIX> nnCalcNode_mtx_pool;
+    private static GSF_TASK_PROCEDURE _ObjObjectExit;
+    private static GSF_TASK_PROCEDURE _ObjObjectMain;
+    private static OBS_OBJECT_WORK_Delegate3 _ObjObjectViewOutCheck;
+    private static GSF_TASK_PROCEDURE _objObjectDataReleaseCheck;
+    private static SimplePool<NNS_MATRIX> nnCalcNode_mtx_pool;
     private static bool[] nnInitMaterialMotionObject_bTexOffsetMot;
-    private static AppMain.AMS_IPHONE_ACCEL_DATA _am_iphone_accel_data;
+    private static AMS_IPHONE_ACCEL_DATA _am_iphone_accel_data;
     private static bool _am_is_back_key_pressed;
     public static bool back_key_is_pressed;
-    private static AppMain.AMS_IPHONE_TP_CTRL_DATA[] _am_iphone_tp_ctrl_data;
+    private static AMS_IPHONE_TP_CTRL_DATA[] _am_iphone_tp_ctrl_data;
     public static Vector2 posVector;
     public static bool[] touchMarked;
-    private static Dictionary<int, AppMain.A2S_AMA_NODE> readAMAFile_nodeHash;
-    private static Dictionary<int, AppMain.A2S_AMA_ACT> readAMAFile_actHash;
-    private static Dictionary<int, AppMain.A2S_AMA_MTN> readAMAFile_mtnHash;
-    private static Dictionary<int, AppMain.A2S_AMA_ANM> readAMAFile_anmHash;
-    private static Dictionary<int, AppMain.A2S_AMA_ACM> readAMAFile_acmHash;
-    private static Dictionary<int, AppMain.A2S_AMA_USR> readAMAFile_usrHash;
-    private static Dictionary<int, AppMain.A2S_AMA_HIT> readAMAFile_hitHash;
-    private static Dictionary<int, AppMain.A2S_SUB_TRS[]> readAMAFile_subtrsHash;
-    private static Dictionary<int, AppMain.A2S_SUB_MTN[]> readAMAFile_submtnHash;
-    private static Dictionary<int, AppMain.A2S_SUB_ANM[]> readAMAFile_subanmHash;
-    private static Dictionary<int, AppMain.A2S_SUB_MAT[]> readAMAFile_submatHash;
-    private static Dictionary<int, AppMain.A2S_SUB_ACM[]> readAMAFile_subacmHash;
-    private static Dictionary<int, AppMain.A2S_SUB_USR[]> readAMAFile_subusrHash;
-    private static Dictionary<int, AppMain.A2S_SUB_HIT[]> readAMAFile_subhitHash;
-    private static Dictionary<int, AppMain.A2S_SUB_KEY[]> readAMAFile_subkeyHash;
+    private static Dictionary<int, A2S_AMA_NODE> readAMAFile_nodeHash;
+    private static Dictionary<int, A2S_AMA_ACT> readAMAFile_actHash;
+    private static Dictionary<int, A2S_AMA_MTN> readAMAFile_mtnHash;
+    private static Dictionary<int, A2S_AMA_ANM> readAMAFile_anmHash;
+    private static Dictionary<int, A2S_AMA_ACM> readAMAFile_acmHash;
+    private static Dictionary<int, A2S_AMA_USR> readAMAFile_usrHash;
+    private static Dictionary<int, A2S_AMA_HIT> readAMAFile_hitHash;
+    private static Dictionary<int, A2S_SUB_TRS[]> readAMAFile_subtrsHash;
+    private static Dictionary<int, A2S_SUB_MTN[]> readAMAFile_submtnHash;
+    private static Dictionary<int, A2S_SUB_ANM[]> readAMAFile_subanmHash;
+    private static Dictionary<int, A2S_SUB_MAT[]> readAMAFile_submatHash;
+    private static Dictionary<int, A2S_SUB_ACM[]> readAMAFile_subacmHash;
+    private static Dictionary<int, A2S_SUB_USR[]> readAMAFile_subusrHash;
+    private static Dictionary<int, A2S_SUB_HIT[]> readAMAFile_subhitHash;
+    private static Dictionary<int, A2S_SUB_KEY[]> readAMAFile_subkeyHash;
     private static char[] readChars_name;
     public static int GMD_MAP_DRAW_BGM_TIMER;
     private static readonly int[] gm_map_prim_draw_tvx_alpha_set_z2;
-    private static AppMain.OBS_ACTION3D_NN_WORK gm_map_obj3d;
+    private static OBS_ACTION3D_NN_WORK gm_map_obj3d;
     private static int gm_map_reg_obj3d_num;
     private static int gm_map_release_obj3d_num;
-    private static AppMain.MTS_TASK_TCB gm_map_tcb;
+    private static MTS_TASK_TCB gm_map_tcb;
     private static uint gm_map_draw_command_state;
-    private static AppMain.AOS_TEXTURE gm_map_texture;
-    private static AppMain.AMS_AMB_HEADER gm_map_model;
+    private static AOS_TEXTURE gm_map_texture;
+    private static AMS_AMB_HEADER gm_map_model;
     private static bool gm_map_tex_load_init;
     private static int gm_map_tex_draw_count;
-    private static AppMain.GMS_MAP_PRIM_DRAW_WORK[] gm_map_prim_draw_work;
-    private static AppMain.GMS_MAP_PRIM_DRAW_TVX_UV_WORK gm_map_prim_draw_uv_work;
+    private static GMS_MAP_PRIM_DRAW_WORK[] gm_map_prim_draw_work;
+    private static GMS_MAP_PRIM_DRAW_TVX_UV_WORK gm_map_prim_draw_uv_work;
     private static uint[] gm_map_draw_size;
     private static int gm_map_draw_bgm_timer;
     private static uint gm_map_draw_margin_adjust;
     private static short[,] gm_map_block_check;
     private static int[] gm_map_add_tbl_use_no;
-    private static AppMain.NNS_MATRIX[] gm_map_use_prim_mtx;
+    private static NNS_MATRIX[] gm_map_use_prim_mtx;
     private static uint gm_map_prim_draw_tvx_color;
     private static int[] gm_map_prim_draw_tvx_alpha_set;
     private static int[] gm_map_addmap_camera_tbl;
@@ -18943,43 +17097,43 @@ public partial class AppMain
     private static uint[] gm_map_addmap_command_state_zf_tbl;
     private static uint[,] gm_map_set_draw_size;
     private static float gmMapTransX;
-    private static AppMain.NNS_VECTOR[] main_camera_pos;
-    private static AppMain.NNS_MATRIX gmMapMain_mtx;
+    private static NNS_VECTOR[] main_camera_pos;
+    private static NNS_MATRIX gmMapMain_mtx;
     public static int GMD_GMK_SCREW_EVE_FLAG_LEFT;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_breakland_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_breakland_obj_3d_list;
     private static readonly short[] gm_gmk_breakland_col_rect_tbl;
     private static readonly byte[] g_gm_breakland_col;
     private static sbyte[] tbl_breaklandquake;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_animal_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_animal_obj_3d_list;
     private static readonly uint[][] g_gm_gmk_animal_type_id;
     private static readonly uint[][] g_gm_gmk_animal_obj_id;
-    private static readonly AppMain.GMS_GMK_ANIMAL_PARAM[] g_gm_gmk_animal_speed_param;
-    private static AppMain.Reference<AppMain.MTS_TASK_TCB> dm_titleop_load_tcb;
-    private static AppMain.MTS_TASK_TCB dm_titleop_build_tcb;
-    private static AppMain.MTS_TASK_TCB dm_titleop_flush_tcb;
-    private static AppMain.MTS_TASK_TCB dm_titleop_mgr_tcb;
+    private static readonly GMS_GMK_ANIMAL_PARAM[] g_gm_gmk_animal_speed_param;
+    private static Reference<MTS_TASK_TCB> dm_titleop_load_tcb;
+    private static MTS_TASK_TCB dm_titleop_build_tcb;
+    private static MTS_TASK_TCB dm_titleop_flush_tcb;
+    private static MTS_TASK_TCB dm_titleop_mgr_tcb;
     private static bool dm_titleop_build_state;
-    private static AppMain.NNS_RGBA_U8 dm_titleop_clear_color;
-    private static AppMain.DMS_TITLEOP_ROCK_SETTING[][] dm_titleop_rock_setting;
+    private static NNS_RGBA_U8 dm_titleop_clear_color;
+    private static DMS_TITLEOP_ROCK_SETTING[][] dm_titleop_rock_setting;
     private static int[] dm_titleop_rock_setting_num;
-    private static AppMain.AMS_FS[] dm_titleop_data;
+    private static AMS_FS[] dm_titleop_data;
     private static object[] dm_titleop_mapfar_data;
-    private static AppMain.AOS_TEXTURE[] dm_titleop_aos_tex;
-    private AppMain.OBS_ACTION3D_NN_WORK[] dm_titleop_obj_3d_list;
-    private AppMain.OBS_ACTION3D_NN_WORK[] dm_titleop_water_obj_3d_list;
+    private static AOS_TEXTURE[] dm_titleop_aos_tex;
+    private OBS_ACTION3D_NN_WORK[] dm_titleop_obj_3d_list;
+    private OBS_ACTION3D_NN_WORK[] dm_titleop_water_obj_3d_list;
     private static int dm_titleop_scrl_x_ofst;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _dmTitleOpPreDrawDT;
-    private static AppMain.OBF_DRAW_USER_DT_FUNC _dmTitleOpFallShaderPreRenderUserFunc;
+    private static OBF_DRAW_USER_DT_FUNC _dmTitleOpPreDrawDT;
+    private static OBF_DRAW_USER_DT_FUNC _dmTitleOpFallShaderPreRenderUserFunc;
     public static int AKD_UTIL_FRAME60_TO_TIME_MAX_FRAME;
     public static string sFile;
-    private static readonly AppMain.OBS_LOAD_INITIAL_WORK obj_load_initial_work;
+    private static readonly OBS_LOAD_INITIAL_WORK obj_load_initial_work;
     private static bool obj_load_initial_set_flag;
-    private static readonly AppMain.OBS_COLLISION_OBJ[] _obj_collision_tbl;
-    private static readonly AppMain.OBS_COLLISION_OBJ[] _obj_collision_tbl_nx;
+    private static readonly OBS_COLLISION_OBJ[] _obj_collision_tbl;
+    private static readonly OBS_COLLISION_OBJ[] _obj_collision_tbl_nx;
     private static byte _obj_collision_num;
     private static byte _obj_collision_num_nx;
-    private static AppMain.pFunc_Delegate _objGetColDataY;
-    private static AppMain.pFunc_Delegate _objGetColDataX;
+    private static pFunc_Delegate _objGetColDataY;
+    private static pFunc_Delegate _objGetColDataX;
     private int nngSubMotIdx;
     public static readonly uint NND_DRAWOBJ_SHADER_USER_PROFILE0;
     public static readonly uint NND_DRAWOBJ_SHADER_USER_PROFILE1;
@@ -18998,22 +17152,22 @@ public partial class AppMain
     public static readonly uint NND_DRAWOBJ_SHADER_USER_PROFILE14;
     public static readonly uint NND_DRAWOBJ_SHADER_USER_PROFILE15;
     public static readonly uint NND_DRAWOBJ_SHADER_USER_PROFILE_MASK;
-    private static AppMain.NNS_MATERIALCALLBACK_FUNC nngMaterialCallbackFunc;
-    private static AppMain.NNS_MATRIX _am_ef_worldViewMtx;
-    private static AppMain.NNS_VECTOR _am_ef_camPos;
-    private static AppMain.AMS_AME_ECB[] _am_ecb_buf;
-    private static AppMain.AMS_AME_ECB[] _am_ecb_ref;
-    private static AppMain.AMS_AME_ENTRY[] _am_entry_buf;
-    private static AppMain.AMS_AME_ENTRY[] _am_entry_ref;
-    private static AppMain.AMS_AME_RUNTIME[] _am_runtime_buf;
-    private static AppMain.AMS_AME_RUNTIME[] _am_runtime_ref;
-    private static AppMain.AMS_AME_RUNTIME_WORK[] _am_work_ref;
-    private static AppMain.AMS_AME_RUNTIME_WORK[] _am_work_buf;
+    private static NNS_MATERIALCALLBACK_FUNC nngMaterialCallbackFunc;
+    private static NNS_MATRIX _am_ef_worldViewMtx;
+    private static NNS_VECTOR _am_ef_camPos;
+    private static AMS_AME_ECB[] _am_ecb_buf;
+    private static AMS_AME_ECB[] _am_ecb_ref;
+    private static AMS_AME_ENTRY[] _am_entry_buf;
+    private static AMS_AME_ENTRY[] _am_entry_ref;
+    private static AMS_AME_RUNTIME[] _am_runtime_buf;
+    private static AMS_AME_RUNTIME[] _am_runtime_ref;
+    private static AMS_AME_RUNTIME_WORK[] _am_work_ref;
+    private static AMS_AME_RUNTIME_WORK[] _am_work_buf;
     private static int _am_enable_draw;
     private static float _am_unit_time;
     private static float _am_unit_frame;
-    private static AppMain.AMS_AME_ECB _am_ecb_head;
-    private static AppMain.AMS_AME_ECB _am_ecb_tail;
+    private static AMS_AME_ECB _am_ecb_head;
+    private static AMS_AME_ECB _am_ecb_tail;
     private static int _am_ecb_alloc;
     private static int _am_ecb_free;
     private static int _am_entry_alloc;
@@ -19022,42 +17176,38 @@ public partial class AppMain
     private static int _am_runtime_free;
     private static int _am_work_alloc;
     private static int _am_work_free;
-    private static AppMain.AMS_FRUSTUM _am_view_frustum;
-    private static AppMain.AmeDelegateFunc[] _am_emitter_func;
-    private static AppMain.AmeDelegateFunc[] _am_particle_func;
-    private static AppMain.AmeFieldFunc[] _am_field_func;
-    private static AppMain.NNS_VECTOR4D _amEffectCreate_vec;
-    private static AppMain.AMS_AME_CREATE_PARAM _amEffect_create_param;
-    private static AppMain.NNS_VECTOR4D _amEffect_position;
-    private static AppMain.NNS_VECTOR4D _amEffect_velocity;
-    private static AppMain.NNS_VECTOR4D _amEffect_direction;
-    private static AppMain.NNS_VECTOR4D _amEffect_vel;
-    private static AppMain.NNS_VECTOR4D _amEffect_rot_ax;
-    private static AppMain.NNS_MATRIX _amEffect_mtx;
-    private static AppMain.NNS_MATRIX _amUpdateCircle_mtx;
-    private static AppMain.NNS_VECTOR4D _amDrawLine_offset;
-    private static AppMain.NNS_VECTOR4D _amDrawLine_eye;
-    private static AppMain.NNS_VECTOR4D _amDrawLine_pos0;
-    private static AppMain.NNS_VECTOR4D _amDrawLine_pos1;
-    private static AppMain.NNS_VECTOR4D _amDrawLine_vel;
-    private static AppMain.NNS_VECTOR4D _amDrawLine_cross;
-    private static AppMain.MTS_TASK_TCB gm_ply_efct_trail_sys_tcb;
-    private static readonly AppMain.GMS_PLY_EFCT_TRAIL_COLOR gm_ply_efct_trail_color_son;
-    private static readonly AppMain.GMS_PLY_EFCT_TRAIL_COLOR gm_ply_efct_trail_color_sson;
-    private static readonly AppMain.GMS_PLY_EFCT_TRAIL_SETTING[] gm_ply_efct_trail_setting;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_ss_emerald_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_ss_1up_obj_3d_list;
-    private static AppMain.GMS_EFFECT_3DES_WORK gm_gmk_ss_emerald_effct;
-    private static readonly AppMain.GMS_GMK_PULLEY_MANAGER gm_gmk_pulley_manager;
-    private static readonly AppMain.NNS_VECTOR[][] gm_gmk_pulley_pos;
-    private static readonly AppMain.NNS_TEXCOORD[][] gm_gmk_pulley_tex;
-    public static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_pulley_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_presswall_obj_3d_list;
-    private static AppMain.GMS_GMK_PWALL_WORK pwall;
+    private static AMS_FRUSTUM _am_view_frustum;
+    private static AmeDelegateFunc[] _am_emitter_func;
+    private static AmeDelegateFunc[] _am_particle_func;
+    private static AmeFieldFunc[] _am_field_func;
+    private static NNS_VECTOR4D _amEffectCreate_vec;
+    private static AMS_AME_CREATE_PARAM _amEffect_create_param;
+    private static NNS_VECTOR4D _amEffect_position;
+    private static NNS_VECTOR4D _amEffect_velocity;
+    private static NNS_VECTOR4D _amEffect_direction;
+    private static NNS_VECTOR4D _amEffect_vel;
+    private static NNS_VECTOR4D _amEffect_rot_ax;
+    private static NNS_MATRIX _amEffect_mtx;
+    private static NNS_MATRIX _amUpdateCircle_mtx;
+    private static NNS_VECTOR4D _amDrawLine_offset;
+    private static NNS_VECTOR4D _amDrawLine_eye;
+    private static NNS_VECTOR4D _amDrawLine_pos0;
+    private static NNS_VECTOR4D _amDrawLine_pos1;
+    private static NNS_VECTOR4D _amDrawLine_vel;
+    private static NNS_VECTOR4D _amDrawLine_cross;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_ss_emerald_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_ss_1up_obj_3d_list;
+    private static GMS_EFFECT_3DES_WORK gm_gmk_ss_emerald_effct;
+    private static readonly GMS_GMK_PULLEY_MANAGER gm_gmk_pulley_manager;
+    private static readonly NNS_VECTOR[][] gm_gmk_pulley_pos;
+    private static readonly NNS_TEXCOORD[][] gm_gmk_pulley_tex;
+    public static OBS_ACTION3D_NN_WORK[] gm_gmk_pulley_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_presswall_obj_3d_list;
+    private static GMS_GMK_PWALL_WORK pwall;
     private static readonly int[] wall_vib;
     private static uint[] tbl_gmk_z4PressWall_model;
     private static int[] tbl_gmk_z4PressWall_ofst_z;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_popsteam_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_popsteam_obj_3d_list;
     private static readonly short[][] tbl_gm_gmk_upbumper_rect;
     private static ushort[][] tbl_popsteam_effct;
     private static readonly int[][] tbl_popsteam_model_id;
@@ -19066,21 +17216,21 @@ public partial class AppMain
     private static sbyte[][][] tbl_steam_efct_ofst;
     private static int[][] tbl_popsteam_pipe_off;
     private static int[][] tbl_popsteam_timer_off;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_gmk_item_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_gmk_item_obj_3d_list;
     private static uint[] gm_gmk_item_matrial_user_data_tbl;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_gardon_obj_3d_list;
-    private static AppMain.OBS_ACTION3D_NN_WORK[] gm_ene_buku_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_gardon_obj_3d_list;
+    private static OBS_ACTION3D_NN_WORK[] gm_ene_buku_obj_3d_list;
     #endregion
 
     private static uint getRand()
     {
-        AppMain.rand_result = AppMain.rand_result % 13U * 330382099U + AppMain.rand_result / 13U;
-        return AppMain.rand_result;
+        rand_result = rand_result % 13U * 330382099U + rand_result / 13U;
+        return rand_result;
     }
 
     public void EvBuyScreenStart(object arg)
     {
-        Upsell.launchUpsellScreen((AppMain.DMS_BUY_SCR_WORK)null);
+        Upsell.launchUpsellScreen(null);
     }
 
     public static void MTM_ASSERT(int _e)
@@ -19103,7 +17253,7 @@ public partial class AppMain
     {
     }
 
-    public static int DmBuyScreenGetResult(AppMain.DMS_BUY_SCR_WORK work)
+    public static int DmBuyScreenGetResult(DMS_BUY_SCR_WORK work)
     {
         return work.result[0];
     }
@@ -19115,217 +17265,214 @@ public partial class AppMain
         int length = block2.Length;
         for (int index = 0; index < length; ++index)
         {
-            if ((int)block1[index] != (int)block2[index])
-                return (int)block1[index] - (int)block2[index];
+            if (block1[index] != block2[index])
+                return block1[index] - block2[index];
         }
         return 0;
     }
 
     public AppMain(Game game, GraphicsDeviceManager graphics, GraphicsDevice graphicsDevice)
     {
-        AppMain.m_game = game;
-        AppMain.m_graphics = graphics;
-        AppMain.m_graphicsDevice = graphicsDevice;
-        AppMain.m_manager = game.Content;
-        AppMain._instance = this;
-        AppMain.SYS_EVT_DATA[] sysEvtDataArray1 = new AppMain.SYS_EVT_DATA[15];
-        sysEvtDataArray1[0] = new AppMain.SYS_EVT_DATA((AppMain.SYS_EVT_DATA._init_func_)null, (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, new short[8], 0U);
-        sysEvtDataArray1[1] = new AppMain.SYS_EVT_DATA(new AppMain.SYS_EVT_DATA._init_func_(AppMain.GsMainSysSystemInitEvent), (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, new short[8]
-        {
-      (short) 2,
-      (short) 2,
-      (short) 3,
-      (short) 0,
-      (short) 0,
-      (short) 0,
-      (short) 0,
-      (short) 0
-        }, 0U);
-        AppMain.SYS_EVT_DATA[] sysEvtDataArray2 = sysEvtDataArray1;
-        AppMain.SYS_EVT_DATA._init_func_ f1_1 = new AppMain.SYS_EVT_DATA._init_func_(this.DmLogoSegaInit);
+        m_game = game;
+        m_graphics = graphics;
+        m_graphicsDevice = graphicsDevice;
+        m_manager = game.Content;
+        _instance = this;
+        SYS_EVT_DATA[] sysEvtDataArray1 = new SYS_EVT_DATA[15];
+        sysEvtDataArray1[0] = new SYS_EVT_DATA(null, null, null, null, null, new short[8], 0U);
+        sysEvtDataArray1[1] = new SYS_EVT_DATA((GsMainSysSystemInitEvent), null, null, null, null, new short[8] { 2, 2, 3, 0, 0, 0, 0, 0 }, 0U);
+        SYS_EVT_DATA[] sysEvtDataArray2 = sysEvtDataArray1;
+        SYS_EVT_DATA._init_func_ f1_1 = (this.DmLogoSegaInit);
         short[] numArray1 = new short[8];
-        numArray1[0] = (short)13;
+        numArray1[0] = 13;
         short[] ar1 = numArray1;
-        AppMain.SYS_EVT_DATA sysEvtData1 = new AppMain.SYS_EVT_DATA(f1_1, (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, ar1, 0U);
+        SYS_EVT_DATA sysEvtData1 = new SYS_EVT_DATA(f1_1, null, null, null, null, ar1, 0U);
         sysEvtDataArray2[2] = sysEvtData1;
-        sysEvtDataArray1[3] = new AppMain.SYS_EVT_DATA(new AppMain.SYS_EVT_DATA._init_func_(this.DmTitleStart), (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, new short[8]
-        {
-      (short) 6,
-      (short) 5,
-      (short) 8,
-      (short) 7,
-      (short) 2,
-      (short) 3,
-      (short) 0,
-      (short) 0
-        }, 0U);
-        sysEvtDataArray1[4] = new AppMain.SYS_EVT_DATA(new AppMain.SYS_EVT_DATA._init_func_(this.DmMainMenuStart), (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, new short[8]
-        {
-      (short) 6,
-      (short) 5,
-      (short) 8,
-      (short) 7,
-      (short) 2,
-      (short) 3,
-      (short) 0,
-      (short) 0
-        }, 0U);
-        sysEvtDataArray1[5] = new AppMain.SYS_EVT_DATA(new AppMain.SYS_EVT_DATA._init_func_(this.DmStgSlctStart), (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, new short[8]
-        {
-      (short) 6,
-      (short) 11,
-      (short) 7,
-      (short) 4,
-      (short) 3,
-      (short) 0,
-      (short) 0,
-      (short) 0
-        }, 0U);
-        sysEvtDataArray1[6] = new AppMain.SYS_EVT_DATA(new AppMain.SYS_EVT_DATA._init_func_(this.GmMainInit), (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, new short[9]
-        {
-      (short) 5,
-      (short) 6,
-      (short) 9,
-      (short) 11,
-      (short) 4,
-      (short) 3,
-      (short) 14,
-      (short) 0,
-      (short) 0
-        }, 0U);
-        AppMain.SYS_EVT_DATA[] sysEvtDataArray3 = sysEvtDataArray1;
-        AppMain.SYS_EVT_DATA._init_func_ f1_2 = new AppMain.SYS_EVT_DATA._init_func_(this.DbgDummyInitResult);
+        sysEvtDataArray1[3] = new SYS_EVT_DATA((this.DmTitleStart), null, null, null, null, new short[8] { 6, 5, 8, 7, 2, 3, 0, 0 }, 0U);
+        sysEvtDataArray1[4] = new SYS_EVT_DATA((this.DmMainMenuStart), null, null, null, null, new short[8] { 6, 5, 8, 7, 2, 3, 0, 0 }, 0U);
+        sysEvtDataArray1[5] = new SYS_EVT_DATA((this.DmStgSlctStart), null, null, null, null, new short[8] { 6, 11, 7, 4, 3, 0, 0, 0 }, 0U);
+        sysEvtDataArray1[6] = new SYS_EVT_DATA((this.GmMainInit), null, null, null, null, new short[9] { 5, 6, 9, 11, 4, 3, 14, 0, 0 }, 0U);
+        SYS_EVT_DATA[] sysEvtDataArray3 = sysEvtDataArray1;
         short[] numArray2 = new short[8];
-        numArray2[0] = (short)2;
+        numArray2[0] = 2;
         short[] ar2 = numArray2;
-        AppMain.SYS_EVT_DATA sysEvtData2 = new AppMain.SYS_EVT_DATA(f1_2, (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, ar2, 0U);
+        SYS_EVT_DATA sysEvtData2 = new SYS_EVT_DATA(this.DbgDummyInitResult, null, null, null, null, ar2, 0U);
         sysEvtDataArray3[7] = sysEvtData2;
-        AppMain.SYS_EVT_DATA[] sysEvtDataArray4 = sysEvtDataArray1;
-        AppMain.SYS_EVT_DATA._init_func_ f1_3 = new AppMain.SYS_EVT_DATA._init_func_(AppMain.DmOptionStart);
+        SYS_EVT_DATA[] sysEvtDataArray4 = sysEvtDataArray1;
+        SYS_EVT_DATA._init_func_ f1_3 = (DmOptionStart);
         short[] numArray3 = new short[8];
-        numArray3[0] = (short)10;
-        numArray3[1] = (short)3;
+        numArray3[0] = 10;
+        numArray3[1] = 3;
         short[] ar3 = numArray3;
-        AppMain.SYS_EVT_DATA sysEvtData3 = new AppMain.SYS_EVT_DATA(f1_3, (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, ar3, 0U);
+        SYS_EVT_DATA sysEvtData3 = new SYS_EVT_DATA(f1_3, null, null, null, null, ar3, 0U);
         sysEvtDataArray4[8] = sysEvtData3;
-        sysEvtDataArray1[9] = new AppMain.SYS_EVT_DATA(new AppMain.SYS_EVT_DATA._init_func_(this.GmMainInit), (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, new short[8]
-        {
-      (short) 10,
-      (short) 3,
-      (short) 10,
-      (short) 10,
-      (short) 4,
-      (short) 3,
-      (short) 10,
-      (short) 0
-        }, 0U);
-        AppMain.SYS_EVT_DATA[] sysEvtDataArray5 = sysEvtDataArray1;
-        AppMain.SYS_EVT_DATA._init_func_ f1_4 = new AppMain.SYS_EVT_DATA._init_func_(AppMain.DmStaffRollStart);
+        sysEvtDataArray1[9] = new SYS_EVT_DATA((this.GmMainInit), null, null, null, null, new short[8] { 10, 3, 10, 10, 4, 3, 10, 0 }, 0U);
+        SYS_EVT_DATA[] sysEvtDataArray5 = sysEvtDataArray1;
+        SYS_EVT_DATA._init_func_ f1_4 = (DmStaffRollStart);
         short[] numArray4 = new short[8];
-        numArray4[0] = (short)4;
-        numArray4[1] = (short)3;
+        numArray4[0] = 4;
+        numArray4[1] = 3;
         short[] ar4 = numArray4;
-        AppMain.SYS_EVT_DATA sysEvtData4 = new AppMain.SYS_EVT_DATA(f1_4, (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, ar4, 0U);
+        SYS_EVT_DATA sysEvtData4 = new SYS_EVT_DATA(f1_4, null, null, null, null, ar4, 0U);
         sysEvtDataArray5[10] = sysEvtData4;
-        AppMain.SYS_EVT_DATA[] sysEvtDataArray6 = sysEvtDataArray1;
-        AppMain.SYS_EVT_DATA._init_func_ f1_5 = new AppMain.SYS_EVT_DATA._init_func_(AppMain.GmSpStageBranchInit);
+        SYS_EVT_DATA[] sysEvtDataArray6 = sysEvtDataArray1;
+        SYS_EVT_DATA._init_func_ f1_5 = (GmSpStageBranchInit);
         short[] numArray5 = new short[8];
-        numArray5[0] = (short)6;
+        numArray5[0] = 6;
         short[] ar5 = numArray5;
-        AppMain.SYS_EVT_DATA sysEvtData5 = new AppMain.SYS_EVT_DATA(f1_5, (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, ar5, 0U);
+        SYS_EVT_DATA sysEvtData5 = new SYS_EVT_DATA(f1_5, null, null, null, null, ar5, 0U);
         sysEvtDataArray6[11] = sysEvtData5;
-        AppMain.SYS_EVT_DATA[] sysEvtDataArray7 = sysEvtDataArray1;
-        AppMain.SYS_EVT_DATA._init_func_ f1_6 = new AppMain.SYS_EVT_DATA._init_func_(this.EvBuyScreenStart);
+        SYS_EVT_DATA[] sysEvtDataArray7 = sysEvtDataArray1;
+        SYS_EVT_DATA._init_func_ f1_6 = (this.EvBuyScreenStart);
         short[] numArray6 = new short[8];
-        numArray6[0] = (short)5;
-        numArray6[1] = (short)4;
+        numArray6[0] = 5;
+        numArray6[1] = 4;
         short[] ar6 = numArray6;
-        AppMain.SYS_EVT_DATA sysEvtData6 = new AppMain.SYS_EVT_DATA(f1_6, (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, ar6, 0U);
+        SYS_EVT_DATA sysEvtData6 = new SYS_EVT_DATA(f1_6, null, null, null, null, ar6, 0U);
         sysEvtDataArray7[12] = sysEvtData6;
-        AppMain.SYS_EVT_DATA[] sysEvtDataArray8 = sysEvtDataArray1;
-        AppMain.SYS_EVT_DATA._init_func_ f1_7 = new AppMain.SYS_EVT_DATA._init_func_(this.DmLogoSonicInit);
+        SYS_EVT_DATA[] sysEvtDataArray8 = sysEvtDataArray1;
+        SYS_EVT_DATA._init_func_ f1_7 = (this.DmLogoSonicInit);
         short[] numArray7 = new short[8];
-        numArray7[0] = (short)3;
+        numArray7[0] = 3;
         short[] ar7 = numArray7;
-        AppMain.SYS_EVT_DATA sysEvtData7 = new AppMain.SYS_EVT_DATA(f1_7, (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, ar7, 0U);
+        SYS_EVT_DATA sysEvtData7 = new SYS_EVT_DATA(f1_7, null, null, null, null, ar7, 0U);
         sysEvtDataArray8[13] = sysEvtData7;
-        AppMain.SYS_EVT_DATA[] sysEvtDataArray9 = sysEvtDataArray1;
-        AppMain.SYS_EVT_DATA._init_func_ f1_8 = new AppMain.SYS_EVT_DATA._init_func_(this.DmMovieInit);
+        SYS_EVT_DATA[] sysEvtDataArray9 = sysEvtDataArray1;
+        SYS_EVT_DATA._init_func_ f1_8 = (this.DmMovieInit);
         short[] numArray8 = new short[8];
-        numArray8[0] = (short)12;
-        numArray8[1] = (short)4;
+        numArray8[0] = 12;
+        numArray8[1] = 4;
         short[] ar8 = numArray8;
-        AppMain.SYS_EVT_DATA sysEvtData8 = new AppMain.SYS_EVT_DATA(f1_8, (AppMain.SYS_EVT_DATA._exit_func_)null, (AppMain.SYS_EVT_DATA._reset_func_)null, (AppMain.SYS_EVT_DATA._init_sys_func_)null, (AppMain.SYS_EVT_DATA._exit_sys_func_)null, ar8, 0U);
+        SYS_EVT_DATA sysEvtData8 = new SYS_EVT_DATA(f1_8, null, null, null, null, ar8, 0U);
         sysEvtDataArray9[14] = sysEvtData8;
-        AppMain._gs_evt_data = sysEvtDataArray1;
+        _gs_evt_data = sysEvtDataArray1;
     }
 
     public int AppInit(string pDocPath)
     {
         // AppMain.store = IsolatedStorageFile.GetUserStoreForApplication();
-        AppMain.storePath = pDocPath;
-        AppMain.presentationParameters = AppMain.m_graphicsDevice.PresentationParameters;
+        storePath = pDocPath;
+        presentationParameters = m_graphicsDevice.PresentationParameters;
         this.amIPhoneInitNN(presentationParameters);
-        this.init(pDocPath);
-        AppMain.nnCalcSinCosTable();
+        this.init(storePath);
+        nnCalcSinCosTable();
         return 0;
     }
 
-    public int AppMainLoop()
+    public void AppMainUpdate()
     {
         int num1 = 0;
-        int amSampleCount = AppMain._am_sample_count;
-        AppMain.AOS_SPRITE_Pool.ReleaseUsedObjects();
-        AppMain.objDrawResetCache();
-        AppMain.amDrawResetCache();
-        AppMain.amFsExecuteBackgroundRead();
-        AppMain.amDrawBeginScene();
+        int amSampleCount = _am_sample_count;
+        AOS_SPRITE_Pool.ReleaseUsedObjects();
+        objDrawResetCache();
+        amDrawResetCache();
+        amFsExecuteBackgroundRead();
+        amDrawBeginScene();
         if (this.amDrawBegin())
         {
-            if (!AppMain._am_sample_is_suspended && AppMain._am_sample_suspended_count > 0)
-                --AppMain._am_sample_suspended_count;
-            if (AppMain._am_sample_suspended_count <= 0)
+            if (!_am_sample_is_suspended && _am_sample_suspended_count > 0)
+                --_am_sample_suspended_count;
+            if (_am_sample_suspended_count <= 0)
             {
-                AppMain.GsMainSysSetSuspendedFlag(AppMain._am_sample_end_suspended);
-                if (AppMain._am_sample_end_suspended)
-                    AppMain._am_sample_end_suspended = false;
+                GsMainSysSetSuspendedFlag(_am_sample_end_suspended);
+                if (_am_sample_end_suspended)
+                    _am_sample_end_suspended = false;
                 int num2 = amSampleCount - 1;
                 if (num2 < 0)
                     num2 = 0;
                 for (int index = 0; index < amSampleCount; ++index)
                 {
-                    AppMain._am_sample_draw_enable = index == num2;
-                    if (AppMain.isForeground)
+                    _am_sample_draw_enable = index == num2;
+                    if (isForeground)
                     {
-                        AppMain.amKeyGetData();
+                        amKeyGetData();
+                        //amPadGetData();
                         AoPad.AoPadUpdate();
                     }
 
                     this.amTpExecute();
-                    AppMain.amTaskExecute();
-                    AppMain.amDrawCloseDisplayList();
+                    amTaskExecute();
+                    amDrawCloseDisplayList();
                 }
-                AppMain.amDrawCloseDisplayList();
-                AppMain.amDrawGetDisplayList();
+                amDrawCloseDisplayList();
+                amDrawGetDisplayList();
             }
             else
-                AppMain._am_sample_end_suspended = true;
-            AppMain.amDrawExecRegist();
-            AppMain.amDrawExecCommand(16777216U);
-            AppMain.amDrawExecute();
-            AppMain.amDrawDisplay();
-            AppMain.setBackKeyRequest(false);
+                _am_sample_end_suspended = true;
+            XBOXLive.showUpdateMB();
+            AoPresenceUpdate();
+        }
+    }
+
+    public void AppMainDraw()
+    {
+        amDrawExecRegist();
+        amDrawExecCommand(16777216U);
+        amDrawExecute();
+        amDrawDisplay();
+        setBackKeyRequest(false);
+        OpenGL.glDepthMask(true);
+        amDrawEnd();
+        OpenGL.glFlush();
+    }
+
+    public int AppMainLoop()
+    {
+        int num1 = 0;
+        int amSampleCount = _am_sample_count;
+        AOS_SPRITE_Pool.ReleaseUsedObjects();
+        objDrawResetCache();
+        amDrawResetCache();
+        amFsExecuteBackgroundRead();
+        amDrawBeginScene();
+        if (this.amDrawBegin())
+        {
+            if (!_am_sample_is_suspended && _am_sample_suspended_count > 0)
+                --_am_sample_suspended_count;
+            if (_am_sample_suspended_count <= 0)
+            {
+                GsMainSysSetSuspendedFlag(_am_sample_end_suspended);
+                if (_am_sample_end_suspended)
+                    _am_sample_end_suspended = false;
+                int num2 = amSampleCount - 1;
+                if (num2 < 0)
+                    num2 = 0;
+                for (int index = 0; index < amSampleCount; ++index)
+                {
+                    _am_sample_draw_enable = index == num2;
+                    if (isForeground)
+                    {
+                        amKeyGetData();
+                        //amPadGetData();
+                        AoPad.AoPadUpdate();
+                    }
+
+                    this.amTpExecute();
+                    amTaskExecute();
+                    amDrawCloseDisplayList();
+                }
+                amDrawCloseDisplayList();
+                amDrawGetDisplayList();
+            }
+            else
+                _am_sample_end_suspended = true;
+            amDrawExecRegist();
+            amDrawExecCommand(16777216U);
+            amDrawExecute();
+            amDrawDisplay();
+            setBackKeyRequest(false);
             OpenGL.glDepthMask(true);
-            AppMain.amDrawEnd();
+            amDrawEnd();
             OpenGL.glFlush();
             XBOXLive.showUpdateMB();
+            AoPresenceUpdate();
         }
         return num1;
     }
 
     public static int AppFinish()
     {
-        AppMain.finish();
+        finish();
         return 0;
     }
 
@@ -19335,36 +17482,36 @@ public partial class AppMain
 
     private int init(string pDocPath)
     {
-        AppMain.initNN();
-        AppMain.nnSetUpMatrixStack(ref AppMain._am_default_stack, 32U);
-        AppMain.amTaskInitSystem();
-        AppMain.amDrawCreateBuffer(1024, 1024, 3145728);
-        AppMain.amDrawInitDisplayList();
-        AppMain.amPadInit();
+        initNN();
+        nnSetUpMatrixStack(ref _am_default_stack, 32U);
+        amTaskInitSystem();
+        amDrawCreateBuffer(1024, 1024, 3145728);
+        amDrawInitDisplayList();
+        amPadInit();
         this.amTpInit();
-        AppMain.GsInitUser();
+        GsInitUser();
         return 0;
     }
 
     private void cri_proc(int arg)
     {
-        AppMain.AMS_ALARM alarm = (AppMain.AMS_ALARM)null;
-        this.amAlarmCreateTimer(alarm);
-        this.amAlarmSetTimer(alarm, 16666U);
-        while (AppMain.amThreadCheckExit(AppMain._am_cri_thread) == 0)
-            this.amAlarmWaitTimer(ref alarm);
-        AppMain.amAlarmDelete(alarm);
-        AppMain.amThreadQuit(AppMain._am_cri_thread);
+        //AppMain.AMS_ALARM alarm = (AppMain.AMS_ALARM)null;
+        //this.amAlarmCreateTimer(alarm);
+        //this.amAlarmSetTimer(alarm, 16666U);
+        //while (AppMain.amThreadCheckExit(AppMain._am_cri_thread) == 0)
+        //    this.amAlarmWaitTimer(ref alarm);
+        //AppMain.amAlarmDelete(alarm);
+        //AppMain.amThreadQuit(AppMain._am_cri_thread);
     }
 
     public static void finish()
     {
-        AppMain.amDrawExitDisplayList();
-        AppMain.amDrawDeleteBuffer();
-        AppMain.amPadExit();
-        AppMain.amTaskExitSystem();
-        AppMain.exitNN();
-        AppMain.m_game.Exit();
+        amDrawExitDisplayList();
+        amDrawDeleteBuffer();
+        amPadExit();
+        amTaskExitSystem();
+        exitNN();
+        m_game.Exit();
     }
 
     public static void initNN()
@@ -19373,7 +17520,7 @@ public partial class AppMain
 
     public static void exitNN()
     {
-        AppMain.amIPhoneExitNN();
+        amIPhoneExitNN();
     }
 
     private void GsMemFileInit()
@@ -19386,16 +17533,12 @@ public partial class AppMain
 
     private byte[] GsMemFileGetWindowTextureAtypeAmb()
     {
-        return AppMain.g_gs_bin_win_a_amb;
+        return g_gs_bin_win_a_amb;
     }
-
-
-
-
 
     private static void amMemFreeSystem(object obj)
     {
-        obj = (object)null;
+        obj = null;
     }
 
     private static void amAssert(object p)
@@ -19410,9 +17553,17 @@ public partial class AppMain
     {
     }
 
-    public static void mppAssertNotImpl()
+#if NET40
+    public static void mppAssertNotImpl() { System.Diagnostics.Debug.Assert(false); }
+#else
+    public static void mppAssertNotImpl(
+        [CallerMemberName] string callerName = null,
+        [CallerFilePath] string callerFilePath = null,
+        [CallerLineNumber] int callerLine = -1)
     {
+        Console.WriteLine("NOT IMPLEMENTED: {0} ({1}:{2})", callerName, callerFilePath, callerLine);
     }
+#endif
 
     public static void mppTemporaryDisabledAssertCurrentSession()
     {
@@ -19459,12 +17610,12 @@ public partial class AppMain
 
     public static T[] New<T>(uint n) where T : new()
     {
-        return AppMain.New<T>((int)n);
+        return New<T>((int)n);
     }
 
     public static T[][] New<T>(uint m, uint n) where T : new()
     {
-        return AppMain.New<T>((int)m, (int)n);
+        return New<T>((int)m, (int)n);
     }
 
     public static T[] New<T>(int n) where T : new()
@@ -19494,24 +17645,22 @@ public partial class AppMain
         return objArray;
     }
 
-    public static void ClearArray<T>(T[] data) where T : AppMain.IClearable
+    public static void ClearArray<T>(T[] data) where T : IClearable
     {
-        int index = 0;
-        int length = data.Length;
-        AppMain.ClearArray<T>(data, index, length);
+        ClearArray(data, 0, data.Length);
     }
 
-    public static void ClearArray<T>(T[] data, int index, int length) where T : AppMain.IClearable
+    public static void ClearArray<T>(T[] data, int index, int length) where T : IClearable
     {
         for (int index1 = index; index1 < length; ++index1)
         {
-            if ((object)data[index1] != null)
+            if (data[index1] != null)
                 data[index1].Clear();
         }
     }
 
     public static void amSystemLog(string s)
     {
+        Console.WriteLine(s);
     }
-
 }
