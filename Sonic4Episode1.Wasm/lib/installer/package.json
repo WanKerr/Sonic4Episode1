@@ -1,0 +1,20 @@
+{
+  "name": "ntos-setup",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "@msgpack/msgpack": "3.0.0-beta2",
+    "@types/emscripten": "^1.39.10",
+    "@zip.js/zip.js": "^2.7.32",
+    "asar": "workspace:asar",
+    "emscripten": "0.0.2-beta",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@window-server/build-tools": "workspace:build-tools"
+  },
+  "scripts": {
+    "build": "window-server-link . /p:configuration=release"
+  }
+}

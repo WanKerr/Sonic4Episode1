@@ -1,0 +1,49 @@
+{
+  "name": "asar",
+  "version": "0.0.9",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "parcel --target browsert test/index.html",
+    "dev2": "parcel watch --target nodet test/node.ts",
+    "rd": "nodemon ./dist/node.js",
+    "build": "parcel build --target main src/index.ts && parcel build --target browsert src/index.ts && tsc --outDir dist"
+  },
+  "files": [
+    "dist"
+  ],
+  "browsert": "dist/browser.js",
+  "nodet": "dist/node.js",
+  "dependencies": {
+    "@msgpack/msgpack": "3.0.0-beta2",
+    "path-browserify": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^16.9.2",
+    "@types/path-browserify": "^1.0.2",
+    "buffer": "^6.0.3",
+    "concurrently": "^6.2.1",
+    "nodemon": "^2.0.12",
+    "parcel": "^2.12.0",
+    "process": "^0.11.10",
+    "typescript": "^5.3.3"
+  },
+  "targets": {
+    "main": {
+      "isLibrary": true,
+      "outputFormat": "commonjs"
+    },
+    "browsert": {
+      "engines": {
+        "browsers": "Chrome 90"
+      }
+    },
+    "nodet": {
+      "engines": {
+        "node": ">= 16"
+      },
+      "isLibrary": true,
+      "outputFormat": "esmodule"
+    }
+  }
+}

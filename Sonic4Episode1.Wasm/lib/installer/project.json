@@ -1,0 +1,14 @@
+{
+    "name": "ntsetup",
+    "dependencies": [],
+    "subsystem": "windows",
+    "targets": [
+        {
+            "name": "index",
+            "type": "sys",
+            "sources": [
+                "src/index.ts"
+            ]
+        }
+    ]
+}

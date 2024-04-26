@@ -6,7 +6,6 @@
 		<DefineConstants>TRACE;FNA;AOT;WASM;ASYNC_IO;</DefineConstants>
 		<RunAOTCompilation>true</RunAOTCompilation>
 		<WasmStripILAfterAOT>true</WasmStripILAfterAOT>
-		<!--<CompressionEnabled>false</CompressionEnabled>-->
 	</PropertyGroup>
 
 	<Import Project="..\Sonic4Episode1\Sonic4Episode1.projitems" Label="Shared" />
@@ -24,10 +23,10 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<NativeFileReference Include=".\lib\SDL2.a" />
-		<NativeFileReference Include=".\lib\FNA3D.a" />
-		<NativeFileReference Include=".\lib\FAudio.a" />
-		<NativeFileReference Include=".\lib\libmojoshader.a" />
+		<NativeFileReference Include=".\lib\wasm\SDL2.a" />
+		<NativeFileReference Include=".\lib\wasm\FNA3D.a" />
+		<NativeFileReference Include=".\lib\wasm\FAudio.a" />
+		<NativeFileReference Include=".\lib\wasm\libmojoshader.a" />
 		<EmccExportedRuntimeMethod Include="SDL" />
 		<EmccExportedRuntimeMethod Include="GL" />
 		<EmccExportedRuntimeMethod Include="FS" />
@@ -37,5 +36,9 @@
 	
 	<ItemGroup>
 	  <ProjectReference Include="..\Submodules\FNA\FNA.Core.csproj" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Folder Include="lib\installer\" />
 	</ItemGroup>
 </Project>

@@ -1,0 +1,4 @@
+packages:
+  - 'asar'
+  - 'build-tools'
+  - 'installer'
